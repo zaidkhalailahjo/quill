@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدير ملفات روبوتات Pudu & Gausium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Tajawal', sans-serif;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            padding-top: 80px; /* مسافة للناف بار الثابت */
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .nav-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.2s ease;
+        }
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+        .media-box {
+            height: 250px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+        .media-box img, .media-box video {
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .copy-toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #10b981;
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 12px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+        }
+        .copy-toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 1.5s;
+        }
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+        .category-label {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin: 2rem 0 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-right: 4px solid #3b82f6;
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+        .back-to-home-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        /* أنماط القائمة المنسدلة */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .nav-item {
+            position: relative;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: bold;
+            color: #e2e8f0;
+            transition: color 0.3s;
+        }
+        .nav-item:hover {
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+
+    <!-- شريط التنقل الجديد (Navigation Bar) -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card px-8 py-0 mb-8 flex justify-between items-center shadow-lg" style="height: 70px; border-radius: 0 0 1rem 1rem;">
+        <div class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 cursor-pointer" onclick="showSection('homePage')">
+            Robotics Manager
+        </div>
+        <div class="flex gap-4">
+            <div class="nav-item dropdown group">
+                <span>Pudu</span>
+                <div class="dropdown-menu hidden absolute top-full right-0 w-56 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2">
+                    <a onclick="showSection('bellaSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Bella Bot Files Gallery</a>
+                    <a onclick="showSection('proSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Bella Bot Pro Files Gallery</a>
+                    <a onclick="showSection('flashSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">FlashBot Arm Files</a>
+                </div>
+            </div>
+
+            <div class="nav-item dropdown group">
+                <span>Gausium</span>
+                <div class="dropdown-menu hidden absolute top-full right-0 w-64 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-2 max-h-[80vh] overflow-y-auto">
+                    <div class="px-2 py-1 text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-700 mb-1">Robots</div>
+                    <a onclick="showSection('scrubberSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Scrubber 75</a>
+                    <a onclick="showSection('scrubber50Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Scrubber 50</a>
+                    <a onclick="showSection('omnieSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">OMNIE</a>
+                    <a onclick="showSection('phantasSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Phantas</a>
+                    <a onclick="showSection('beetleSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Beetle Pro</a>
+                    <a onclick="showSection('phanshopSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Phanshop</a>
+                    <a onclick="showSection('vacuum40Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Vacuum 40</a>
+                    <a onclick="showSection('mobileWaterTankSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">Mobile Water Tank</a>
+                    
+                    <div class="px-2 py-1 text-xs font-bold text-green-400 uppercase tracking-wider border-b border-slate-700 mt-2 mb-1">Charging</div>
+                    <a onclick="showSection('cd01Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">CD-01</a>
+                    <a onclick="showSection('cd04Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">CD-04</a>
+                    <a onclick="showSection('ws01Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">WS-01</a>
+                    <a onclick="showSection('ws02Section')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">WS-02</a>
+                    <a onclick="showSection('ws03sSection')" class="block px-4 py-2 hover:bg-slate-700 rounded-lg text-sm text-gray-300 hover:text-white transition-colors">WS-03-S</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الصفحة الرئيسية (Dashboard) -->
+    <div id="homePage" class="max-w-6xl mx-auto mt-12">
+        <header class="text-center mb-16">
+            <h1 class="text-5xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Robotics Assets Manager</h1>
+            <p class="text-slate-400 text-lg">اختر نوع الروبوت لاستعراض الملفات والوسائط</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div onclick="showSection('bellaSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/pudu-bellabot-featured-web.webp" alt="Bella Bot" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Bella Bot Files</h2>
+                <p class="text-blue-400">37 ملفاً</p>
+            </div>
+            <div onclick="showSection('proSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://i.postimg.cc/j2wpwkNv/Bellabot-Pro.webp" alt="Bella Bot Pro" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Bella Bot Pro Files</h2>
+                <p class="text-emerald-400">5 ملفات (Pro)</p>
+            </div>
+            <div onclick="showSection('flashSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://cdn.pudutech.com/nav_product_flashbot_arm_58961abf05.png" alt="FlashBot Arm" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">FlashBot Arm Files</h2>
+                <p class="text-orange-400">24 ملفاً</p>
+            </div>
+            <div onclick="showSection('scrubberSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-1-May.jpg" alt="Scrubber 75" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Scrubber 75 Files</h2>
+                <p class="text-purple-400">33 ملفاً</p>
+            </div>
+            <!-- بطاقة Scrubber 50 -->
+            <div onclick="showSection('scrubber50Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/04/sc50-v4.2_disc-card-1-560x365.png" alt="Scrubber 50" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Scrubber 50 Files</h2>
+                <p class="text-teal-400">34 ملفاً</p>
+            </div>
+
+            <div onclick="showSection('omnieSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2024/12/omnie-roller-card-560x365.png" alt="OMNIE" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">OMNIE Files</h2>
+                <p class="text-cyan-400">17 ملفاً</p>
+            </div>
+            <div onclick="showSection('phantasSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/04/phantas-v1.3-card-560x365.png" alt="Phantas" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Phantas Files</h2>
+                <p class="text-rose-400">40 ملفاً</p>
+            </div>
+            <div onclick="showSection('beetleSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2024/11/Beetle-Pro-card-1-560x365.png" alt="Beetle Pro" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Beetle Pro Files</h2>
+                <p class="text-yellow-400">22 ملفاً</p>
+            </div>
+             <!-- بطاقة Phanshop -->
+             <div onclick="showSection('phanshopSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2025/11/phanshop-card-2-560x365.png" alt="Phanshop" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Phanshop Files</h2>
+                <p class="text-pink-400">10 ملفات</p>
+            </div>
+            <!-- بطاقة Vacuum 40 -->
+            <div onclick="showSection('vacuum40Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/04/40-v1.6-card-1-560x365.png" alt="Vacuum 40" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Vacuum 40 Files</h2>
+                <p class="text-indigo-400">32 ملفاً</p>
+            </div>
+            <!-- بطاقة CD-01 -->
+            <div onclick="showSection('cd01Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-1.png" alt="CD-01" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">CD-01 Charging Dock</h2>
+                <p class="text-gray-400">13 ملفاً</p>
+            </div>
+            <!-- بطاقة CD-04 -->
+            <div onclick="showSection('cd04Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-1.jpg" alt="CD-04" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">CD-04 Charging Dock</h2>
+                <p class="text-lime-400">7 ملفات</p>
+            </div>
+            <!-- بطاقة WS-01 -->
+            <div onclick="showSection('ws01Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2023/03/3.png" alt="WS-01" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">WS-01 Workstation</h2>
+                <p class="text-red-400">10 ملفات</p>
+            </div>
+            <!-- بطاقة WS-02 -->
+            <div onclick="showSection('ws02Section')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2022/05/75-workstation-1-560x348.png" alt="WS-02" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">WS-02 Workstation</h2>
+                <p class="text-violet-400">10 ملفات</p>
+            </div>
+            <!-- بطاقة Mobile Water Tank -->
+            <div onclick="showSection('mobileWaterTankSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2024/12/mobile-water-tank-card-560x365.png" alt="Mobile Water Tank" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">Mobile Water Tank</h2>
+                <p class="text-sky-500">11 ملفاً</p>
+            </div>
+            <!-- بطاقة WS-03-S -->
+            <div onclick="showSection('ws03sSection')" class="glass-card p-8 rounded-3xl cursor-pointer text-center group">
+                <div class="mb-6 overflow-hidden rounded-2xl h-56 bg-white flex items-center justify-center">
+                    <img loading="lazy" src="https://gausium.com/wp-content/uploads/2024/07/WS-03-S_front-card-560x365.png" alt="WS-03-S" class="group-hover:scale-110 transition duration-500 max-h-full">
+                </div>
+                <h2 class="text-2xl font-bold mb-2">WS-03-S Workstation</h2>
+                <p class="text-fuchsia-400">15 ملفاً</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- أقسام الروبوتات -->
+    <div id="bellaSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-blue-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-blue-400">Bella Bot Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="bellaGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="proSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-emerald-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-emerald-400">Bella Bot Pro Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="proGrid"></div>
+        <div class="mt-12 mb-8 text-center">
+            <p class="text-red-500 font-bold text-xl">ان شاء الله بكملها بعدين لأنه في شوية صعوبة بنسخ الملفات</p>
+        </div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="flashSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-orange-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-orange-400">FlashBot Arm Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="flashGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="scrubberSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-purple-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-purple-400">Scrubber 75 Files Gallery</h2>
+        <div id="scrubberGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="scrubber50Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-teal-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-teal-400">Scrubber 50 Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="scrubber50Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="omnieSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-cyan-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-cyan-400">OMNIE Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="omnieGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="phantasSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-rose-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-rose-400">Phantas Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="phantasGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="beetleSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-yellow-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-yellow-400">Beetle Pro Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="beetleGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="phanshopSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-pink-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-pink-400">Phanshop Files Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="phanshopGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم Vacuum 40 -->
+    <div id="vacuum40Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-indigo-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-indigo-400">Vacuum 40 Files Gallery</h2>
+        <div id="vacuum40Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم CD-01 -->
+    <div id="cd01Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-gray-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-gray-400">CD-01 Charging Dock Gallery</h2>
+        <div id="cd01Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم CD-04 -->
+    <div id="cd04Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-lime-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-lime-400">CD-04 Charging Dock Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="cd04Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم WS-01 -->
+    <div id="ws01Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-red-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-red-400">WS-01 Workstation Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ws01Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم WS-02 -->
+    <div id="ws02Section" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-violet-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-violet-400">WS-02 Workstation Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ws02Grid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم Mobile Water Tank -->
+    <div id="mobileWaterTankSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-sky-500 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-sky-500">Mobile Water Tank Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mobileWaterTankGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <!-- قسم WS-03-S -->
+    <div id="ws03sSection" class="hidden max-w-7xl mx-auto">
+        <button onclick="showSection('homePage')" class="mb-8 text-fuchsia-400 flex items-center gap-2 hover:underline font-bold text-lg">
+            <span>&rarr;</span> العودة للرئيسية
+        </button>
+        <h2 class="text-4xl font-bold mb-10 text-center text-fuchsia-400">WS-03-S Gallery</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="ws03sGrid"></div>
+        <div class="back-to-home-footer">
+            <button onclick="showSection('homePage')" class="px-6 py-3 nav-btn rounded-xl text-white font-bold shadow-md hover:scale-105 transition-transform">العودة للرئيسية</button>
+        </div>
+    </div>
+
+    <div id="toast" class="copy-toast">تم نسخ الرابط بنجاح!</div>
+
+    <script>
+        // بيانات Bella Bot
+        const bellaFiles = [
+            { name: "Bella Bot Featured", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/pudu-bellabot-featured-web.webp", type: "img" },
+            { name: "Bella Bot الرئيسية", url: "https://uploads.onecompiler.io/43n8uttmw/44czs5ukk/Screenshot%202026-02-08%20175520.png", type: "img" },
+            { name: "Business Video", url: "https://cdn.pudutech.com/website/video/bellabot/business_en.mp4", type: "video" },
+            { name: "Visual SLAM", url: "https://cdn.pudutech.com/website/video/bellabot/visualslam.mp4", type: "video" },
+            { name: "Laser SLAM", url: "https://cdn.pudutech.com/website/video/bellabot/laserslam.mp4", type: "video" },
+            { name: "Design 1", url: "https://cdn.pudutech.com/website/images/pc/bellabot/design1.png", type: "img" },
+            { name: "Design 2", url: "https://cdn.pudutech.com/website/images/pc/bellabot/design2.png", type: "img" },
+            { name: "Design 3", url: "https://cdn.pudutech.com/website/images/pc/bellabot/design3.png", type: "img" },
+            { name: "Design 4", url: "https://cdn.pudutech.com/website/images/pc/bellabot/design4.png", type: "img" },
+            { name: "Avoidance", url: "https://cdn.pudutech.com/website/video/bellabot/avoid.mp4", type: "video" },
+            { name: "Height Test", url: "https://cdn.pudutech.com/website/video/bellabot/height.mp4", type: "video" },
+            { name: "Radius Test", url: "https://cdn.pudutech.com/website/video/bellabot/radius.mp4", type: "video" },
+            { name: "Tray Details", url: "https://cdn.pudutech.com/website/images/pc/bellabot/light_flash_btn.png", type: "img" },
+            { name: "Light Tray", url: "https://cdn.pudutech.com/website/images/pc/bellabot/light_tray.png", type: "img" },
+            { name: "Light Ear", url: "https://cdn.pudutech.com/website/images/pc/bellabot/light_ear.png", type: "img" },
+            { name: "Touch UI", url: "https://cdn.pudutech.com/website/images/pc/bellabot/touch.png", type: "img" },
+            { name: "Face Emotions", url: "https://cdn.pudutech.com/website/images/pc/bellabot/face.png", type: "img" },
+            { name: "Face BG", url: "https://cdn.pudutech.com/website/images/pc/bellabot/face_bg.png", type: "img" },
+            { name: "Battery Tech", url: "https://cdn.pudutech.com/website/images/pc/bellabot/evolve_battery.png", type: "img" },
+            { name: "Tray Evolve", url: "https://cdn.pudutech.com/website/images/pc/bellabot/evolve_tray.png", type: "img" },
+            { name: "Design Award", url: "https://uploads.onecompiler.io/43n8uttmw/44czs5ukk/%D8%AA%D8%B5%D9%85%D9%8A%D9%85%20%D8%A8%D8%AF%D9%88%D9%86%20%D8%B9%D9%86%D9%88%D8%A7%D9%86%20(9).png", type: "img" },
+            { name: "Suspension", url: "https://cdn.pudutech.com/website/images/pc/bellabot/suspension.png", type: "img" },
+            { name: "Scheduler", url: "https://cdn.pudutech.com/website/images/pc/bellabot/scheduler.png", type: "img" },
+            { name: "Pudu Detail 1", url: "https://cdn.pudutech.com/2_b9f0db78fb.png", type: "img" },
+            { name: "Pudu Detail 2", url: "https://cdn.pudutech.com/1_fd30ae614a.png", type: "img" },
+            { name: "Pudu Detail 3", url: "https://cdn.pudutech.com/2_ea98c5047c.png", type: "img" },
+            { name: "Pudu Detail 4", url: "https://cdn.pudutech.com/1_4e36215c19.png", type: "img" },
+            { name: "Pudu Watch 1", url: "https://cdn.pudutech.com/watch_2_8b42940ce1.png", type: "img" },
+            { name: "Pudu Watch 2", url: "https://cdn.pudutech.com/watch_1_3bd6cadd21.png", type: "img" },
+            { name: "Pudu Detail 5", url: "https://cdn.pudutech.com/2_9d2c92ddb6.png", type: "img" },
+            { name: "Pudu Detail 6", url: "https://cdn.pudutech.com/1_6afb028fdf.png", type: "img" },
+            { name: "Charging 1", url: "https://cdn.pudutech.com/c_2_8065b28471.png", type: "img" },
+            { name: "Charging 2", url: "https://cdn.pudutech.com/c_1_f3b2757e00.png", type: "img" },
+            { name: "Parameters", url: "https://cdn.pudutech.com/website/images/pc/bellabot/parameter2.2.0.png", type: "img" },
+            { name: "SVG Asset 1", url: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%20fill%3D%22%230072FF%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M92.6%2026.7c.8.9%201.6%201.9%202.2%202.9.5.9%201%201.8%201.4%202.8%2019.9%206.7%2034.3%2025.6%2034.3%2047.7%200%2027.8-22.6%2050.4-50.4%2050.4s-50.4-22.6-50.4-50.4c0-22.1%2014.3-41%2034.2-47.7.4-1%20.8-1.9%201.4-2.8.6-1%201.4-2%202.2-2.9-24.2%205.7-42.3%2027.5-42.3%2053.4%200%2030.3%2024.6%2054.9%2054.9%2054.9S135%20110.4%20135%2080.1c-.1-25.9-18.2-47.7-42.4-53.4z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M80%2052c7.4%200%2013.5-6%2013.5-13.5%200-2.8-.8-5.3-2.3-7.5-.7-1-1.5-2-2.5-2.8-1.7-1.4-3.6-2.4-5.8-2.9-1-.2-1.9-.3-2.9-.3s-2%20.1-2.9.3c-2.2.5-4.2%201.5-5.8%202.9-1%20.8-1.8%201.7-2.5%202.8-1.4%202.1-2.3%204.7-2.3%207.5C66.5%2045.9%2072.6%2052%2080%2052zM120.9%2078.8c1.3.7%202.8%200%203.1-1.4.2-1-.3-2-1.3-2.4l-8.7-3.7c-.7-.3-1.4-.1-1.9.4-.8.8-.5%202.1.4%202.7l8.4%204.4zM48%2071.6c-.5-.5-1.3-.7-1.9-.4l-8.7%203.7c-.9.4-1.5%201.4-1.3%202.4.3%201.4%201.9%202.1%203.1%201.4l8.3-4.5c1-.5%201.2-1.8.5-2.6zM99.8%2081.1c-.8.5-1.1%201.5-.5%202.3l10.1%2013.9c.8%201.2%202.5%201.3%203.5.2.8-.9.9-2.2.1-3.1l-11.4-12.9c-.4-.6-1.2-.7-1.8-.4zM85.5%2087.3l3.6%2020.4c.2%201.4%201.6%202.2%203%201.9%201.3-.3%202-1.7%201.7-2.9l-5.5-20c-.2-.7-.9-1.1-1.6-1-.8.1-1.3.8-1.2%201.6zM67.7%20109.6c.1%200%20.1%200%20.2.1%201.3.3%202.6-.5%202.9-1.8l3.7-20.6c.1-.7-.4-1.4-1.1-1.6h-.2c-.7-.1-1.3.3-1.5.9l-5.6%2020.2c-.4%201.1.4%202.4%201.6%202.8zM47.2%2097.7c0%20.1%200%20.1%200%200%20.9.9%202.4.8%203.2-.3L60.9%2083c.5-.6.3-1.5-.4-1.9-.1-.1-.3-.2-.4-.2-.5-.3-1.2-.2-1.5.3L46.8%2094.5c-.7.8-.7%202.1.1%202.9l.3.3zM104.3%2056.8H93.9c-.2%200-.4.2-.4.4s.1.4.4.4l10.4.6c.4%200%20.7-.3.7-.6%200-.5-.3-.8-.7-.8zM68.3%2063.5c-.2-.4-.7-.5-1.1-.3l-8.3%204.2c-.7.4-1%201.2-.6%201.9s1.3.9%201.9.4l7.7-5.1c.5-.2.6-.7.4-1.1zM92.5%2078.4c.7-.4.9-1.3.5-2l-5.1-7.7c-.2-.4-.7-.5-1.1-.3-.4.2-.5.7-.3%201.1l4.2%208.3c.3.7%201.1%201%201.8.6zM80%2070.3c-.5%200-.8.3-.9.8l-.5%209.3c0%20.8.6%201.4%201.3%201.4.8%200%201.4-.7%201.3-1.4l-.5-9.3c.1-.5-.3-.8-.7-.8zM91.7%2063.5c-.2.4-.1.9.3%201.1l7.7%205.1c.7.4%201.5.2%201.9-.4.4-.7.1-1.6-.6-1.9l-8.3-4.1c-.3-.3-.8-.2-1%20.2zM67.5%2078.4c.7.4%201.6.1%201.9-.6l4.2-8.3c.2-.4.1-.9-.3-1.1-.4-.2-.9-.1-1.1.3L67%2076.5c-.4.6-.2%201.5.5%201.9zM55.7%2058.1l10.4-.6c.2%200%20.4-.2.4-.4s-.2-.4-.4-.4H55.7c-.4%200-.7.3-.7.7%200%20.4.3.7.7.7z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%3C%2Fsvg%3E", type: "img" },
+            { name: "SVG Asset 2", url: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%20fill%3D%22%230072FF%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M80%2023.9c-30.3%200-54.9%2024.6-54.9%2054.9%200%2027.3%2020%2049.9%2046.1%2054.2l-2.5-2.8-1.3-1.4-1.7-1.7c-20.8-6.2-36-25.5-36-48.3C29.6%2051%2052.2%2028.4%2080%2028.4s50.4%2022.6%2050.4%2050.4c0%2016-7.5%2030.3-19.2%2039.6l-.5%203.2-.5%203c14.9-9.8%2024.7-26.7%2024.7-45.8%200-30.3-24.6-54.9-54.9-54.9z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M86.9%2087c2.4-2%203.9-5.1%203.8-8.5-.1-5.9-5.1-10.7-11-10.5-5.9.1-10.6%205.1-10.5%2011%20.1%203.4%201.7%206.3%204.2%208.3l-.2-6.9c-.1-.5-.2-1-.2-1.5-.1-3.8%202.9-7%206.8-7.1h.2c3.7%200%206.8%203%206.9%206.8%200%20.6%200%201.1-.2%201.6l.2%206.8z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M96.4%2078.4c-.2-9-7.7-16.1-16.6-16h-.4c-8.9.3-16%207.8-15.8%2016.8.2%206.6%204.3%2012.3%2010%2014.7l-.1-3.6c-3.9-2.2-6.6-6.4-6.7-11.2-.2-7.3%205.6-13.4%2012.9-13.5h.3c7.1%200%2013%205.7%2013.2%2012.9.1%204.8-2.4%209.1-6.2%2011.5l.1%203.6c5.6-2.8%209.5-8.6%209.3-15.2z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M102%2078.2c-.3-12-10.2-21.6-22.2-21.5h-.6c-12%20.4-21.5%2010.5-21.2%2022.6.2%209.8%206.9%2018%2015.8%2020.6l-.1-2.7c-7.5-2.6-13-9.6-13.2-18-.3-10.8%208.3-19.7%2019-20h.5c10.5%200%2019.3%208.4%2019.5%2019%20.2%208.1-4.6%2015.2-11.5%2018.3%201.2.2%202.3.6%203.4%201.1%206.5-3.9%2010.8-11.2%2010.6-19.4z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M107.7%2078.1c-.4-15.1-12.8-27.1-27.8-27h-.7c-15.2.4-27.3%2013.1-26.9%2028.3.3%2012.9%209.5%2023.6%2021.6%2026.3v-1.9c-11-2.7-19.4-12.5-19.7-24.4-.3-14.2%2010.9-26.1%2025.2-26.4h.6c13.9%200%2025.5%2011.2%2025.8%2025.2.2%208.8-4.1%2016.7-10.8%2021.5l1.7%201.1c6.9-5.2%2011.2-13.5%2011-22.7z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M113.3%2077.9C112.9%2059.8%2098%2045.4%2080%2045.4h-.8c-18.4.5-32.9%2015.8-32.5%2034.2.4%2016.1%2012.1%2029.2%2027.4%2032v-1.3C59.6%20107.5%2048.4%2094.9%2048%2079.5%2047.6%2061.8%2061.6%2047%2079.3%2046.6h.8c17.3%200%2031.7%2013.9%2032.1%2031.3.2%2010.1-4.2%2019.3-11.5%2025.4l1.1.7c7.3-6.3%2011.8-15.7%2011.5-26.1z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M106.7%20107.2c7.8-7.3%2012.6-17.8%2012.3-29.4-.5-21.2-17.9-38-39-38h-1c-21.5.5-38.6%2018.4-38%2039.9.3%2013%207%2024.4%2017.1%2031.3l.6-.3c-10-6.7-16.7-18-17.1-31-.5-21.2%2016.3-38.8%2037.5-39.3h1c20.8%200%2037.9%2016.6%2038.4%2037.5.3%2011.4-4.5%2021.8-12.2%2029l.4.2c-.1%200%200%200%200%20.1z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M105.2%20109.5l-.7-.4-.5-.3-4.6-2.9-1.1-.7-4.1-2.6-1.8-1.1-.4-.3c-1.3-.8-2.8-1.4-4.3-1.7-.9-.2-1.8-.3-2.8-.2h-.3v-1.4c0-.8%200-1.9-.1-3.2%200-1-.1-2.1-.1-3.3%200-.9%200-1.7-.1-2.6%200-1.5-.1-3-.1-4.4%200-1.7-.1-3.4-.1-4.8-.1-2.3-2-4.2-4.3-4.1h-.1c-2.3.1-4%201.9-4%204.2l.1%204.9.1%204.4.1%202.6.1%203.3.1%203.2.1%202.6.1%203.8v1.9l.1%204.5v1.2l.1%203.9-1.1%201.1-.5.5-1.4%201.4-5-2.7-3.2-1.8-2-1.1c-.4-.2-.9-.4-1.3-.4-.4-.1-.8-.1-1.2%200-1%20.1-1.8.6-2.5%201.4-.7.8-.6%202.1.2%202.8L69%20127.4l.9.9%202.7%202.7%201.5%201.5c.4.4.8.7%201.2%201.1%202.2%201.7%204.9%202.7%207.7%202.7h11.9c5.9%200%2011-4.1%2012.2-9.8.1-.3.1-.5.2-.8l.3-2.1.5-3%20.5-3c.7-3.3-.7-6.4-3.4-8.1z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%3C%2Fsvg%3E", type: "img" },
+            { name: "SVG Asset 3", url: "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%20fill%3D%22%230072FF%22%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M107.2%2029.7l-3.4-1.9V38c0%202.6-2.1%204.7-4.7%204.7H60.8c-2.6%200-4.7-2.1-4.7-4.7V27.8l-3.4%201.9c-17%209.7-27.6%2027.9-27.6%2047.4-.1%2029.9%2024.2%2054.7%2054.1%2055.1h.8c14.5%200%2028.2-5.6%2038.5-15.8%2010.5-10.4%2016.3-24.3%2016.3-39.1.1-19.6-10.5-37.8-27.6-47.6zm-27.9%2098c-27.5-.4-49.8-23.1-49.7-50.6.1-16.6%208.4-32.1%2022-41.4V38c0%205.1%204.1%209.2%209.2%209.2h38.4c5.1%200%209.2-4.1%209.2-9.2v-2.3c13.7%209.3%2022%2024.9%2022%2041.6%200%2013.6-5.3%2026.3-15%2035.9-9.7%209.6-22.5%2014.7-36.1%2014.5z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2257.6%22%20cy%3D%2276.1%22%20r%3D%2212.5%22%3E%3C%2Fcircle%3E%0A%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M109.3%2067.1c-.5-.1-11.9-1.4-18.7%2011.5-.2.4-.2%201%200%201.4.2.4.7.7%201.2.8.1%200%2010.4%201.4%2015.3%204.6.3.2.5.2.8.2.5%200%201-.2%201.3-.7.5-.7.3-1.7-.4-2.1-4-2.6-10.8-4.1-14.4-4.7%205.8-9%2014.1-8.1%2014.5-8%20.8.1%201.6-.5%201.7-1.3.2-.8-.4-1.6-1.3-1.7zM80%2084.3c1.4%200%202.5-1.1%202.5-2.5s-1.1-1.6-2.5-1.6-2.5.2-2.5%201.6c0%201.4%201.1%202.5%202.5%202.5zM38.4%2089.5h4.9c.8%200%201.5-.7%201.5-1.5s-.7-1.5-1.5-1.5h-4.9c-.8%200-1.5.7-1.5%201.5s.7%201.5%201.5%201.5zM43%2092l-4.9%201c-.8.2-1.4%201-1.2%201.8.2.7.8%201.2%201.5%201.2h.3l4.9-1c.8-.2%201.4-1%201.2-1.8-.2-.9-1-1.4-1.8-1.2zM116.7%2089.5h4.9c.8%200%201.5-.7%201.5-1.5s-.7-1.5-1.5-1.5h-4.9c-.8%200-1.5.7-1.5%201.5s.6%201.5%201.5%201.5zM116.4%2095l4.9%201h.3c.7%200%201.3-.5%201.5-1.2.2-.8-.4-1.6-1.2-1.8l-4.9-1c-.8-.2-1.6.4-1.8%201.2-.2.8.3%201.6%201.2%201.8zM85.7%2090c-1.6%201-2.8.6-3.4.3-.8-.4-1.1-1.1-1.1-1.3v-2.1c0-.7-.5-1.2-1.2-1.2s-1.2.5-1.2%201.2V89c0%20.2-.3.9-1.1%201.3-.6.3-1.8.7-3.4-.3-.6-.4-1.3-.2-1.7.4-.4.6-.2%201.3.4%201.7%201.1.7%202.2%201%203.3%201%20.9%200%201.8-.2%202.6-.7.4-.2.8-.5%201.1-.9.3.3.7.6%201.1.9.8.5%201.7.7%202.6.7%201.1%200%202.2-.3%203.3-1%20.6-.4.7-1.1.4-1.7-.4-.6-1.1-.7-1.7-.4zM72.7%2057.7c-.1-.8-.9-1.4-1.7-1.3l-8.2%201.2c-.8.1-1.4.9-1.3%201.7.1.8.8%201.3%201.5%201.3h.2l8.2-1.2c.9-.1%201.4-.9%201.3-1.7zM96.9%2060.7c.7%200%201.4-.5%201.5-1.3.1-.8-.4-1.6-1.3-1.7L89%2056.4c-.8-.1-1.6.4-1.7%201.3-.1.8.4%201.6%201.3%201.7l8.2%201.2c0%20.1.1.1.1.1z%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%3C%2Fsvg%3E", type: "img" }
+        ];
+
+        // بيانات Bella Bot Pro
+        const proFiles = [
+            { name: "Pro Product Nav", url: "https://cdn.pudutech.com/nav_product_bella_pro_816bfa936e.png", type: "img" },
+            { name: "Pro S3 Feature", url: "https://cdn.pudutech.com/official-website/bellabotpro/S3_4.png", type: "img" },
+            { name: "Bella Bot Pro Intro Video", url: "https://cdn.pudutech.com/official-website/bellabotpro/intro_en.mp4", type: "video" },
+            { name: "Bella Pro Featured En", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/bella_pro_en2.webp", type: "img" },
+            { name: "Bella Bot Pro (رئيسية)", url: "https://i.postimg.cc/j2wpwkNv/Bellabot-Pro.webp", type: "img" }
+        ];
+
+        // بيانات FlashBot Arm
+        const flashFiles = [
+            { name: "FlashBot Arm Intro", url: "https://cdn.pudutech.com/official-website/flashbot_arm/FlashBotArm_en.mp4", type: "video" },
+            { name: "S1-1 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S1-1.webp", type: "img" },
+            { name: "Main FlashBot Arm", url: "https://cdn.pudutech.com/nav_product_flashbot_arm_58961abf05.png", type: "img" },
+            { name: "S2-1 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S2-1.mp4", type: "video" },
+            { name: "S3-1 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S3-1.webp", type: "img" },
+            { name: "S3-2 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S3-2.webp", type: "img" },
+            { name: "S3-3 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S3-3.webp", type: "img" },
+            { name: "S3-4 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S3-4.webp", type: "img" },
+            { name: "S3-5 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S3-5.webp", type: "img" },
+            { name: "S4-1 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S4-1-en.mp4", type: "video" },
+            { name: "S4-2 Feature", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/S4-2.webp", type: "img" },
+            { name: "S4-3 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S4-3.mp4", type: "video" },
+            { name: "S5-3 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S5-3.mp4", type: "video" },
+            { name: "Missing Video Placeholder", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/%D9%87%D9%88%D9%86%20%D9%84%D8%A7%D8%B2%D9%85%20%D9%8A%D9%83%D9%88%D9%86%20%D9%81%D9%8A%20%D9%81%D9%8A%D8%AF%D9%8A%D9%88.png", type: "img" },
+            { name: "S6-1-1 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S6-1-1.webp", type: "img" },
+            { name: "S7-1 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S7-1.mp4", type: "video" },
+            { name: "S7-2 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S7-2.webp", type: "img" },
+            { name: "S7-3 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S7-3.webp", type: "img" },
+            { name: "S8-1 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S8-1.mp4", type: "video" },
+            { name: "S8-2 Video", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S8-2.mp4", type: "video" },
+            { name: "S10-1 Feature", url: "https://cdn.pudutech.com/official-website/flashbot_arm/S10-1.png", type: "img" },
+            { name: "S9-01 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S9-01.webp", type: "img" },
+            { name: "S9-2 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S9-2.webp", type: "img" },
+            { name: "S9-3 Feature", url: "https://roboticsnorden.com/wp-content/uploads/2025/09/S9-3.webp", type: "img" }
+        ];
+
+        // بيانات Scrubber 75
+        const scrubberS = [
+            { name: "Scrubber 75 s-1 (Main)", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-1-May.jpg", type: "img" },
+            { name: "Scrubber 75 s-2", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-2-May.jpg", type: "img" },
+            { name: "Scrubber 75 s-3", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-3-May.jpg", type: "img" },
+            { name: "Scrubber 75 s-4", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-4-May.jpg", type: "img" },
+            { name: "Scrubber 75 s-5", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-s-5-May.jpg", type: "img" }
+        ];
+
+        const scrubberP = [
+            { name: "3D Scrubber 75 P", url: "https://gausium.com/wp-content/uploads/2022/04/3D-Scrubber-75-P-768x745.jpg", type: "img" },
+            { name: "Scrubber 75 p-1 May", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-p-1-May.jpg", type: "img" },
+            { name: "Scrubber 75 p-1 Apr", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-p-1-Apr.jpg", type: "img" },
+            { name: "Scrubber 75 p-2 Apr", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-p-2-Apr.jpg", type: "img" },
+            { name: "Scrubber 75 p-3 Apr", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-p-3-Apr.jpg", type: "img" },
+            { name: "Scrubber 75 p-4 Apr", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-75-p-4-Apr.jpg", type: "img" }
+        ];
+
+        const scrubberMisc = [
+            { name: "Scrubber 75 Banner", url: "https://gausium.com/wp-content/uploads/2022/04/product-banner-scrubber75-D.jpg", type: "img" },
+            { name: "Superb Productivity", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_Superb-Productivity.svg", type: "img" },
+            { name: "Oil Cleaning Mode", url: "https://gausium.com/wp-content/uploads/2022/04/Oil-Cleaning-Mode.svg", type: "img" },
+            { name: "Rotational Brush Head", url: "https://gausium.com/wp-content/uploads/2022/04/270%C2%B0-Rotational-Brush-Head-1.svg", type: "img" },
+            { name: "Industry-leading Algorithm", url: "https://gausium.com/wp-content/uploads/2022/04/Industry-leading-Algorithm-3.svg", type: "img" },
+            { name: "Advanced Lighting System", url: "https://gausium.com/wp-content/uploads/2022/04/Advanced-lighting-system.svg", type: "img" },
+            { name: "5 Stage Filtration", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_5-Stage-Filtration.svg", type: "img" },
+            { name: "Ergonomic Manual Mode", url: "https://gausium.com/wp-content/uploads/2022/04/Ergonomic-Manual-Mode-1.svg", type: "img" },
+            { name: "Minimal Human Maintenance", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_Minimal-human-maintenance.svg", type: "img" },
+            { name: "Shopping Mall Video", url: "https://gausium.com/wp-content/uploads/2022/04/scrubber75-shopping-mall.mp4", type: "video" },
+            { name: "Parking Lot Video", url: "https://gausium.com/wp-content/uploads/2022/04/scrubber75P-parking-lot.mp4", type: "video" },
+            { name: "Finland West Harbour", url: "https://gausium.com/wp-content/uploads/2022/04/75-Finland-West-Harbour-577x500.webp", type: "img" },
+            { name: "Scrubber Case 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+            { name: "Scrubber Case 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211805.png", type: "img" },
+            { name: "Scrubber Case 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+            { name: "Scrubber Case 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211831.png", type: "img" },
+            { name: "Scrubber Case 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211847.png", type: "img" },
+            { name: "Scrubber Case 6", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+            { name: "Scrubber Case 7", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20212000.png", type: "img" },
+            { name: "Specifications Scrubber 75", url: "https://gausium.com/wp-content/uploads/2022/04/Specifications-Scrubber-75-April-PNG-768x745.png", type: "img" },
+            { name: "Water Tank Accessories", url: "https://gausium.com/wp-content/uploads/2022/04/Accessories-75-water-tank-compressed-768x745.jpg", type: "img" },
+            { name: "Case Study 1", url: "https://gausium.com/wp-content/uploads/2025/10/DSC04524-768x667.jpg", type: "img" },
+            { name: "Network Rail Case", url: "https://gausium.com/wp-content/uploads/2025/01/cover_case_network-rail-768x667.jpg", type: "img" },
+            { name: "London Heathrow Case", url: "https://gausium.com/wp-content/uploads/2025/02/Cleaning-robot-at-London-Heathrow-Airport-768x667.jpg", type: "img" },
+            { name: "New Cover", url: "https://gausium.com/wp-content/uploads/2022/09/New-Cover-577x500.jpg", type: "img" }
+        ];
+
+        // بيانات Scrubber 50 (جديد)
+        const scrubber50Files = [
+            { name: "Scrubber 50 Card", url: "https://gausium.com/wp-content/uploads/2022/04/sc50-v4.2_disc-card-1-560x365.png", type: "img" },
+            { name: "Banner Scrubber 50", url: "https://gausium.com/wp-content/uploads/2022/04/Banner-Scrubber-50-D.-min-March-2023.jpg", type: "img" },
+            { name: "Gallery Pro 1", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-1-min-1.jpg", type: "img" },
+            { name: "Gallery Pro 2", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-2-min-1.jpg", type: "img" },
+            { name: "Gallery Pro 3", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-3-min-2.jpg", type: "img" },
+            { name: "Gallery Pro 4", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-4-min-1.jpg", type: "img" },
+            { name: "Gallery Pro 5", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-5-min-1.jpg", type: "img" },
+            { name: "Gallery Pro 3D", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-Scrubber-50-Pro-3D-768x745.jpg", type: "img" },
+            { name: "3-in-1 Feature", url: "https://gausium.com/wp-content/uploads/2022/04/3-in-1.svg", type: "img" },
+            { name: "Auto Spot Cleaning", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_Auto-Spot-Cleaning.svg", type: "img" },
+            { name: "Rotational Brush Head", url: "https://gausium.com/wp-content/uploads/2022/04/270%C2%B0-Rotational-Brush-Head-1.svg", type: "img" },
+            { name: "5 Stage Filtration", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_5-Stage-Filtration.svg", type: "img" },
+            { name: "H13 HEPA Filter", url: "https://gausium.com/wp-content/uploads/2022/04/H13-HEPA-Filter.svg", type: "img" },
+            { name: "Minimal Maintenance", url: "https://gausium.com/wp-content/uploads/2022/04/icon_feature_Minimal-human-maintenance.svg", type: "img" },
+            { name: "50 Supermarket", url: "https://gausium.com/wp-content/uploads/2022/04/50-Supermarket-577x500-March-2023.png", type: "img" },
+            { name: "London Luton Airport", url: "https://gausium.com/wp-content/uploads/2022/04/50-in-London-Luton-Airport-1-577x500-March-2023.jpg", type: "img" },
+            { name: "Rendering Office Lobby", url: "https://gausium.com/wp-content/uploads/2022/04/Rendering_50-4.1_Office-building_Lobby_1-768x666.jpg", type: "img" },
+            { name: "Screenshot Case 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211847.png", type: "img" },
+            { name: "Screenshot Case 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211805.png", type: "img" },
+            { name: "Screenshot Case 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20212000.png", type: "img" },
+            { name: "Screenshot Case 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+            { name: "Screenshot Case 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+            { name: "Screenshot Case 6", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+            { name: "Specifications Scrubber 50", url: "https://gausium.com/wp-content/uploads/2022/04/Specifications-Img-Scrubber-50-min-compressed-768x745.jpg", type: "img" },
+            { name: "Charging Dock Access.", url: "https://gausium.com/wp-content/uploads/2022/04/Accessories-Charging-Dock-CD-01-min-1024x994-March-2023-768x746.jpg", type: "img" },
+            { name: "Style Outlet Madrid", url: "https://gausium.com/wp-content/uploads/2026/01/Gausium-Scrubber-50_The-Style-Outlet-Madrid-768x667.webp", type: "img" },
+            { name: "Screenshot 2025", url: "https://gausium.com/wp-content/uploads/2025/08/Screenshot-2025-08-25-at-19.53.54-768x666.png", type: "img" },
+            { name: "EUROSPAR Cover", url: "https://gausium.com/wp-content/uploads/2025/08/cover-EUROSPAR-768x667.png", type: "img" },
+            { name: "XXXLutz Group Case", url: "https://gausium.com/wp-content/uploads/2024/12/case_xxxlutz-group-768x667.jpg", type: "img" },
+            { name: "FMZ Imst Cover", url: "https://gausium.com/wp-content/uploads/2025/01/cover_FMZ-Imst-768x667.jpg", type: "img" },
+            { name: "Da Nang Airport Case", url: "https://gausium.com/wp-content/uploads/2025/03/cover_case_Da-Nang-Airport-768x667.jpg", type: "img" },
+            { name: "TZU Lienz Cover", url: "https://gausium.com/wp-content/uploads/2025/01/cover_TZU-Lienz-768x667.jpg", type: "img" },
+            { name: "Network Rail Case", url: "https://gausium.com/wp-content/uploads/2025/01/cover_case_network-rail-768x667.jpg", type: "img" },
+            { name: "London Heathrow Case", url: "https://gausium.com/wp-content/uploads/2025/02/Cleaning-robot-at-London-Heathrow-Airport-768x667.jpg", type: "img" }
+        ];
+
+        // بيانات OMNIE
+        const omnieFiles = [
+            { name: "OMNIE Roller Card (Main)", url: "https://gausium.com/wp-content/uploads/2024/12/omnie-roller-card-560x365.png", type: "img" },
+            { name: "OMNIE Slider Main", url: "https://gausium.com/wp-content/uploads/2025/05/Slider_OMNIE_new-scaled.jpg", type: "img" },
+            { name: "OMNIE 1980x1080", url: "https://gausium.com/wp-content/uploads/2024/12/1980x1080%E5%89%AF%E6%9C%AC-scaled.jpg", type: "img" },
+            { name: "OMNIE LiDAR", url: "https://gausium.com/wp-content/uploads/2024/12/OmniLiDAR-1.jpg", type: "img" },
+            { name: "OMNIE Video Intro", url: "https://gausium.com/wp-content/uploads/2024/12/Omnie-Video_compressed.mp4", type: "video" },
+            { name: "OMNIE Case Screenshot 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211805.png", type: "img" },
+            { name: "OMNIE Case Screenshot 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20212000.png", type: "img" },
+            { name: "OMNIE Case Screenshot 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211847.png", type: "img" },
+            { name: "OMNIE Case Screenshot 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+            { name: "OMNIE Case Screenshot 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+            { name: "OMNIE Case Screenshot 6", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+            { name: "OMNIE Spot Cleaning", url: "https://gausium.com/wp-content/uploads/2024/12/omnie-spot-cleaning-scaled.jpg", type: "img" },
+            { name: "OMNIE Clean New", url: "https://gausium.com/wp-content/uploads/2024/12/OmnieClean-new.jpg", type: "img" },
+            { name: "OMNIE Spot Mobile", url: "https://gausium.com/wp-content/uploads/2024/12/Omnie-spot-cleaning-mobile-scaled.jpg", type: "img" },
+            { name: "Tight Corners SVG", url: "https://gausium.com/wp-content/uploads/2022/05/Tight-corners-and-narrow-aisles.svg", type: "img" },
+            { name: "Auto Dumping SVG", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Dumping-1.svg", type: "img" },
+            { name: "Industry Algorithm SVG", url: "https://gausium.com/wp-content/uploads/2022/04/Industry-leading-Algorithm-3.svg", type: "img" }
+        ];
+
+        // بيانات Phantas
+        const phantasFiles = [
+            { name: "Phantas v1.3 Card", url: "https://gausium.com/wp-content/uploads/2022/04/phantas-v1.3-card-560x365.png", type: "img" },
+            { name: "Phantas 1.3 Slider", url: "https://gausium.com/wp-content/uploads/2025/05/Phantas-1.3-Slider-compressed.png", type: "img" },
+            { name: "Vacuuming Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Vacuuming-2.svg", type: "img" },
+            { name: "Sweeping Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Sweeping-2.svg", type: "img" },
+            { name: "Scrubbing Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Scrubbing.svg", type: "img" },
+            { name: "Dust Mopping Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Dust-Mopping-1.svg", type: "img" },
+            { name: "Innovation Grip", url: "https://gausium.com/wp-content/uploads/2022/04/img-Elevating-Your-Grip-on-Innovation-D.-min.png", type: "img" },
+            { name: "Every Inch Matters", url: "https://gausium.com/wp-content/uploads/2022/04/Every-Inch-Matters-D.-min-3.jpg", type: "img" },
+            { name: "Tight Corners SVG", url: "https://gausium.com/wp-content/uploads/2022/05/Tight-corners-and-narrow-aisles.svg", type: "img" },
+            { name: "0cm From Edge", url: "https://gausium.com/wp-content/uploads/2022/04/0cm-from-edge-1.svg", type: "img" },
+            { name: "AI Learning", url: "https://gausium.com/wp-content/uploads/2022/04/AI-Powered-Learning-while-Cleaning-D.-min.jpg", type: "img" },
+            { name: "Map Construction", url: "https://gausium.com/wp-content/uploads/2022/04/Map-Construction.svg", type: "img" },
+            { name: "Industry Algorithm", url: "https://gausium.com/wp-content/uploads/2022/04/Industry-leading-Algorithm-2.svg", type: "img" },
+            { name: "Path Planning", url: "https://gausium.com/wp-content/uploads/2022/04/Flexible-Path-Planning.svg", type: "img" },
+            { name: "3D Model Phantas", url: "https://gausium.com/wp-content/uploads/2022/04/3D-model%E2%80%A8-Phantas-min-768x745.jpg", type: "img" },
+            { name: "Phantas S1.3 Video", url: "https://gausium.com/wp-content/uploads/2022/04/S1.3.mp4", type: "video" },
+            { name: "Case Screenshot 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211847.png", type: "img" },
+            { name: "Case Screenshot 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211805.png", type: "img" },
+            { name: "Case Screenshot 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20135304.png", type: "img" },
+            { name: "Case Screenshot 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+            { name: "Case Screenshot 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20135422.png", type: "img" },
+            { name: "Case Screenshot 6", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+            { name: "Case Screenshot 7", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+            { name: "Obstacle Avoidance", url: "https://gausium.com/wp-content/uploads/2022/04/Smart-Obstacle-Avoidance-D.-min-2.jpg", type: "img" },
+            { name: "4X Efficiency", url: "https://gausium.com/wp-content/uploads/2022/04/4X-Efficiency-Improvement-D.-min.jpg", type: "img" },
+            { name: "Workstation Scaled", url: "https://gausium.com/wp-content/uploads/2022/04/Phantas_workstation-scaled.jpg", type: "img" },
+            { name: "High Performance Battery", url: "https://gausium.com/wp-content/uploads/2022/04/High-Performance-Battery.svg", type: "img" },
+            { name: "Water Refill Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Water-Refill-and-Discharge-1.svg", type: "img" },
+            { name: "Suction Pipe Rinse", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Suction-Pipe-Rinse_-1.svg", type: "img" },
+            { name: "Tank Cleaning Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-water-tank-cleaning.svg", type: "img" },
+            { name: "Case Manifest", url: "https://gausium.com/wp-content/uploads/2025/11/case-cover_Manifest.jpg", type: "img" },
+            { name: "Printz Rudolf Case", url: "https://gausium.com/wp-content/uploads/2025/09/cover-printz-rudolf-768x667.jpg", type: "img" },
+            { name: "Vina Costeira Case", url: "https://gausium.com/wp-content/uploads/2025/07/cover_case_vina-costeira-768x667.png", type: "img" },
+            { name: "Hospital Alvaro Cunqueiro", url: "https://gausium.com/wp-content/uploads/2025/06/cover_Hospital-Alvaro-Cunqueiro-768x667.jpg", type: "img" },
+            { name: "Rossmann Case", url: "https://gausium.com/wp-content/uploads/2025/04/case_Rossmann_cover-768x667.png", type: "img" },
+            { name: "Phantas Elvi Case", url: "https://gausium.com/wp-content/uploads/2025/05/case_Phantas_Elvi-768x667.jpg", type: "img" },
+            { name: "IKI Case", url: "https://gausium.com/wp-content/uploads/2025/03/cover_IKI-768x667.png", type: "img" },
+            { name: "Waberer Medical", url: "https://gausium.com/wp-content/uploads/2024/12/case_waberer-medical-centre-768x667.jpg", type: "img" },
+            { name: "Intercontinental Case", url: "https://gausium.com/wp-content/uploads/2024/12/coverpic_case_Intercontinental-577x500.jpg", type: "img" },
+            { name: "Network Rail Case", url: "https://gausium.com/wp-content/uploads/2025/01/cover_case_network-rail-768x667.jpg", type: "img" }
+        ];
+
+        // بيانات Beetle Pro
+        const beetleFiles = [
+            { name: "Beetle Pro Card", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-Pro-card-1-560x365.png", type: "img" },
+            { name: "Banner Beetle", url: "https://gausium.com/wp-content/uploads/2024/11/Banner-Beetle.png", type: "img" },
+            { name: "Beetle 3D Laser", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle_3D_Laser-scaled.jpg", type: "img" },
+            { name: "Beetle Ultimate Cleaning", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle_ultimate_Cleaning.jpg", type: "img" },
+            { name: "Ultra Strong Absorption", url: "https://gausium.com/wp-content/uploads/2022/04/Ultra-strong-Absorption-1.svg", type: "img" },
+            { name: "Heavy Duty Cleaning", url: "https://gausium.com/wp-content/uploads/2022/05/Requirement-of-heavy-duty-cleaning.svg", type: "img" },
+            { name: "Beetle Agile Maneuverability", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-agile-maneuverability-scaled.jpg", type: "img" },
+            { name: "0cm From Edge", url: "https://gausium.com/wp-content/uploads/2022/04/inco_white_0cm-from-edge.svg", type: "img" },
+            { name: "Multiply Servicing", url: "https://gausium.com/wp-content/uploads/2022/05/Multiply-servicing-productivity-white-1.svg", type: "img" },
+            { name: "Beetle Promo Video", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-promo_compressed.mp4", type: "video" },
+            { name: "Screenshot Case 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20143739.png", type: "img" },
+            { name: "Screenshot Case 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+            { name: "Screenshot Case 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20143827.png", type: "img" },
+            { name: "Screenshot Case 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+            { name: "Screenshot Case 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+            { name: "Beetle Spot Cleaning", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-spot_cleaning-1.jpg", type: "img" },
+            { name: "Beetle Autodoor", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-autodoor-scaled.jpg", type: "img" },
+            { name: "Beetle Endurance", url: "https://gausium.com/wp-content/uploads/2024/11/Beetle-Endurance.jpg", type: "img" },
+            { name: "Auto Dumping Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Dumping_icon_white.svg", type: "img" },
+            { name: "High Perf Battery", url: "https://gausium.com/wp-content/uploads/2022/04/High-Performance-Battery_icon_white.svg", type: "img" },
+            { name: "Auto Charging Icon", url: "https://gausium.com/wp-content/uploads/2022/06/Auto-Charging.svg", type: "img" },
+            { name: "Gerobo Loulis Case", url: "https://gausium.com/wp-content/uploads/2025/09/Gerobo_Loulis-Group-768x667.jpg", type: "img" }
+        ];
+
+        // بيانات Phanshop (الجديدة)
+        const phanshopFiles = [
+            { name: "Phanshop Card", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-card-2-560x365.png", type: "img" },
+            { name: "Phanshop Banner", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-banner-5-1-scaled.jpg", type: "img" },
+            { name: "Phanshop Tray", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-tray-04-scaled.jpg", type: "img" },
+            { name: "Display PC", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-display-pc-scaled.jpg", type: "img" },
+            { name: "Data Intelligence Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Data-intelligence.svg", type: "img" },
+            { name: "4-in-1 Icon", url: "https://gausium.com/wp-content/uploads/2022/06/4-in-1.svg", type: "img" },
+            { name: "Phanshop Video Intro", url: "https://gausium.com/wp-content/uploads/2025/11/PHANSHOP%EF%BC%8824MB%EF%BC%89.mp4", type: "video" },
+            { name: "Height Specs", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-height-scaled.jpg", type: "img" },
+            { name: "Web Detail", url: "https://gausium.com/wp-content/uploads/2025/11/phanshop-%E7%BD%91%E9%A1%B5-05-scaled.jpg", type: "img" },
+            { name: "Corporate Image Icon", url: "https://gausium.com/wp-content/uploads/2022/05/Improve-corporate-image-with-cutting-edge-robotics-technologies-white.svg", type: "img" }
+        ];
+
+        // بيانات Vacuum 40 (Misc/General)
+        const vacuum40Misc = [
+             { name: "Product Banner", url: "https://gausium.com/wp-content/uploads/2022/04/Product-Vacuum40-banner.jpg", type: "img" },
+             { name: "Vacuum 40 Min", url: "https://gausium.com/wp-content/uploads/2022/04/Vacuum-40-min.jpg", type: "img" },
+             { name: "3-in-1 Icon", url: "https://gausium.com/wp-content/uploads/2022/04/3-in-1.svg", type: "img" },
+             { name: "Adaptability Icon", url: "https://gausium.com/wp-content/uploads/2022/04/icon_blue_Vacuum-40-Adaptability.svg", type: "img" },
+             { name: "Sanitizing Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Sanitizing.svg", type: "img" },
+             { name: "H13 HEPA Filter", url: "https://gausium.com/wp-content/uploads/2022/04/H13-HEPA-Filter.svg", type: "img" },
+             { name: "24 KPA Suction", url: "https://gausium.com/wp-content/uploads/2022/04/24-KPA-Suction-Motor.svg", type: "img" },
+             { name: "0cm From Edge", url: "https://gausium.com/wp-content/uploads/2022/04/0cm-from-edge-1.svg", type: "img" },
+             { name: "IMG 0050", url: "https://gausium.com/wp-content/uploads/2022/04/IMG_0050-768x666.jpg", type: "img" },
+             { name: "Features Pic 2", url: "https://gausium.com/wp-content/uploads/2022/04/features-vacuum40-Pic-2-577x500.webp", type: "img" },
+             { name: "Features Pic 1", url: "https://gausium.com/wp-content/uploads/2022/04/features-vacuum40-Pic-1-577x500.webp", type: "img" },
+             { name: "Screenshot 1", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20161926.png", type: "img" },
+             { name: "Screenshot 2", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20135304.png", type: "img" },
+             { name: "Screenshot 3", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211601.png", type: "img" },
+             { name: "Screenshot 4", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211805.png", type: "img" },
+             { name: "Screenshot 5", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211819.png", type: "img" },
+             { name: "Screenshot 6", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211847.png", type: "img" },
+             { name: "Screenshot 7", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-10%20211909.png", type: "img" },
+             { name: "Screenshot 8", url: "https://uploads.onecompiler.io/43n8uttmw/44d2anh2v/Screenshot%202026-02-12%20135422.png", type: "img" },
+             { name: "Specifications", url: "https://gausium.com/wp-content/uploads/2022/04/Specifications-Img-Vacuum-40.jpg", type: "img" },
+             { name: "Accessories", url: "https://gausium.com/wp-content/uploads/2022/11/Accessories-Vacuum-40-min-768x745.jpeg", type: "img" },
+             { name: "Intercontinental Case", url: "https://gausium.com/wp-content/uploads/2024/12/coverpic_case_Intercontinental-577x500.jpg", type: "img" },
+             { name: "Cover Pic", url: "https://gausium.com/wp-content/uploads/2022/07/Cover-pic-577x500.jpeg", type: "img" }
+        ];
+
+        // بيانات Vacuum 40 (Gallery 1)
+        const vacuum40Main = [
+            { name: "Gallery V40 1", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-1-min.jpeg", type: "img" },
+            { name: "Gallery V40 5", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-5-min.jpeg", type: "img" },
+            { name: "Gallery V40 4", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-4-min.jpeg", type: "img" },
+            { name: "Gallery V40 3", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-3-min.jpeg", type: "img" },
+            { name: "Gallery V40 2", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-2-min.jpeg", type: "img" }
+        ];
+
+        // بيانات Vacuum 40 Diffuser (Gallery 2)
+        const vacuum40Diffuser = [
+            { name: "Diffuser Gallery 1", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-Diffusor-1-min.jpeg", type: "img" },
+            { name: "Diffuser Gallery 5", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-Diffusor-5-min.jpeg", type: "img" },
+            { name: "Diffuser Gallery 4", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-Diffusor-4-min.jpeg", type: "img" },
+            { name: "Diffuser Gallery 3", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-Diffusor-3-min.jpeg", type: "img" },
+            { name: "Diffuser Gallery 2", url: "https://gausium.com/wp-content/uploads/2022/11/Gallery-Vacuum-40-Diffusor-2-min.jpeg", type: "img" }
+        ];
+
+        // بيانات CD-01 Misc/General
+        const cd01Misc = [
+            { name: "Gallery CD-01 White (Main)", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-1.png", type: "img" },
+            { name: "CD-01 D Min", url: "https://gausium.com/wp-content/uploads/2022/04/CD-01-D.-min.jpg", type: "img" },
+            { name: "Specs CD-01", url: "https://gausium.com/wp-content/uploads/2022/04/Specifications-Img-CD-01-min-690-768x745.png", type: "img" }
+        ];
+
+        // بيانات CD-01 White
+        const cd01White = [
+            { name: "Gallery White 6", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-6.png", type: "img" },
+            { name: "Gallery White 5", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-5.png", type: "img" },
+            { name: "Gallery White 3", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-3.png", type: "img" },
+            { name: "Gallery White 2", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-2.png", type: "img" },
+            { name: "Gallery White 1", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-White-1.png", type: "img" }
+        ];
+
+        // بيانات CD-01 Grey
+        const cd01Grey = [
+            { name: "Gallery Grey 6", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-Grey-6.png", type: "img" },
+            { name: "Gallery Grey 1", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-Grey-1.png", type: "img" },
+            { name: "Gallery Grey 3", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-Grey-3.png", type: "img" },
+            { name: "Gallery Grey 4", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-Grey-4.png", type: "img" },
+            { name: "Gallery Grey 5", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-CD-01-Grey-5.png", type: "img" }
+        ];
+
+        // بيانات CD-04
+        const cd04Files = [
+            { name: "Gallery CD-04 1", url: "https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-1.jpg", type: "img" },
+            { name: "CD-04 D Min", url: "https://gausium.com/wp-content/uploads/2022/10/CD-04-D.-min.jpg", type: "img" },
+            { name: "Gallery CD-04 2", url: "https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-2.jpg", type: "img" },
+            { name: "Gallery CD-04 3", url: "https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-3.jpg", type: "img" },
+            { name: "Gallery CD-04 4", url: "https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-4.jpg", type: "img" },
+            { name: "Gallery CD-04 5", url: "https://gausium.com/wp-content/uploads/2022/10/Gallery-CD-04-5.jpg", type: "img" },
+            { name: "Specs CD-04", url: "https://gausium.com/wp-content/uploads/2022/10/Specifications-Img-CD-04.jpg", type: "img" }
+        ];
+
+        // بيانات WS-01
+        const ws01Files = [
+            { name: "WS-01 Card", url: "https://gausium.com/wp-content/uploads/2023/03/3.png", type: "img" },
+            { name: "WS-01 D Min", url: "https://gausium.com/wp-content/uploads/2022/04/WS-01-D.-min.jpg", type: "img" },
+            { name: "Gallery Grey 2", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-WS-01-Grey-2.png", type: "img" },
+            { name: "Gallery Grey 3", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-WS-01-Grey-3.png", type: "img" },
+            { name: "Gallery Grey 4", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-WS-01-Grey-4.png", type: "img" },
+            { name: "Gallery Grey 5", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-WS-01-Grey-5.png", type: "img" },
+            { name: "Gallery Grey 1", url: "https://gausium.com/wp-content/uploads/2022/04/Gallery-WS-01-Grey-1.png", type: "img" },
+            { name: "Auto Charging Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Charging-1.svg", type: "img" },
+            { name: "Auto Water Refill Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Water-Refill-and-Discharge-1.svg", type: "img" },
+            { name: "Specifications", url: "https://gausium.com/wp-content/uploads/2022/04/Specifications-Img-Scrubber-50-min-1390-768x745.jpg", type: "img" }
+        ];
+
+        // بيانات WS-02
+        const ws02Files = [
+            { name: "WS-02 Card", url: "https://gausium.com/wp-content/uploads/2022/05/75-workstation-1-560x348.png", type: "img" },
+            { name: "WS-02 D Min", url: "https://gausium.com/wp-content/uploads/2022/05/WS-02-D.-min.jpg", type: "img" },
+            { name: "Gallery WS-02 1", url: "https://gausium.com/wp-content/uploads/2022/05/Gallery-WS-02-1-min.jpg", type: "img" },
+            { name: "Gallery WS-02 5", url: "https://gausium.com/wp-content/uploads/2022/05/Gallery-WS-02-5-min.jpg", type: "img" },
+            { name: "Gallery WS-02 4", url: "https://gausium.com/wp-content/uploads/2022/05/Gallery-WS-02-4-min.jpg", type: "img" },
+            { name: "Gallery WS-02 3", url: "https://gausium.com/wp-content/uploads/2022/05/Gallery-WS-02-3-min.jpg", type: "img" },
+            { name: "Gallery WS-02 2", url: "https://gausium.com/wp-content/uploads/2022/05/Gallery-WS-02-2-min.jpg", type: "img" },
+            { name: "Auto Charging Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Charging-1.svg", type: "img" },
+            { name: "Auto Water Refill Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-Water-Refill-and-Discharge-1.svg", type: "img" },
+            { name: "Specs WS-02", url: "https://gausium.com/wp-content/uploads/2022/05/Specifications-Img-WS-02.jpg", type: "img" }
+        ];
+
+        // بيانات Mobile Water Tank (جديدة)
+        const mobileWaterTankFiles = [
+            { name: "Mobile Water Tank Card", url: "https://gausium.com/wp-content/uploads/2024/12/mobile-water-tank-card-560x365.png", type: "img" },
+            { name: "Banner", url: "https://gausium.com/wp-content/uploads/2024/12/mobile-water-tank-banner-scaled.jpg", type: "img" },
+            { name: "Gallery 1", url: "https://gausium.com/wp-content/uploads/2024/12/Mobile-Water-Tank.185.png", type: "img" },
+            { name: "Gallery 2", url: "https://gausium.com/wp-content/uploads/2024/12/Mobile-Water-Tank.186.png", type: "img" },
+            { name: "Gallery 3", url: "https://gausium.com/wp-content/uploads/2024/12/Mobile-Water-Tank.193.png", type: "img" },
+            { name: "Gallery 4", url: "https://gausium.com/wp-content/uploads/2024/12/Mobile-Water-Tank.187.png", type: "img" },
+            { name: "Gallery 5", url: "https://gausium.com/wp-content/uploads/2024/12/Mobile-Water-Tank.189.png", type: "img" },
+            { name: "Minimal Maintenance Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Minimal-human-maintenance.svg", type: "img" },
+            { name: "Auto Tank Cleaning Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Auto-water-tank-cleaning.svg", type: "img" },
+            { name: "Task Scheduling Icon", url: "https://gausium.com/wp-content/uploads/2022/04/Task-Scheduling.svg", type: "img" },
+            { name: "Specs", url: "https://gausium.com/wp-content/uploads/2024/12/mobile-water-tank-specs-grey-768x745.jpg", type: "img" }
+        ];
+
+        // بيانات WS-03-S (جديدة)
+        const ws03sFiles = [
+            { name: "WS-03-S Card", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_front-card-560x365.png", type: "img" },
+            { name: "Banner", url: "https://gausium.com/wp-content/uploads/2024/07/Banner_ws-03-s.jpg", type: "img" },
+            { name: "Perspective View", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_perspective-2.png", type: "img" },
+            { name: "Front View", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_front.png", type: "img" },
+            { name: "Rear View", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_rear.png", type: "img" },
+            { name: "Side View 1", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_side-1.png", type: "img" },
+            { name: "Side View 2", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_side-2.png", type: "img" },
+            { name: "Top View", url: "https://gausium.com/wp-content/uploads/2024/07/top.png", type: "img" },
+            { name: "Auto Charging Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Power-Charging.svg", type: "img" },
+            { name: "Auto Refill Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Water-Refill.svg", type: "img" },
+            { name: "Sewage Discharge Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Sewage-Discharge.svg", type: "img" },
+            { name: "Pipe Rinse Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Suction-Pipe-Rinse_.svg", type: "img" },
+            { name: "Squeegee Rinse Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Auto-Squeegee-Rinse_.svg", type: "img" },
+            { name: "Optional Tank Icon", url: "https://gausium.com/wp-content/uploads/2024/07/Optional-Mobile-Water-Tank_.svg", type: "img" },
+            { name: "Specs Line", url: "https://gausium.com/wp-content/uploads/2024/07/WS-03-S_SPEC-line.jpg", type: "img" }
+        ];
+
+        function showSection(id) {
+            document.querySelectorAll('video').forEach(v => v.pause());
+            ['homePage', 'bellaSection', 'proSection', 'flashSection', 'scrubberSection', 'scrubber50Section', 'omnieSection', 'phantasSection', 'beetleSection', 'phanshopSection', 'vacuum40Section', 'cd01Section', 'cd04Section', 'ws01Section', 'ws02Section', 'mobileWaterTankSection', 'ws03sSection'].forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.toggle('hidden', s !== id);
+            });
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.select();
+            textArea.setSelectionRange(0, 99999);
+            try {
+                if (document.execCommand('copy')) showToast();
+            } catch (err) {}
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.className = "copy-toast show";
+            setTimeout(() => toast.className = "copy-toast", 2000);
+        }
+
+        function createCard(file, index, colorClass) {
+            let media = file.type === 'img' 
+                ? `<img loading="lazy" src="${file.url}" alt="${file.name}">` 
+                : `<video preload="metadata" controls class="w-full h-full object-contain"><source src="${file.url}" type="video/mp4"></video>`;
+            return `
+                <div class="glass-card p-4 rounded-2xl relative">
+                    <div class="media-box mb-4">${media}</div>
+                    <h3 class="font-bold mb-4 text-center"><span class="${colorClass}">#${index+1}</span> ${file.name}</h3>
+                    <button onclick="copyToClipboard('${file.url}')" class="w-full py-2 nav-btn rounded-xl text-white font-bold shadow-md hover:brightness-110 active:scale-95 transition-all">نسخ الرابط</button>
+                </div>`;
+        }
+
+        function renderGrid(files, gridId, colorClass) {
+            const grid = document.getElementById(gridId);
+            if(grid) {
+                grid.innerHTML = files.map((file, index) => createCard(file, index, colorClass)).join('');
+            }
+        }
+
+        function renderScrubber() {
+            const container = document.getElementById('scrubberGrid');
+            if(container) {
+                let html = `<div class="category-label">Product Banner & Misc</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${scrubberMisc.map((f, i) => createCard(f, i, 'text-purple-400')).join('')}</div>`;
+                html += `<div class="category-label">Scrubber 75 S Series</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${scrubberS.map((f, i) => createCard(f, i, 'text-purple-400')).join('')}</div>`;
+                html += `<div class="category-label">Scrubber 75 P Series</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${scrubberP.map((f, i) => createCard(f, i, 'text-purple-400')).join('')}</div>`;
+                container.innerHTML = html;
+            }
+        }
+
+        function renderVacuum40() {
+            const container = document.getElementById('vacuum40Grid');
+            if(container) {
+                let html = `<div class="category-label">General Images & Features</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${vacuum40Misc.map((f, i) => createCard(f, i, 'text-indigo-400')).join('')}</div>`;
+                html += `<div class="category-label">Vacuum 40 Gallery</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${vacuum40Main.map((f, i) => createCard(f, i, 'text-indigo-400')).join('')}</div>`;
+                html += `<div class="category-label">Vacuum 40 Diffuser Gallery</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${vacuum40Diffuser.map((f, i) => createCard(f, i, 'text-indigo-400')).join('')}</div>`;
+                container.innerHTML = html;
+            }
+        }
+
+        function renderCD01() {
+            const container = document.getElementById('cd01Grid');
+            if(container) {
+                let html = `<div class="category-label">General & Specs</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cd01Misc.map((f, i) => createCard(f, i, 'text-gray-400')).join('')}</div>`;
+                html += `<div class="category-label">CD-01 White</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cd01White.map((f, i) => createCard(f, i, 'text-gray-400')).join('')}</div>`;
+                html += `<div class="category-label">CD-01 Grey</div><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${cd01Grey.map((f, i) => createCard(f, i, 'text-gray-400')).join('')}</div>`;
+                container.innerHTML = html;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderGrid(bellaFiles, 'bellaGrid', 'text-blue-400');
+            renderGrid(proFiles, 'proGrid', 'text-emerald-400');
+            renderGrid(flashFiles, 'flashGrid', 'text-orange-400');
+            renderGrid(scrubber50Files, 'scrubber50Grid', 'text-teal-400'); 
+            renderGrid(omnieFiles, 'omnieGrid', 'text-cyan-400');
+            renderGrid(phantasFiles, 'phantasGrid', 'text-rose-400');
+            renderGrid(beetleFiles, 'beetleGrid', 'text-yellow-400');
+            renderGrid(phanshopFiles, 'phanshopGrid', 'text-pink-400'); 
+            renderScrubber();
+            renderVacuum40(); 
+            renderCD01(); 
+            renderGrid(cd04Files, 'cd04Grid', 'text-lime-400'); 
+            renderGrid(ws01Files, 'ws01Grid', 'text-red-400'); 
+            renderGrid(ws02Files, 'ws02Grid', 'text-violet-400'); 
+            renderGrid(mobileWaterTankFiles, 'mobileWaterTankGrid', 'text-sky-500'); // Mobile Water Tank Render
+            renderGrid(ws03sFiles, 'ws03sGrid', 'text-fuchsia-400'); // WS-03-S Render
+        });
+    </script>
+</body>
+</html>
