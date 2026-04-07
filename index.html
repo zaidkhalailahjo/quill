@@ -79,7 +79,6 @@
                     <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
                     <select id="setupRole" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
                         <option value="" disabled selected>-- اختر وظيفتك --</option>
-                        <option value="CEO">CEO (المدير التنفيذي)</option>
                         <option value="technical team supervisor">Technical Team Supervisor</option>
                         <option value="Technical Engineer">Technical Engineer</option>
                         <option value="accountant">Accountant</option>
@@ -567,7 +566,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInWithCustomToken, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -607,7 +606,7 @@
         let initialTaskLoad = true; 
         let initialChatLoad = true;
         let knownTaskIds = new Set();
-        let groupReadTimestamps = {}; // { groupId: timestamp }
+        let groupReadTimestamps = {}; 
         
         let pendingChatFileData = null;
         let pendingChatFileType = null;
@@ -624,7 +623,6 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
-        // ------------------ إشعارات المتصفح ------------------
         let hasRequestedNotification = false;
         window.requestNotifications = () => {
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -647,7 +645,6 @@
             }
         }
 
-        // ------------------ مكالمات الفيديو والاجتماعات ------------------
         window.openCreateMeetingModal = () => {
             const container = document.getElementById('meetingMembersSelection');
             container.innerHTML = '';
@@ -684,7 +681,7 @@
 
             const checkboxes = document.querySelectorAll('.meeting-member-checkbox:checked');
             const invited = Array.from(checkboxes).map(cb => cb.value);
-            invited.push(currentUserData.uid); // المدير دائماً مدعو
+            invited.push(currentUserData.uid); 
 
             try {
                 await addDoc(getColRef('meetings'), {
@@ -696,7 +693,7 @@
                     status: status,
                     startedAt: status === 'active' ? Date.now() : null,
                     endedAt: null,
-                    events: [], // لتسجيل من دخل وخرج
+                    events: [], 
                     timestamp: Date.now()
                 });
 
@@ -729,10 +726,8 @@
             document.querySelector('#jitsiContainer').innerHTML = '';
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
-            // تسجيل الدخول في قاعدة البيانات
             logMeetingEvent(meetingId, 'joined');
 
-            // إذا كان المدير يدخل اجتماعاً مجدولاً، حوله لـ Active
             if (currentUserData.role === 'CEO') {
                 const meeting = globalMeetings.find(m => m.id === meetingId);
                 if (meeting && meeting.status === 'scheduled') {
@@ -840,7 +835,6 @@
                         </div>
                     `;
                 } else if (meeting.status === 'ended') {
-                    // للموظف العادي: يجب أن يكون قد دخل المكالمة لتظهر له
                     const myEvents = meeting.events ? meeting.events.filter(e => e.uid === currentUserData.uid) : [];
                     if (!isCEO && myEvents.length === 0) return;
 
@@ -849,11 +843,9 @@
                     
                     let detailsHtml = '';
                     if (isCEO) {
-                        // المدير يرى كل التفاصيل
                         const participants = [...new Set((meeting.events || []).map(e => e.name))].join('، ');
                         detailsHtml = `<p class="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">المشاركون: ${participants || 'لا أحد'}</p>`;
                     } else {
-                        // الموظف يرى من كان معه ومتى دخل
                         const joinTime = myEvents.find(e => e.action === 'joined')?.timestamp;
                         const joinStr = joinTime ? new Date(joinTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
                         const others = [...new Set((meeting.events || []).map(e => e.name))].filter(n => n !== currentUserData.name).join('، ');
@@ -880,7 +872,6 @@
             if(!hasPast) pastList.innerHTML = '<p class="text-sm text-gray-400">لا يوجد سجل مكالمات سابقة.</p>';
         }
 
-        // ------------------ معالجة الروابط (Hash Routing) ------------------
         function handleHashChange() {
             if(!currentUserData) return; 
             
@@ -968,14 +959,12 @@
                 document.getElementById('mobileOverlay').classList.add('hidden');
             }
             if(sectionId === 'chat') {
-                // عند فتح الشات، قم بتحديث وقت القراءة
                 updateReadReceipt(currentGroupId);
                 const chatBox = document.getElementById('chatMessages');
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         };
 
-        // تحديث وقت قراءة الرسائل للمجموعة
         async function updateReadReceipt(groupId) {
             if(!currentUserData) return;
             groupReadTimestamps[groupId] = Date.now();
@@ -983,7 +972,7 @@
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
                     readReceipts: groupReadTimestamps
                 });
-                renderChatSubMenu(); // لإعادة حساب الإشعارات وإخفائها
+                renderChatSubMenu(); 
             } catch(e) {}
         }
 
@@ -1126,12 +1115,12 @@
             document.getElementById('chatColorPicker').classList.toggle('hidden');
         };
 
-        window.setChatColor = (colorClass, btnElement) => {
+        window.setChatColor = async (colorClass, btnElement) => {
             selectedChatColor = colorClass;
             document.getElementById('chatColorPicker').classList.add('hidden');
             
             const sendBtn = document.querySelector('#chatForm button[type="submit"]');
-            sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+            if (sendBtn) sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
             
             if (btnElement) {
                 document.querySelectorAll('.color-btn').forEach(b => {
@@ -1141,6 +1130,15 @@
                 btnElement.classList.remove('hover:scale-110');
                 const ringClass = colorClass.replace('bg-', 'ring-');
                 btnElement.className += ` ring-2 ring-offset-2 ${ringClass}`;
+            }
+
+            if (currentUserData) {
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                        chatColor: colorClass
+                    });
+                    currentUserData.chatColor = colorClass;
+                } catch(e) {}
             }
         };
 
@@ -1222,15 +1220,17 @@
             }
         };
 
-        // ------------------ المصادقة ------------------
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } catch (err) { console.error("Auth error:", err); }
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                try { await signInWithCustomToken(auth, __initial_auth_token); } catch(e) {}
+            }
         };
 
         onAuthStateChanged(auth, async (user) => {
             document.getElementById('loadingScreen').classList.add('hidden');
             
             if (user) {
+                document.getElementById('loginScreen').classList.add('hidden');
                 currentUserAuth = user;
                 const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
                 try {
@@ -1242,11 +1242,20 @@
                         finishLoginSetup();
                     } else {
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
+                        if(user.displayName) document.getElementById('setupName').value = user.displayName;
                     }
                 } catch(e) { console.error(e); }
             } else {
-                document.getElementById('setupProfileScreen').classList.remove('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('setupProfileScreen').classList.add('hidden');
             }
+        });
+
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+            } catch (error) { alert("خطأ في تسجيل الدخول"); }
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -1269,6 +1278,7 @@
                     email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
                     chatLayout: 'media-top',
+                    chatColor: 'bg-[#00839b]',
                     readReceipts: {},
                     timestamp: Date.now()
                 };
@@ -1285,7 +1295,6 @@
         function finishLoginSetup() {
             updateUIWithUserData();
             
-            // طلب الإشعارات
             if ("Notification" in window && Notification.permission !== "granted") {
                 Notification.requestPermission();
             }
@@ -1327,6 +1336,22 @@
             
             const layoutSelect = document.getElementById('settingsChatLayout');
             if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
+
+            if (currentUserData.chatColor) {
+                selectedChatColor = currentUserData.chatColor;
+                const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+                if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+                
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
+                    b.classList.add('hover:scale-110');
+                    if(b.classList.contains(selectedChatColor)) {
+                        b.classList.remove('hover:scale-110');
+                        const ringClass = selectedChatColor.replace('bg-', 'ring-');
+                        b.className += ` ring-2 ring-offset-2 ${ringClass}`;
+                    }
+                });
+            }
         }
 
         async function logAction(action, details) {
@@ -1396,7 +1421,6 @@
                 updateStorageProgress();
             });
 
-            // الاستماع للاجتماعات
             onSnapshot(getColRef('meetings'), (snapshot) => {
                 globalMeetings = [];
                 snapshot.forEach(doc => globalMeetings.push({ id: doc.id, ...doc.data() }));
@@ -1422,7 +1446,6 @@
             onSnapshot(getColRef('chat'), (snapshot) => {
                 const oldChatCount = globalChat.length;
                 globalChat = [];
-                let newMessages = [];
                 
                 snapshot.forEach(doc => {
                     const msg = { id: doc.id, ...doc.data() };
@@ -1430,9 +1453,7 @@
                 });
                 globalChat.sort((a, b) => a.timestamp - b.timestamp);
                 
-                // البحث عن الرسائل الجديدة لإرسال إشعارات
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
-                    // آخر رسالة
                     const latestMsg = globalChat[globalChat.length - 1];
                     if (latestMsg && latestMsg.uid !== currentUserData.uid) {
                         const isMention = latestMsg.text && latestMsg.text.includes(`@${currentUserData.name}`);
@@ -1445,18 +1466,16 @@
                     }
                 }
 
-                // إذا كنا داخل الشات، نحدث وقت القراءة للمجموعة الحالية فوراً
                 if (!document.getElementById('chat').classList.contains('hidden')) {
                     updateReadReceipt(currentGroupId);
                 }
 
                 initialChatLoad = false;
-                renderChatSubMenu(); // لتحديث إشعارات الأرقام والمنشن
+                renderChatSubMenu(); 
                 renderChat();
             });
         }
 
-        // ------------------ إحصائيات وعدادات الشات ------------------
         function getGroupUnreadInfo(groupId) {
             const lastRead = groupReadTimestamps[groupId] || 0;
             const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
@@ -1496,7 +1515,6 @@
                 `;
             });
             
-            // تحديث الشارة الرئيسية للمحادثات
             const mainBadge = document.getElementById('globalChatBadge');
             if(totalMentions) {
                 mainBadge.innerText = '@';
@@ -1523,7 +1541,7 @@
 
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
-            window.showSection('chat'); // تقوم بتحديث updateReadReceipt
+            window.showSection('chat'); 
             renderChatSubMenu(); 
             renderChat();
             
@@ -1740,7 +1758,35 @@
 
             filteredChat.forEach(msg => {
                 const isMe = msg.uid === currentUserData.uid;
-                const formattedText = msg.text ? msg.text.replace(/@([^\s]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>') : '';
+                
+                // ---------------------------------
+                // تحسين نظام المنشن ليشمل الاسم الكامل
+                // ---------------------------------
+                let formattedText = msg.text || '';
+                if (formattedText) {
+                    let mentionedNames = [];
+                    // ترتيب الأسماء من الأطول للأقصر لتفادي تداخل الأسماء المتشابهة
+                    const sortedNames = globalUsers.map(u => u.name).sort((a, b) => b.length - a.length);
+                    
+                    sortedNames.forEach((name, index) => {
+                        const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`@${safeName}`, 'g');
+                        if (regex.test(formattedText)) {
+                            mentionedNames.push(name);
+                            formattedText = formattedText.replace(regex, `__MENTION_${index}__`);
+                        }
+                    });
+                    
+                    // استبدال باقي المنشن العادي بدون مسافات (إن وجد)
+                    formattedText = formattedText.replace(/@([^\s_]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
+                    
+                    // إعادة الأسماء الكاملة
+                    mentionedNames.forEach((name, index) => {
+                        formattedText = formattedText.replace(new RegExp(`__MENTION_${index}__`, 'g'), `<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@${name}</span>`);
+                    });
+                }
+                // ---------------------------------
+                
                 const alignClass = isMe ? 'justify-start' : 'justify-end';
                 
                 const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white border border-gray-200 text-gray-800');
