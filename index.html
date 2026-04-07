@@ -588,7 +588,7 @@
                 if (userProfile) {
                     document.getElementById('profile-screen').classList.add('hidden-view');
                     document.getElementById('main-app').classList.remove('hidden-view');
-                    updateUI();
+                    updateUI(); // هنا يتم تحديث وعرض كل الأقسام بما فيها الدردشة
                 } else {
                     document.getElementById('profile-name').value = currentUser.displayName || '';
                     document.getElementById('profile-email').value = currentUser.email || '';
@@ -668,9 +668,18 @@
             const topbarBadge = document.getElementById('topbar-notif-badge');
             unreadCount > 0 ? topbarBadge.classList.remove('hidden') : topbarBadge.classList.add('hidden');
 
+            // إضافة جميع عمليات الرسم هنا لحل مشكلة عدم الظهور عند تسجيل الدخول
             renderNotifications();
             renderTeamMembers();
             renderTasks();
+            renderChat();
+            renderCRM();
+            renderDrive();
+            
+            if (!document.getElementById('admin-panel').classList.contains('hidden-view')) {
+                renderAdminPanel();
+            }
+
             lucide.createIcons();
         }
 
