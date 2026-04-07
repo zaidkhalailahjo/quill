@@ -336,13 +336,13 @@
                         </div>
 
                         <!-- لوحة الألوان العائمة للدردشة -->
-                        <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-3 z-20">
-                            <button type="button" onclick="window.setChatColor('bg-secondary')" class="w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] focus:outline-none focus:ring-opacity-50" title="افتراضي (بترولي)"></button>
-                            <button type="button" onclick="window.setChatColor('bg-indigo-500')" class="w-6 h-6 rounded-full bg-indigo-500 hover:scale-110 transition-transform" title="نيلي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-[#002d74]')" class="w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="أزرق داكن"></button>
-                            <button type="button" onclick="window.setChatColor('bg-emerald-600')" class="w-6 h-6 rounded-full bg-emerald-600 hover:scale-110 transition-transform" title="زمردي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-violet-500')" class="w-6 h-6 rounded-full bg-violet-500 hover:scale-110 transition-transform" title="بنفسجي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-slate-600')" class="w-6 h-6 rounded-full bg-slate-600 hover:scale-110 transition-transform" title="رمادي غامق"></button>
+                        <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-2 z-20">
+                            <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
+                            <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
+                            <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
+                            <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
+                            <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
+                            <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
                         </div>
 
                         <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
@@ -420,6 +420,19 @@
                             <div class="relative">
                                 <i class="fa-solid fa-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="email" id="settingsEmail" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none" dir="ltr" style="text-align: left;">
+                            </div>
+                        </div>
+
+                        <!-- إعدادات وسائط الدردشة -->
+                        <div class="pt-4 border-t border-gray-100">
+                            <label class="block text-sm font-bold text-gray-700 mb-1">ترتيب عرض وسائط المحادثة</label>
+                            <p class="text-xs text-gray-500 mb-2">اختر طريقة عرض النص مع الصور أو الفيديوهات في رسائلك.</p>
+                            <div class="relative">
+                                <i class="fa-solid fa-layer-group absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <select id="settingsChatLayout" onchange="window.updateChatLayoutPref(this.value)" class="w-full border border-gray-200 bg-white rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium focus:border-secondary focus:outline-none transition shadow-sm cursor-pointer hover:border-gray-300">
+                                    <option value="media-top">الوسائط في الأعلى والنص في الأسفل (الافتراضي)</option>
+                                    <option value="text-top">النص في الأعلى والوسائط في الأسفل</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -585,7 +598,7 @@
         let pendingChatFileType = null;
         
         // لون رسالة الشات الافتراضي (البترولي)
-        let selectedChatColor = 'bg-secondary'; 
+        let selectedChatColor = 'bg-[#00839b]'; 
 
         // المساحة الكلية (15 ميجابايت = 15 * 1024 * 1024)
         const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; 
@@ -845,18 +858,44 @@
             reader.readAsDataURL(file);
         };
 
+        // ------------------ تغيير تفضيل ترتيب الوسائط ------------------
+        window.updateChatLayoutPref = async (value) => {
+            if(!currentUserData) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    chatLayout: value
+                });
+                currentUserData.chatLayout = value; // التحديث محلياً فوراً
+                showToast('تم حفظ تفضيلات الدردشة بنجاح', 'success');
+                renderChat(); // إعادة رسم الدردشة لتطبيق الشكل الجديد
+            } catch(e) {
+                showToast('حدث خطأ أثناء حفظ الإعدادات', 'warning');
+            }
+        };
+
         // ------------------ ألوان الدردشة ------------------
         window.toggleChatColorPicker = () => {
             document.getElementById('chatColorPicker').classList.toggle('hidden');
         };
 
-        window.setChatColor = (colorClass) => {
+        window.setChatColor = (colorClass, btnElement) => {
             selectedChatColor = colorClass;
             document.getElementById('chatColorPicker').classList.add('hidden');
             
             // تغيير لون أيقونة الإرسال لتعكس اللون المختار
-            const btn = document.querySelector('#chatForm button[type="submit"]');
-            btn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+            const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+            sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+            
+            // تحديث الدائرة النشطة لتبين اللون الذي تم اختياره
+            if (btnElement) {
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
+                    b.classList.add('hover:scale-110');
+                });
+                btnElement.classList.remove('hover:scale-110');
+                const ringClass = colorClass.replace('bg-', 'ring-');
+                btnElement.className += ` ring-2 ring-offset-2 ${ringClass}`;
+            }
         };
 
         document.addEventListener('click', (e) => {
@@ -1033,6 +1072,7 @@
                     uid: currentUserAuth.uid,
                     email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
+                    chatLayout: 'media-top', // التفضيل الافتراضي لترتيب الوسائط
                     timestamp: Date.now()
                 };
                 
@@ -1079,6 +1119,12 @@
             document.getElementById('settingsName').value = currentUserData.name;
             document.getElementById('settingsRole').value = currentUserData.role;
             document.getElementById('settingsEmail').value = currentUserData.email;
+            
+            // تحديث تفضيلات الدردشة في الإعدادات
+            const layoutSelect = document.getElementById('settingsChatLayout');
+            if (layoutSelect) {
+                layoutSelect.value = currentUserData.chatLayout || 'media-top';
+            }
         }
 
         async function logAction(action, details) {
@@ -1454,17 +1500,17 @@
                 else if(file.type.includes('pdf')) fileIcon = 'fa-file-pdf text-red-600';
                 else if(file.type.includes('word') || file.type.includes('document')) fileIcon = 'fa-file-word text-blue-700';
 
-                // أزرار التحكم متاحة للجميع
+                // أزرار التحكم في الأسفل
                 let controlsHtml = `
-                    <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 p-1" title="حذف">
+                    <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-gray-500 hover:text-red-500 w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="حذف">
                         <i class="fa-solid fa-trash"></i>
                     </button>
-                    <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-500'} p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}">
+                    <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-yellow-500 bg-yellow-50' : 'text-gray-500 hover:text-yellow-500 bg-gray-100'} w-8 h-8 flex items-center justify-center rounded transition" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}">
                         <i class="fa-solid fa-thumbtack"></i>
                     </button>
                 `;
 
-                // عرض معاينة إن كانت صورة أو فيديو بحيث تفتح في المودال
+                // عرض معاينة
                 let previewHtml = `<div class="h-24 bg-gray-50 flex items-center justify-center text-4xl"><i class="fa-solid ${fileIcon}"></i></div>`;
                 if(file.type.startsWith('image/')) {
                     previewHtml = `<div class="h-24 bg-gray-200 cursor-pointer" onclick="window.openMedia('${file.data}', '${file.type}')"><img src="${file.data}" class="w-full h-full object-cover hover:opacity-80 transition"></div>`;
@@ -1476,16 +1522,17 @@
                 }
 
                 const fileCard = `
-                    <div class="bg-white rounded-xl shadow-sm border ${file.pinned ? 'border-yellow-300 shadow-yellow-100' : 'border-gray-200'} overflow-hidden relative flex flex-col group transition-all hover:shadow-md">
+                    <div class="bg-white rounded-xl shadow-sm border ${file.pinned ? 'border-yellow-300 shadow-yellow-100' : 'border-gray-200'} overflow-hidden relative flex flex-col group transition-all hover:shadow-md pb-8">
                         ${previewHtml}
                         <div class="p-3 flex-1 flex flex-col">
                             <p class="font-bold text-gray-800 text-xs truncate mb-1" title="${file.name}">${file.name}</p>
                             <p class="text-[10px] text-gray-500 mt-auto">بواسطة: ${file.uploaderName}${fileSizeText}</p>
                         </div>
                         
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 pointer-events-none">
-                            <div class="pointer-events-auto flex items-center gap-3">
-                                <a href="${file.data}" download="${file.name}" class="bg-white text-gray-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-secondary hover:text-white transition" title="تحميل">
+                        <!-- شريط الأزرار في الأسفل -->
+                        <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity border-t border-gray-100 pointer-events-none flex justify-end">
+                            <div class="pointer-events-auto flex items-center gap-2">
+                                <a href="${file.data}" download="${file.name}" class="text-gray-500 hover:text-primary w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="تحميل">
                                     <i class="fa-solid fa-download"></i>
                                 </a>
                                 ${controlsHtml}
@@ -1535,6 +1582,7 @@
             });
         }
 
+        // رسم محتوى الدردشة مع احترام تفضيلات المستخدم (وسائط فوق أم نص فوق)
         function renderChat() {
             const chatBox = document.getElementById('chatMessages');
             chatBox.innerHTML = '';
@@ -1546,15 +1594,19 @@
                 return;
             }
 
+            const layoutPref = currentUserData?.chatLayout || 'media-top';
+
             filteredChat.forEach(msg => {
                 const isMe = msg.uid === currentUserData.uid;
                 const formattedText = msg.text ? msg.text.replace(/@([^\s]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>') : '';
                 const alignClass = isMe ? 'justify-start' : 'justify-end';
                 
-                // استخدام اللون المحفوظ أو الافتراضي
-                const msgBgClass = isMe ? (msg.color || 'bg-secondary') + ' text-white' : 'bg-white border border-gray-200 text-gray-800';
-                const textClass = isMe ? 'text-gray-400' : 'text-gray-500';
+                const msgBgClass = isMe ? (msg.color || 'bg-[#00839b]') + ' text-white' : 'bg-white border border-gray-200 text-gray-800';
+                const textClass = isMe ? 'text-gray-500 font-bold' : 'text-gray-800 font-bold'; // جعل الاسم أغمق للآخرين
                 const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
+                
+                // جلب صورة صاحب الرسالة
+                const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName)}&background=00839b&color=fff`;
 
                 let attachmentHtml = '';
                 if(msg.fileData) {
@@ -1567,16 +1619,30 @@
                     }
                 }
 
-                // ترتيب الرسالة: المرفق في الأعلى والنص في الأسفل إذا كان موجوداً
+                // بناء محتوى الرسالة بناءً على إعدادات المستخدم المخصصة
+                let messageBody = '';
+                if (layoutPref === 'text-top') {
+                    messageBody = `
+                        ${formattedText ? `<p class="text-sm md:text-base break-words ${msg.fileData ? 'mb-2' : ''}">${formattedText}</p>` : ''}
+                        ${attachmentHtml}
+                    `;
+                } else {
+                    messageBody = `
+                        ${attachmentHtml}
+                        ${formattedText ? `<p class="text-sm md:text-base break-words ${msg.fileData ? 'mt-2' : ''}">${formattedText}</p>` : ''}
+                    `;
+                }
+
                 chatBox.innerHTML += `
-                    <div class="flex ${alignClass} mb-4">
+                    <div class="flex ${alignClass} mb-4 items-end gap-2">
+                        ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" alt="Avatar">` : ''}
                         <div class="max-w-[85%] md:max-w-[70%] min-w-[150px]">
-                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
+                            <span class="text-xs ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
                             <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
-                                ${attachmentHtml}
-                                ${formattedText ? `<p class="text-sm md:text-base break-words ${msg.fileData ? 'mt-2' : ''}">${formattedText}</p>` : ''}
+                                ${messageBody}
                             </div>
                         </div>
+                        ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" alt="Avatar">` : ''}
                     </div>
                 `;
             });
@@ -1681,6 +1747,7 @@
                     text: text,
                     uid: currentUserData.uid,
                     senderName: currentUserData.name,
+                    photoURL: currentUserData.photoURL, // إضافة الصورة مع الرسالة
                     groupId: currentGroupId,
                     color: selectedChatColor, // حفظ اللون المختار
                     timestamp: Date.now()
