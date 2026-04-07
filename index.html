@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  LayoutDashboard, 
-  CheckSquare, 
-  Users, 
-  Settings, 
-  Bell, 
-  Search, 
-  Plus, 
-  MoreVertical,
-  LogOut,
-  Briefcase
+  LayoutDashboard, CheckSquare, Users, Settings, Bell, Search, Plus, 
+  MoreVertical, LogOut, Briefcase, UserPlus, AlertCircle
 } from 'lucide-react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken, signOut } from 'firebase/auth';
+import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+
+// إعدادات بيئة Firebase (متوفرة تلقائياً في هذه البيئة)
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'quill-workspace';
 
 // ألوان شركة Quill
 const brandColors = {
@@ -20,45 +22,216 @@ const brandColors = {
   white: '#ffffff'
 };
 
+const LOGO_URL = "https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png";
+
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'تصميم الشعار الجديد للمشروع (ألفا)', status: 'قيد التنفيذ', priority: 'عالية', date: 'اليوم' },
-    { id: 2, title: 'تحديث بيانات الموظفين في النظام', status: 'مكتمل', priority: 'متوسطة', date: 'أمس' },
-    { id: 3, title: 'التحضير لاجتماع الإدارة الربع سنوي', status: 'معلق', priority: 'عالية', date: 'غداً' },
-  ]);
+  
+  // State for Firestore Data
+  const [tasks, setTasks] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  
+  // UI States
+  const [loading, setLoading] = useState(true);
   const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [profileForm, setProfileForm] = useState({ name: '', role: '', email: '' });
 
-  const teamMembers = [
-    { id: 1, name: 'أحمد محمود', role: 'مدير منتج', email: 'ahmad@quill.com', avatar: 'https://i.pravatar.cc/150?u=1' },
-    { id: 2, name: 'سارة خالد', role: 'مصممة واجهات', email: 'sara@quill.com', avatar: 'https://i.pravatar.cc/150?u=2' },
-    { id: 3, name: 'عمر عبدالله', role: 'مطور ويب', email: 'omar@quill.com', avatar: 'https://i.pravatar.cc/150?u=3' },
-    { id: 4, name: 'ليلى حسن', role: 'مسؤولة تسويق', email: 'laila@quill.com', avatar: 'https://i.pravatar.cc/150?u=4' },
-  ];
+  const processedNotifications = useRef(new Set()); // لمنع تكرار إشعارات المتصفح
 
-  const handleAddTask = (e) => {
+  // 1. التهيئة والمصادقة (Auth)
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Auth error:", error);
+      }
+    };
+    initAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (!currentUser) setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. جلب البيانات من Firebase (Tasks, Users, Notifications)
+  useEffect(() => {
+    if (!user) return;
+
+    // طلب إذن إشعارات المتصفح
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+    const tasksRef = collection(db, 'artifacts', appId, 'public', 'data', 'tasks');
+    const notifRef = collection(db, 'artifacts', appId, 'public', 'data', 'notifications');
+
+    const unsubUsers = onSnapshot(usersRef, (snapshot) => {
+      const usersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTeamMembers(usersData);
+      
+      const currentProfile = usersData.find(u => u.id === user.uid);
+      if (currentProfile) {
+        setUserProfile(currentProfile);
+        setShowProfileSetup(false);
+      } else {
+        setShowProfileSetup(true);
+      }
+      setLoading(false);
+    }, (err) => console.error("Users Error:", err));
+
+    const unsubTasks = onSnapshot(tasksRef, (snapshot) => {
+      const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => b.createdAt - a.createdAt);
+      setTasks(tasksData);
+    }, (err) => console.error("Tasks Error:", err));
+
+    const unsubNotif = onSnapshot(notifRef, (snapshot) => {
+      const allNotifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // جلب الإشعارات الخاصة بي فقط
+      const myNotifs = allNotifs.filter(n => n.userId === user.uid).sort((a,b) => b.createdAt - a.createdAt);
+      setNotifications(myNotifs);
+
+      // إطلاق إشعار سطح المكتب للإشعارات الجديدة غير المقروءة
+      myNotifs.forEach(notif => {
+        if (!notif.read && !processedNotifications.current.has(notif.id)) {
+          processedNotifications.current.add(notif.id);
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Quill Workspace", {
+              body: notif.message,
+              icon: LOGO_URL
+            });
+          }
+        }
+      });
+    }, (err) => console.error("Notif Error:", err));
+
+    return () => { unsubUsers(); unsubTasks(); unsubNotif(); };
+  }, [user]);
+
+  // إعداد الملف الشخصي
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    if (!profileForm.name || !profileForm.role) return;
+    
+    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid), {
+      name: profileForm.name,
+      role: profileForm.role,
+      email: profileForm.email || 'user@quill.com',
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(profileForm.name)}&background=002d74&color=fff`,
+      joinedAt: Date.now()
+    });
+  };
+
+  // إضافة مهمة جديدة
+  const handleAddTask = async (e) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
-    const newTask = {
-      id: tasks.length + 1,
+    
+    const taskData = {
       title: newTaskTitle,
       status: 'معلق',
       priority: 'متوسطة',
-      date: 'اليوم'
+      date: new Date().toLocaleDateString('ar-EG'),
+      creatorId: user.uid,
+      creatorName: userProfile?.name || 'مجهول',
+      assigneeId: assignedTo || null,
+      createdAt: Date.now()
     };
-    setTasks([newTask, ...tasks]);
+
+    const taskRef = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), taskData);
+
+    // إذا تم تعيين المهمة لشخص آخر، أرسل له إشعاراً
+    if (assignedTo && assignedTo !== user.uid) {
+      const assignee = teamMembers.find(m => m.id === assignedTo);
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notifications'), {
+        userId: assignedTo,
+        message: `تم تكليفك بمهمة جديدة: ${newTaskTitle}`,
+        taskId: taskRef.id,
+        read: false,
+        createdAt: Date.now()
+      });
+      // NOTE: هنا يمكن ربط Firebase Functions لإرسال Email حقيقي للموظف.
+    }
+
     setNewTaskTitle('');
+    setAssignedTo('');
   };
 
-  // --- مكونات الواجهة الفرعية ---
+  // تغيير حالة المهمة
+  const toggleTaskStatus = async (task) => {
+    const newStatus = task.status === 'مكتمل' ? 'معلق' : 'مكتمل';
+    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id), {
+      status: newStatus
+    });
+    
+    // إشعار لصاحب المهمة إذا أكملها شخص آخر
+    if (newStatus === 'مكتمل' && task.creatorId !== user.uid) {
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notifications'), {
+        userId: task.creatorId,
+        message: `${userProfile?.name} أكمل المهمة: ${task.title}`,
+        taskId: task.id,
+        read: false,
+        createdAt: Date.now()
+      });
+    }
+  };
+
+  // --- مكونات الواجهة ---
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]" dir="rtl"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00839b]"></div></div>;
+  }
+
+  if (showProfileSetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir="rtl">
+        <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4" style={{ borderTopColor: brandColors.navy }}>
+          <div className="text-center mb-8">
+            <img src={LOGO_URL} alt="Quill Logo" className="h-16 mx-auto mb-4 bg-[#002d74] p-2 rounded-xl" />
+            <h2 className="text-2xl font-bold" style={{ color: brandColors.navy }}>أهلاً بك في مساحة العمل</h2>
+            <p className="text-gray-500 mt-2">يرجى إكمال بياناتك للانضمام للفريق</p>
+          </div>
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+              <input type="text" required value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 outline-none" style={{ focusRingColor: brandColors.teal }} placeholder="مثال: أحمد محمود" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">المسمى الوظيفي</label>
+              <input type="text" required value={profileForm.role} onChange={e => setProfileForm({...profileForm, role: e.target.value})} className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 outline-none" placeholder="مثال: مطور، مدير مبيعات..." />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+              <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 outline-none" placeholder="name@quill.world" />
+            </div>
+            <button type="submit" className="w-full text-white py-3 rounded-xl font-bold mt-6 shadow-md transition-all hover:shadow-lg" style={{ backgroundColor: brandColors.teal }}>
+              انضمام لمساحة العمل
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const Sidebar = () => (
     <div className="w-64 h-screen fixed top-0 right-0 text-white flex flex-col shadow-2xl z-20" style={{ backgroundColor: brandColors.navy }}>
       <div className="p-6 flex items-center justify-center border-b border-white/10">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xl mr-3 shadow-lg" style={{ backgroundColor: brandColors.teal }}>
-          Q
-        </div>
-        <span className="text-2xl font-bold tracking-wider">Quill</span>
+        <img src={LOGO_URL} alt="Quill" className="max-w-[150px] object-contain drop-shadow-md" />
       </div>
       
       <nav className="flex-1 mt-8 px-4 space-y-2">
@@ -66,9 +239,14 @@ export default function App() {
           <LayoutDashboard size={20} className="ml-3" />
           <span className="font-medium">لوحة التحكم</span>
         </button>
-        <button onClick={() => setActiveTab('tasks')} className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 ${activeTab === 'tasks' ? 'bg-white/20 shadow-md' : 'hover:bg-white/10'}`}>
+        <button onClick={() => setActiveTab('tasks')} className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 ${activeTab === 'tasks' ? 'bg-white/20 shadow-md' : 'hover:bg-white/10 relative'}`}>
           <CheckSquare size={20} className="ml-3" />
           <span className="font-medium">إدارة المهام</span>
+          {tasks.filter(t => t.assigneeId === user?.uid && t.status !== 'مكتمل').length > 0 && (
+            <span className="absolute left-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+              {tasks.filter(t => t.assigneeId === user?.uid && t.status !== 'مكتمل').length}
+            </span>
+          )}
         </button>
         <button onClick={() => setActiveTab('team')} className={`w-full flex items-center p-3 rounded-xl transition-all duration-300 ${activeTab === 'team' ? 'bg-white/20 shadow-md' : 'hover:bg-white/10'}`}>
           <Users size={20} className="ml-3" />
@@ -77,89 +255,121 @@ export default function App() {
       </nav>
 
       <div className="p-4 border-t border-white/10 mt-auto">
-        <div className="flex items-center p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
-          <img src="https://i.pravatar.cc/150?u=admin" alt="Admin" className="w-10 h-10 rounded-full ml-3 border-2 border-white/20" />
-          <div>
-            <div className="text-sm font-bold">المدير العام</div>
-            <div className="text-xs text-gray-300">admin@quill.com</div>
+        <div className="flex items-center p-3 bg-white/5 rounded-xl">
+          <img src={userProfile?.avatar} alt={userProfile?.name} className="w-10 h-10 rounded-full ml-3 border-2 border-white/20" />
+          <div className="overflow-hidden">
+            <div className="text-sm font-bold truncate">{userProfile?.name}</div>
+            <div className="text-xs text-gray-300 truncate">{userProfile?.role}</div>
           </div>
         </div>
-        <button className="w-full flex items-center justify-center p-3 mt-4 text-red-300 hover:bg-white/5 rounded-xl transition-colors">
-          <LogOut size={18} className="ml-2" />
-          <span>تسجيل الخروج</span>
-        </button>
       </div>
     </div>
   );
 
-  const Topbar = () => (
-    <header className="h-20 bg-white shadow-sm flex items-center justify-between px-8 z-10 sticky top-0">
-      <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-1/3 border border-gray-200 focus-within:ring-2 focus-within:ring-[#00839b]/50 transition-all">
-        <Search size={20} className="text-gray-400 ml-2" />
-        <input 
-          type="text" 
-          placeholder="ابحث في مساحة العمل..." 
-          className="bg-transparent border-none outline-none w-full text-sm text-gray-700"
-        />
-      </div>
-      <div className="flex items-center space-x-4 space-x-reverse">
-        <button className="p-2 relative text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-          <Bell size={22} />
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-        </button>
-        <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
-          <Settings size={22} />
-        </button>
-      </div>
-    </header>
-  );
+  const Topbar = () => {
+    const [showNotif, setShowNotif] = useState(false);
+
+    const markAllRead = () => {
+      notifications.filter(n => !n.read).forEach(async (notif) => {
+        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notifications', notif.id), { read: true });
+      });
+      setShowNotif(false);
+    };
+
+    return (
+      <header className="h-20 bg-white shadow-sm flex items-center justify-between px-8 z-10 sticky top-0">
+        <div className="flex items-center bg-gray-100 rounded-full px-4 py-2 w-1/3 border border-gray-200">
+          <Search size={20} className="text-gray-400 ml-2" />
+          <input type="text" placeholder="ابحث في مساحة العمل..." className="bg-transparent border-none outline-none w-full text-sm text-gray-700" />
+        </div>
+        <div className="flex items-center space-x-4 space-x-reverse relative">
+          <button onClick={() => setShowNotif(!showNotif)} className="p-2 relative text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+            <Bell size={22} />
+            {unreadCount > 0 && <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>}
+          </button>
+          
+          {/* Notifications Dropdown */}
+          {showNotif && (
+            <div className="absolute top-12 left-0 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h4 className="font-bold">الإشعارات</h4>
+                {unreadCount > 0 && <button onClick={markAllRead} className="text-xs text-blue-600 hover:underline">تحديد كـ مقروء</button>}
+              </div>
+              <div className="max-h-64 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <p className="p-4 text-center text-gray-500 text-sm">لا توجد إشعارات حالياً</p>
+                ) : (
+                  notifications.map(n => (
+                    <div key={n.id} className={`p-4 border-b border-gray-50 text-sm ${!n.read ? 'bg-blue-50/50 font-medium' : 'text-gray-600'}`}>
+                      {n.message}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+            <Settings size={22} />
+          </button>
+        </div>
+      </header>
+    );
+  };
 
   const DashboardView = () => (
     <div className="space-y-6 animate-fade-in">
-      <h1 className="text-3xl font-bold" style={{ color: brandColors.navy }}>مرحباً بك في مساحة عمل Quill 👋</h1>
-      <p className="text-gray-500">إليك ملخص سريع لما يحدث في شركتك اليوم.</p>
+      <h1 className="text-3xl font-bold" style={{ color: brandColors.navy }}>مرحباً بك، {userProfile?.name} 👋</h1>
+      <p className="text-gray-500">مساحة عمل Quill المتزامنة سحابياً (Real-time).</p>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4" style={{ borderTopColor: brandColors.teal }}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-700">المهام النشطة</h3>
+            <h3 className="text-lg font-bold text-gray-700">المهام الكلية (قيد التنفيذ)</h3>
             <div className="p-2 bg-blue-50 rounded-lg text-[#00839b]"><CheckSquare size={24} /></div>
           </div>
           <p className="text-3xl font-black" style={{ color: brandColors.navy }}>{tasks.filter(t => t.status !== 'مكتمل').length}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4" style={{ borderTopColor: brandColors.navy }}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-700">الموظفين المتصلين</h3>
-            <div className="p-2 bg-indigo-50 rounded-lg text-[#002d74]"><Users size={24} /></div>
+            <h3 className="text-lg font-bold text-gray-700">المهام الموكلة إليك</h3>
+            <div className="p-2 bg-red-50 rounded-lg text-red-500"><AlertCircle size={24} /></div>
           </div>
-          <p className="text-3xl font-black" style={{ color: brandColors.navy }}>{teamMembers.length}</p>
+          <p className="text-3xl font-black text-red-600">{tasks.filter(t => t.assigneeId === user?.uid && t.status !== 'مكتمل').length}</p>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-orange-400">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-700">المشاريع الحالية</h3>
-            <div className="p-2 bg-orange-50 rounded-lg text-orange-500"><Briefcase size={24} /></div>
+            <h3 className="text-lg font-bold text-gray-700">فريق العمل</h3>
+            <div className="p-2 bg-orange-50 rounded-lg text-orange-500"><Users size={24} /></div>
           </div>
-          <p className="text-3xl font-black" style={{ color: brandColors.navy }}>2</p>
+          <p className="text-3xl font-black" style={{ color: brandColors.navy }}>{teamMembers.length}</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-8">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h3 className="text-xl font-bold" style={{ color: brandColors.navy }}>أحدث المهام</h3>
+          <h3 className="text-xl font-bold" style={{ color: brandColors.navy }}>المهام الحديثة في الشركة</h3>
           <button onClick={() => setActiveTab('tasks')} className="text-sm font-medium hover:underline" style={{ color: brandColors.teal }}>عرض الكل</button>
         </div>
         <div className="divide-y divide-gray-100">
-          {tasks.slice(0, 3).map(task => (
-            <div key={task.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
-              <div className="flex items-center">
-                <input type="checkbox" checked={task.status === 'مكتمل'} readOnly className="w-5 h-5 ml-4 rounded border-gray-300 text-[#00839b] focus:ring-[#00839b]" />
-                <span className={`font-medium ${task.status === 'مكتمل' ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{task.title}</span>
+          {tasks.slice(0, 5).map(task => {
+            const assignee = teamMembers.find(m => m.id === task.assigneeId);
+            return (
+              <div key={task.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div className="flex items-center">
+                  <input type="checkbox" checked={task.status === 'مكتمل'} onChange={() => toggleTaskStatus(task)} className="w-5 h-5 ml-4 rounded border-gray-300 text-[#00839b] focus:ring-[#00839b] cursor-pointer" />
+                  <div>
+                    <span className={`font-medium ${task.status === 'مكتمل' ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{task.title}</span>
+                    <div className="text-xs text-gray-500 mt-1">بواسطة: {task.creatorName} {assignee && `| مكلف بها: ${assignee.name}`}</div>
+                  </div>
+                </div>
+                <span className={`text-xs px-3 py-1 rounded-full font-medium ${task.status === 'مكتمل' ? 'bg-gray-100 text-gray-500' : 'bg-blue-50 text-blue-600'}`}>
+                  {task.status}
+                </span>
               </div>
-              <span className="text-xs px-3 py-1 rounded-full font-medium bg-gray-100 text-gray-600">
-                {task.status}
-              </span>
-            </div>
-          ))}
+            );
+          })}
+          {tasks.length === 0 && <p className="p-6 text-center text-gray-500">لا توجد مهام حتى الآن.</p>}
         </div>
       </div>
     </div>
@@ -169,57 +379,84 @@ export default function App() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold" style={{ color: brandColors.navy }}>إدارة المهام</h1>
-          <p className="text-gray-500 mt-1">نظم مهامك وتتبع تقدم العمل.</p>
+          <h1 className="text-3xl font-bold" style={{ color: brandColors.navy }}>إدارة المهام وتكليف الموظفين</h1>
+          <p className="text-gray-500 mt-1">المهام تتم مزامنتها مع جميع الأجهزة لحظياً.</p>
         </div>
       </div>
 
-      <form onSubmit={handleAddTask} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4">
-        <input 
-          type="text" 
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-          placeholder="ما هي المهمة الجديدة؟" 
-          className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 outline-none focus:ring-2 transition-all"
-          style={{ focusRingColor: brandColors.teal }}
-        />
+      <form onSubmit={handleAddTask} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-end">
+        <div className="flex-1 w-full">
+          <label className="block text-xs font-medium text-gray-500 mb-1">وصف المهمة</label>
+          <input 
+            type="text" 
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            placeholder="ماذا يجب أن ننجز؟" 
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-2 transition-all"
+            style={{ focusRingColor: brandColors.teal }}
+          />
+        </div>
+        <div className="w-full md:w-64">
+          <label className="block text-xs font-medium text-gray-500 mb-1">تعيين إلى (إشعار)</label>
+          <select 
+            value={assignedTo}
+            onChange={(e) => setAssignedTo(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-2 transition-all"
+          >
+            <option value="">-- بدون تعيين --</option>
+            {teamMembers.map(m => (
+              <option key={m.id} value={m.id}>{m.name} ({m.role})</option>
+            ))}
+          </select>
+        </div>
         <button 
           type="submit" 
-          className="text-white px-6 py-2 rounded-lg font-medium flex items-center transition-all hover:opacity-90 shadow-md hover:shadow-lg"
+          className="w-full md:w-auto text-white px-8 py-3 rounded-lg font-bold flex items-center justify-center transition-all shadow-md hover:shadow-lg"
           style={{ backgroundColor: brandColors.teal }}
         >
           <Plus size={18} className="ml-2" />
-          إضافة مهمة
+          إضافة وتكليف
         </button>
       </form>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="divide-y divide-gray-100">
-          {tasks.map(task => (
-            <div key={task.id} className="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors group">
-              <div className="flex items-center flex-1">
-                <input 
-                  type="checkbox" 
-                  checked={task.status === 'مكتمل'} 
-                  onChange={() => {
-                    const newTasks = tasks.map(t => t.id === task.id ? {...t, status: t.status === 'مكتمل' ? 'معلق' : 'مكتمل'} : t);
-                    setTasks(newTasks);
-                  }}
-                  className="w-5 h-5 ml-4 rounded border-gray-300 text-[#00839b] focus:ring-[#00839b] cursor-pointer" 
-                />
-                <div>
-                  <h4 className={`font-medium text-lg ${task.status === 'مكتمل' ? 'text-gray-400 line-through' : 'text-gray-800'}`}>{task.title}</h4>
-                  <div className="flex items-center gap-3 mt-1 text-xs">
-                    <span className="text-gray-500 flex items-center"><Bell size={12} className="ml-1"/> {task.date}</span>
-                    <span className={`px-2 py-0.5 rounded-full ${task.priority === 'عالية' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>أولوية {task.priority}</span>
+          {tasks.map(task => {
+            const assignee = teamMembers.find(m => m.id === task.assigneeId);
+            const isMyTask = task.assigneeId === user?.uid;
+            
+            return (
+              <div key={task.id} className={`p-5 flex items-center justify-between hover:bg-gray-50 transition-colors group ${isMyTask && task.status !== 'مكتمل' ? 'bg-blue-50/30' : ''}`}>
+                <div className="flex items-center flex-1">
+                  <input 
+                    type="checkbox" 
+                    checked={task.status === 'مكتمل'} 
+                    onChange={() => toggleTaskStatus(task)}
+                    className="w-5 h-5 ml-4 rounded border-gray-300 text-[#00839b] focus:ring-[#00839b] cursor-pointer" 
+                  />
+                  <div>
+                    <h4 className={`font-medium text-lg ${task.status === 'مكتمل' ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                      {task.title}
+                    </h4>
+                    <div className="flex items-center gap-3 mt-2 text-xs">
+                      <span className="text-gray-500">{task.date}</span>
+                      <span className="text-gray-400">• بواسطة: {task.creatorName}</span>
+                      {assignee && (
+                        <span className={`px-2 py-0.5 rounded-full ${isMyTask ? 'bg-red-100 text-red-700 font-bold' : 'bg-gray-100 text-gray-700'}`}>
+                          موكلة إلى: {isMyTask ? 'أنت' : assignee.name}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
+                {task.creatorId === user.uid && (
+                  <button onClick={() => deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id))} className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-2">
+                    حذف
+                  </button>
+                )}
               </div>
-              <button className="text-gray-400 hover:text-[#002d74] opacity-0 group-hover:opacity-100 transition-opacity">
-                <MoreVertical size={20} />
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -230,19 +467,16 @@ export default function App() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold" style={{ color: brandColors.navy }}>فريق العمل</h1>
-          <p className="text-gray-500 mt-1">دليل الموظفين وطرق التواصل.</p>
+          <p className="text-gray-500 mt-1">يتم تحديث قائمة الأعضاء المنضمين للمنصة تلقائياً.</p>
         </div>
-        <button className="text-white px-4 py-2 rounded-lg font-medium flex items-center transition-all shadow-md hover:shadow-lg" style={{ backgroundColor: brandColors.navy }}>
-          <Plus size={18} className="ml-2" />
-          إضافة موظف
-        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {teamMembers.map(member => (
           <div key={member.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col items-center text-center hover:shadow-md transition-shadow relative overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-16 transition-all group-hover:h-20" style={{ backgroundColor: brandColors.navy }}></div>
-            <img src={member.avatar} alt={member.name} className="w-24 h-24 rounded-full border-4 border-white shadow-md z-10 mb-4" />
+            {member.id === user.uid && <div className="absolute top-2 right-2 bg-green-400 text-white text-[10px] px-2 py-1 rounded-full z-10">أنت</div>}
+            <img src={member.avatar} alt={member.name} className="w-24 h-24 rounded-full border-4 border-white shadow-md z-10 mb-4 bg-white" />
             <h3 className="text-xl font-bold text-gray-800">{member.name}</h3>
             <p className="text-sm font-medium mb-4" style={{ color: brandColors.teal }}>{member.role}</p>
             <div className="w-full pt-4 border-t border-gray-100">
@@ -255,19 +489,16 @@ export default function App() {
   );
 
   return (
-    // استخدام direction rtl لدعم اللغة العربية
     <div className="flex bg-[#f8fafc] min-h-screen font-sans" dir="rtl">
-      {/* ستايلات مخصصة للأنيميشن */}
       <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
       `}} />
-      
       <Sidebar />
-      
       <div className="flex-1 mr-64 flex flex-col min-h-screen">
         <Topbar />
-        
         <main className="p-8 flex-1">
           {activeTab === 'dashboard' && <DashboardView />}
           {activeTab === 'tasks' && <TasksView />}
