@@ -264,25 +264,32 @@
     <!-- Firebase و JavaScript Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 
-        // إعدادات Firebase (يتم حقنها من البيئة)
-        let firebaseConfig = {};
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-        }
+        // إعدادات Firebase الخاصة بمشروعك quill-world
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
+            authDomain: "quill-world.firebaseapp.com",
+            projectId: "quill-world",
+            storageBucket: "quill-world.firebasestorage.app",
+            messagingSenderId: "339188796023",
+            appId: "1:339188796023:web:e0a1ba750b49909220d472",
+            measurementId: "G-BMEZ49L6CN"
+        };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const analytics = getAnalytics(app);
+        const appId = 'quill-world-system';
 
         let currentUser = null;
         let globalEmployees = [];
         let globalTasks = [];
         let globalLogs = [];
-        let initialLoad = true; // لمنع الإشعارات للمهام القديمة
+        let initialLoad = true; 
         let knownTaskIds = new Set();
 
         // ------------------ واجهة المستخدم الأساسية ------------------
@@ -342,11 +349,8 @@
         // ------------------ تهيئة المصادقة ------------------
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // نظراً لأننا نستخدم قاعدة بياناتك الخاصة، سنبدأ بتسجيل الدخول المجهول للزوار الجدد
+                await signInAnonymously(auth);
             } catch (err) {
                 console.error("Auth error:", err);
             }
@@ -382,10 +386,9 @@
             try {
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth, provider);
-                // سيتم التقاط الدخول بواسطة onAuthStateChanged
             } catch (error) {
                 console.error("Google Auth failed", error);
-                alert("حدث خطأ أثناء تسجيل الدخول");
+                alert("يرجى التأكد من تفعيل خدمة (Google Sign-In) من لوحة تحكم Firebase الخاصة بك.");
             }
         });
 
@@ -398,7 +401,7 @@
         // ------------------ إدارة قاعدة البيانات (Firestore) ------------------
         
         function getColRef(colName) {
-            // مسار صارم حسب قواعد النظام
+            // مسار الحفظ في قاعدة بياناتك
             return collection(db, 'artifacts', appId, 'public', 'data', colName);
         }
 
@@ -411,7 +414,7 @@
                     userName: currentUser.displayName || 'مستخدم',
                     timestamp: Date.now()
                 });
-            } catch(e) { console.error("Log error", e); }
+            } catch(e) { console.error("Log error. يرجى مراجعة صلاحيات Firestore Rules", e); }
         }
 
         function startDatabaseListeners() {
@@ -423,18 +426,17 @@
                 snapshot.forEach(doc => globalEmployees.push({ id: doc.id, ...doc.data() }));
                 renderEmployees();
                 updateDashboardStats();
-            }, (err) => console.error(err));
+            }, (err) => console.error("قراءة الموظفين فشلت - تأكد من Rules", err));
 
             // 2. المستمع لسجل النظام
             onSnapshot(getColRef('logs'), (snapshot) => {
                 globalLogs = [];
                 snapshot.forEach(doc => globalLogs.push({ id: doc.id, ...doc.data() }));
-                // الفرز تنازلياً حسب الوقت في الذاكرة لتجنب استعلامات معقدة
                 globalLogs.sort((a, b) => b.timestamp - a.timestamp);
                 renderLogs();
             }, (err) => console.error(err));
 
-            // 3. المستمع للمهام (شريان النظام)
+            // 3. المستمع للمهام
             onSnapshot(getColRef('tasks'), (snapshot) => {
                 globalTasks = [];
                 let hasNewAssignedTask = false;
@@ -444,10 +446,8 @@
                     const taskData = { id: doc.id, ...doc.data() };
                     globalTasks.push(taskData);
                     
-                    // نظام الإشعارات
                     if (!initialLoad && !knownTaskIds.has(taskData.id)) {
                         knownTaskIds.add(taskData.id);
-                        // إذا كانت المهمة موجهة للمستخدم الحالي (بناءً على اسمه أو كان هو من تم اختياره)
                         if(taskData.assigneeName === currentUser.displayName || taskData.status === 'pending') {
                             hasNewAssignedTask = true;
                             latestTaskName = taskData.title;
@@ -469,14 +469,12 @@
 
         // ------------------ دوال معالجة وواجهة البيانات ------------------
 
-        // تحديث إحصائيات لوحة التحكم
         function updateDashboardStats() {
             document.getElementById('stat-employees').innerText = globalEmployees.length;
             document.getElementById('stat-tasks').innerText = globalTasks.length;
             document.getElementById('stat-completed').innerText = globalTasks.filter(t => t.status === 'completed').length;
         }
 
-        // رسم قائمة الموظفين
         function renderEmployees() {
             const list = document.getElementById('employeesList');
             list.innerHTML = '';
@@ -497,7 +495,6 @@
             });
         }
 
-        // رسم قائمة المهام مقسمة للأعمدة
         function renderTasks() {
             const pending = document.getElementById('tasks-pending');
             const progress = document.getElementById('tasks-progress');
@@ -536,7 +533,6 @@
             });
         }
 
-        // رسم سجل النظام
         function renderLogs() {
             const list = document.getElementById('logsList');
             list.innerHTML = '';
@@ -559,7 +555,6 @@
 
         // ------------------ العمليات ------------------
 
-        // 1. إضافة موظف
         document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUser) return;
@@ -576,7 +571,6 @@
             } catch(e) { console.error(e); }
         });
 
-        // 2. حذف موظف
         window.deleteEmployee = async (id, name) => {
             if(confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'employees', id));
@@ -584,7 +578,6 @@
             }
         };
 
-        // 3. إضافة مهمة (إرسال إشعار)
         document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUser) return;
@@ -609,7 +602,6 @@
             } catch(e) { console.error(e); }
         });
 
-        // 4. تحديث حالة المهمة
         window.updateTaskStatus = async (id, newStatus, taskTitle) => {
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
@@ -621,16 +613,13 @@
             } catch(e) { console.error(e); }
         };
 
-        // 5. حذف مهمة
         window.deleteTask = async (id) => {
             if(confirm('حذف هذه المهمة؟')) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id));
             }
         };
 
-        // تشغيل التهيئة عند بدء الصفحة
         initAuth();
-
     </script>
 </body>
 </html>
