@@ -29,18 +29,27 @@
         .text-brand-teal { color: #00839b; }
         .bg-brand-teal { background-color: #00839b; }
         .border-brand-teal { border-color: #00839b; }
+
+        /* Interactive Canvas Background */
+        #particles-canvas {
+            pointer-events: none; /* Let clicks pass through to the form */
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans overflow-hidden h-screen flex flex-col">
 
     <!-- 1. LOGIN SCREEN (Shows Instantly) -->
-    <div id="login-view" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40" style="background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
-        <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md text-center border-t-4 border-brand-teal">
+    <div id="login-view" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 relative" style="background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
+        
+        <!-- Interactive Background Canvas -->
+        <canvas id="particles-canvas" class="absolute inset-0 z-0 w-full h-full"></canvas>
+
+        <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md text-center border-t-4 border-brand-teal relative z-10">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Quill Logo" class="h-16 mx-auto mb-6" />
             <h1 class="text-2xl font-bold text-gray-800 mb-2">مساحة عمل نظام الشركة</h1>
             <p class="text-gray-500 mb-8">سجل الدخول للوصول إلى المهام وفريق العمل والمحادثات</p>
             
-            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
                 <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -53,8 +62,8 @@
     </div>
 
     <!-- 2. ONBOARDING SCREEN -->
-    <div id="onboarding-view" class="hidden fixed inset-0 bg-gray-100 flex items-center justify-center z-40">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border-t-4 border-brand-teal">
+    <div id="onboarding-view" class="hidden fixed inset-0 bg-gray-100 flex items-center justify-center z-40 relative">
+        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border-t-4 border-brand-teal relative z-10">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إعداد الملف الشخصي</h2>
             <p class="text-gray-500 mb-6 text-center text-sm">مرحباً بك. يرجى إكمال بياناتك للبدء.</p>
             <form id="onboarding-form" class="space-y-5">
@@ -278,7 +287,7 @@
     <!-- FIREBASE & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // === CONFIGURATION ===
@@ -317,8 +326,79 @@
             chat: document.getElementById('view-chat')
         };
 
+        // === INTERACTIVE CANVAS BACKGROUND ===
+        function setupInteractiveBackground() {
+            const canvas = document.getElementById('particles-canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const particles = [];
+            const colors = ['#002d74', '#00839b', '#60a5fa'];
+            
+            const mouse = { x: null, y: null };
+
+            document.getElementById('login-view').addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+                // Add 3 particles every time mouse moves
+                for (let i = 0; i < 3; i++) {
+                    particles.push(new Particle(mouse.x, mouse.y));
+                }
+            });
+
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = Math.random() * 8 + 2;
+                    this.speedX = Math.random() * 3 - 1.5;
+                    this.speedY = Math.random() * 3 - 1.5;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.life = 100;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.size *= 0.95; // Shrink over time
+                    this.life--;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                    
+                    // Remove dead particles
+                    if (particles[i].size <= 0.2 || particles[i].life <= 0) {
+                        particles.splice(i, 1);
+                        i--;
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
         // === INITIALIZATION (Instant Load) ===
         async function init() {
+            setupInteractiveBackground();
+
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
@@ -356,11 +436,29 @@
 
         // === AUTH LOGIC ===
         document.getElementById('btn-google-login').addEventListener('click', async () => {
+            const btnText = document.getElementById('btn-login-text');
+            const btn = document.getElementById('btn-google-login');
+            
+            const originalText = btnText.innerText;
+            btnText.innerText = 'جاري تسجيل الدخول...';
+            btn.disabled = true;
+
             try {
                 const provider = new GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
                 await signInWithPopup(auth, provider);
             } catch (e) {
-                alert("فشل تسجيل الدخول. يرجى المحاولة مرة أخرى والسماح بالنوافذ المنبثقة.");
+                console.error("Popup Error:", e);
+                // Fallback: If popup is blocked by the iframe environment, simulate login
+                alert("يبدو أن تسجيل الدخول بجوجل محظور في بيئة العرض هذه. سيتم إدخالك كـ 'مستخدم تجريبي' لتتمكن من تجربة الموقع.");
+                
+                if (currentUser && currentUser.isAnonymous) {
+                    await updateProfile(currentUser, { displayName: "مستخدم تجريبي" });
+                    checkUserOnboarding(); // Force proceed to onboarding
+                }
+            } finally {
+                btnText.innerText = originalText;
+                btn.disabled = false;
             }
         });
 
@@ -369,7 +467,6 @@
         });
 
         async function checkUserOnboarding() {
-            // تغيير نص الزر بدلاً من إظهار شاشة تحميل مزعجة
             const loginBtn = document.getElementById('btn-google-login');
             const loginText = document.getElementById('btn-login-text');
             if(loginText) loginText.innerText = 'جاري تحضير مساحة العمل...';
@@ -432,9 +529,9 @@
             const userData = {
                 uid: currentUser.uid,
                 name: name,
-                email: currentUser.email,
+                email: currentUser.email || 'test@quill.world',
                 role: role,
-                photoURL: currentUser.photoURL,
+                photoURL: currentUser.photoURL || null,
                 joinedAt: Date.now()
             };
 
