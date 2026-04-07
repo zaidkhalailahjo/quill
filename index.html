@@ -62,24 +62,12 @@
         <p class="text-primary font-bold text-lg">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
     </div>
 
-    <!-- شاشة تسجيل الدخول -->
-    <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مرحباً بك في نظام شركتي</h2>
-            <p class="text-gray-500 mb-8 text-sm">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
-            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
-                تسجيل الدخول باستخدام Google
-            </button>
-        </div>
-    </div>
-
-    <!-- شاشة إعداد الملف الشخصي -->
+    <!-- شاشة إعداد الملف الشخصي (لأول مرة) -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
             <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">إكمال بيانات الملف الشخصي</h2>
-            <p class="text-gray-500 mb-6 text-sm text-center">يرجى إدخال اسمك وتحديد وظيفتك في الشركة للمتابعة</p>
+            <p class="text-gray-500 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
             
             <form id="setupProfileForm" class="space-y-4">
                 <div>
@@ -97,7 +85,7 @@
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors mt-4">
-                    حفظ الدخول للنظام
+                    الدخول للنظام
                 </button>
             </form>
         </div>
@@ -119,13 +107,13 @@
         </div>
         
         <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
-            <button onclick="window.showSection('dashboard')" class="nav-btn active-nav w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="dashboard">
+            <button id="nav-dashboard-btn" onclick="window.showSection('dashboard')" class="nav-btn active-nav hidden w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="dashboard">
                 <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">لوحة التحكم</span>
             </button>
-            <button onclick="window.showSection('employees')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
+            <button id="nav-employees-btn" onclick="window.showSection('employees')" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
                 <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الموظفين</span>
             </button>
-            <button onclick="window.showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
+            <button id="nav-tasks-btn" onclick="window.showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
                 <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المهام</span>
             </button>
             
@@ -188,8 +176,8 @@
         <!-- الأقسام المتغيرة -->
         <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 relative">
             
-            <!-- 1. لوحة التحكم -->
-            <section id="dashboard" class="section-content animate-fade-in">
+            <!-- 1. لوحة التحكم (للمدير فقط) -->
+            <section id="dashboard" class="section-content animate-fade-in hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
                     <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-primary">
                         <div><p class="text-xs md:text-sm text-gray-500 mb-1">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
@@ -206,7 +194,7 @@
                 </div>
             </section>
 
-            <!-- 2. الموظفين -->
+            <!-- 2. الموظفين (للمدير فقط) -->
             <section id="employees" class="section-content hidden animate-fade-in">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600">فريق العمل المسجل في النظام</p>
@@ -413,15 +401,6 @@
                                 <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
-                        
-                        <!-- الإيميل -->
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">البريد الإلكتروني المربوط</label>
-                            <div class="relative">
-                                <i class="fa-solid fa-envelope absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="email" id="settingsEmail" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none" dir="ltr" style="text-align: left;">
-                            </div>
-                        </div>
 
                         <!-- إعدادات وسائط الدردشة -->
                         <div class="pt-4 border-t border-gray-100">
@@ -554,7 +533,7 @@
     <!-- Firebase و JavaScript Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -619,14 +598,21 @@
             const hash = window.location.hash.replace('#', '');
             const validSections = ['dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings'];
             
-            if (validSections.includes(hash)) {
-                if (hash === 'logs' && currentUserData.role !== 'CEO') {
-                    window.showSection('dashboard');
-                } else {
-                    window.showSection(hash);
+            let targetSection = hash;
+            
+            // تحديد الصلاحيات للصفحات حسب نوع الموظف
+            if (currentUserData.role !== 'CEO') {
+                if (['dashboard', 'employees', 'logs'].includes(targetSection) || !targetSection) {
+                    targetSection = 'tasks';
                 }
             } else {
-                window.showSection('dashboard');
+                if (!targetSection) targetSection = 'dashboard';
+            }
+
+            if (validSections.includes(targetSection)) {
+                window.showSection(targetSection);
+            } else {
+                window.showSection(currentUserData.role === 'CEO' ? 'dashboard' : 'tasks');
             }
         }
         window.addEventListener('hashchange', handleHashChange);
@@ -1008,38 +994,23 @@
             document.getElementById('loadingScreen').classList.add('hidden');
             
             if (user) {
-                if(user.isAnonymous && !user.displayName) {
-                    document.getElementById('loginScreen').classList.remove('hidden');
-                    document.getElementById('setupProfileScreen').classList.add('hidden');
-                } else {
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    currentUserAuth = user;
-                    
-                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-                    try {
-                        const docSnap = await getDoc(userDocRef);
-                        if (docSnap.exists()) {
-                            currentUserData = docSnap.data();
-                            document.getElementById('setupProfileScreen').classList.add('hidden');
-                            finishLoginSetup();
-                        } else {
-                            document.getElementById('setupProfileScreen').classList.remove('hidden');
-                            if(user.displayName) document.getElementById('setupName').value = user.displayName;
-                            checkCEOAvailability(); 
-                        }
-                    } catch(e) { console.error(e); }
-                }
+                currentUserAuth = user;
+                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
+                try {
+                    const docSnap = await getDoc(userDocRef);
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        document.getElementById('setupProfileScreen').classList.add('hidden');
+                        finishLoginSetup();
+                    } else {
+                        document.getElementById('setupProfileScreen').classList.remove('hidden');
+                        if(user.displayName) document.getElementById('setupName').value = user.displayName;
+                        checkCEOAvailability(); 
+                    }
+                } catch(e) { console.error(e); }
             } else {
-                document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('setupProfileScreen').classList.add('hidden');
+                document.getElementById('setupProfileScreen').classList.remove('hidden');
             }
-        });
-
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-            } catch (error) { alert("خطأ في تسجيل الدخول"); }
         });
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -1088,6 +1059,8 @@
             updateUIWithUserData();
 
             if(currentUserData.role === 'CEO') {
+                document.getElementById('nav-dashboard-btn').classList.remove('hidden');
+                document.getElementById('nav-employees-btn').classList.remove('hidden');
                 document.getElementById('nav-logs-btn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').style.display = 'flex';
@@ -1096,6 +1069,8 @@
                 document.getElementById('createGroupBtn').classList.remove('hidden');
                 document.getElementById('clearChatBtn').classList.remove('hidden');
             } else {
+                document.getElementById('nav-dashboard-btn').classList.add('hidden');
+                document.getElementById('nav-employees-btn').classList.add('hidden');
                 document.getElementById('nav-logs-btn').classList.add('hidden');
                 document.getElementById('addTaskBtn').style.display = 'none';
                 document.getElementById('empActionHeader').classList.add('hidden');
@@ -1118,13 +1093,7 @@
             document.getElementById('settingsAvatarPreview').src = currentUserData.photoURL;
             document.getElementById('settingsName').value = currentUserData.name;
             document.getElementById('settingsRole').value = currentUserData.role;
-            document.getElementById('settingsEmail').value = currentUserData.email;
-            
-            // تحديث تفضيلات الدردشة في الإعدادات
-            const layoutSelect = document.getElementById('settingsChatLayout');
-            if (layoutSelect) {
-                layoutSelect.value = currentUserData.chatLayout || 'media-top';
-            }
+            // لا يوجد ايميل مسجل إذا كان تسجيل مجهول لكن سنحاول عرضه إن وجد
         }
 
         async function logAction(action, details) {
@@ -1448,17 +1417,25 @@
             pending.innerHTML = progress.innerHTML = completed.innerHTML = '';
 
             globalTasks.forEach(task => {
-                const isMyTask = task.assigneeName === currentUserData.name;
+                const isMyTask = task.assigneeId === currentUserData.uid;
                 const isCEO = currentUserData.role === 'CEO';
+                
+                // الموظف يرى مهامه فقط
+                if (!isCEO && !isMyTask) return;
+
                 let actionsHtml = '';
                 
-                if(isMyTask || isCEO) {
+                // الموظف يغير حالة المهمة، المدير لا يمكنه التغيير بل الحذف فقط
+                if(isMyTask && !isCEO) {
                     if(task.status === 'pending') {
                         actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">البدء بالتنفيذ</button>`;
                     } else if(task.status === 'in-progress') {
                         actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">تأكيد الإنجاز <i class="fa-solid fa-check ml-1"></i></button>`;
                     }
                 }
+
+                // الحذف متاح للمدير فقط
+                const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : '';
 
                 const card = `
                     <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 ${task.status === 'completed' ? 'border-r-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-r-secondary' : 'border-r-gray-400')}">
@@ -1471,7 +1448,7 @@
                             ${isMyTask ? '<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">مهمتك</span>' : ''}
                         </div>
                         ${actionsHtml}
-                        ${isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : ''}
+                        ${deleteHtml}
                     </div>
                 `;
 
@@ -1601,8 +1578,13 @@
                 const formattedText = msg.text ? msg.text.replace(/@([^\s]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>') : '';
                 const alignClass = isMe ? 'justify-start' : 'justify-end';
                 
-                const msgBgClass = isMe ? (msg.color || 'bg-[#00839b]') + ' text-white' : 'bg-white border border-gray-200 text-gray-800';
-                const textClass = isMe ? 'text-gray-500 font-bold' : 'text-gray-800 font-bold'; // جعل الاسم أغمق للآخرين
+                // تطبيق لون الرسالة للجميع بغض النظر عمن أرسلها
+                const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white border border-gray-200 text-gray-800');
+                
+                // إذا كان للمربع لون غامق، اجعل اسم المرسل بلون فاتح ليظهر بوضوح، والعكس صحيح
+                const isColored = msg.color && msg.color !== 'bg-white';
+                const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 font-bold';
+                
                 const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
                 
                 // جلب صورة صاحب الرسالة
