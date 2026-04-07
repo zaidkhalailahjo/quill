@@ -3,1069 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quill Workspace</title>
-    
-    <!-- Tailwind CSS -->
+    <title>نظام إدارة الشركة</title>
+    <!-- تضمين مكتبة Tailwind CSS للتصميم -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- تضمين أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- خطوط عربية (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Phosphor Icons (for beautiful icons) -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
+    <!-- إعداد ألوان الشركة -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#002d74',   /* الأزرق الداكن */
+                        secondary: '#00839b', /* الأزرق المخضر */
+                        light: '#f3f4f6',
+                        dark: '#1f2937'
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Custom Scrollbar for Chat and Tasks */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        /* Brand Colors */
-        .text-brand-blue { color: #002d74; }
-        .bg-brand-blue { background-color: #002d74; }
-        .text-brand-teal { color: #00839b; }
-        .bg-brand-teal { background-color: #00839b; }
-        .border-brand-teal { border-color: #00839b; }
-
-        /* Interactive Canvas Background */
-        #particles-canvas {
-            pointer-events: none; /* Let clicks pass through to the form */
-        }
+        body { font-family: 'Cairo', sans-serif; }
+        /* لتخصيص شريط التمرير */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #00839b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #002d74; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans overflow-hidden h-screen flex flex-col">
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex">
 
-    <!-- 1. LOGIN SCREEN (Shows Instantly) -->
-    <div id="login-view" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40 relative" style="background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="w-64 bg-primary text-white flex flex-col transition-all duration-300 shadow-xl z-20">
+        <div class="p-6 flex items-center justify-center border-b border-white/10">
+            <i class="fa-solid fa-building text-3xl ml-3 text-secondary"></i>
+            <h1 class="text-2xl font-bold tracking-wider">شركتي</h1>
+        </div>
         
-        <!-- Interactive Background Canvas -->
-        <canvas id="particles-canvas" class="absolute inset-0 z-0 w-full h-full"></canvas>
-
-        <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md text-center border-t-4 border-brand-teal relative z-10">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Quill Logo" class="h-16 mx-auto mb-6" />
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">مساحة عمل نظام الشركة</h1>
-            <p class="text-gray-500 mb-8">سجل الدخول للوصول إلى المهام وفريق العمل والمحادثات</p>
-            
-            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 hover:shadow-md transition-all shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer relative z-20">
-                <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span id="btn-login-text">تسجيل الدخول باستخدام Google</span>
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <button onclick="showSection('dashboard')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white hover:bg-secondary/80 transition-colors">
+                <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i>
+                <span class="font-semibold">لوحة التحكم</span>
             </button>
+            
+            <button onclick="showSection('employees')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <i class="fa-solid fa-users w-6 text-center ml-3"></i>
+                <span class="font-semibold">الموظفين</span>
+            </button>
+            
+            <button onclick="showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <i class="fa-solid fa-list-check w-6 text-center ml-3"></i>
+                <span class="font-semibold">المهام</span>
+            </button>
+            
+            <button onclick="showSection('customers')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <i class="fa-solid fa-handshake w-6 text-center ml-3"></i>
+                <span class="font-semibold">العملاء</span>
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-white/10 text-sm text-center text-gray-400">
+            &copy; 2026 نظام شركتي
+        </div>
+    </aside>
+
+    <!-- المحتوى الرئيسي (Main Content) -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- الشريط العلوي (Header) -->
+        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
+            <div class="flex items-center">
+                <button class="text-gray-500 hover:text-primary md:hidden mr-4">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                <h2 id="page-title" class="text-xl font-bold text-primary">لوحة التحكم</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <button class="text-gray-400 hover:text-secondary relative">
+                    <i class="fa-solid fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                </button>
+                
+                <div class="flex items-center cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=المدير&background=00839b&color=fff" alt="User" class="w-10 h-10 rounded-full border-2 border-secondary">
+                    <div class="mr-3 hidden md:block">
+                        <p class="text-sm font-semibold text-gray-800">المدير العام</p>
+                        <p class="text-xs text-gray-500">مُسؤول النظام</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- منطقة الأقسام المتغيرة -->
+        <div class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            
+            <!-- 1. قسم لوحة التحكم -->
+            <section id="dashboard" class="section-content animate-fade-in">
+                <!-- بطاقات الإحصائيات -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between border-b-4 border-b-primary">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">إجمالي الموظفين</p>
+                            <h3 class="text-3xl font-bold text-gray-800">24</h3>
+                        </div>
+                        <div class="bg-blue-50 text-primary p-4 rounded-full">
+                            <i class="fa-solid fa-users text-2xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between border-b-4 border-b-secondary">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">المهام قيد التنفيذ</p>
+                            <h3 class="text-3xl font-bold text-gray-800">12</h3>
+                        </div>
+                        <div class="bg-teal-50 text-secondary p-4 rounded-full">
+                            <i class="fa-solid fa-spinner text-2xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between border-b-4 border-b-green-500">
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">الإيرادات (هذا الشهر)</p>
+                            <h3 class="text-3xl font-bold text-gray-800">$15,400</h3>
+                        </div>
+                        <div class="bg-green-50 text-green-500 p-4 rounded-full">
+                            <i class="fa-solid fa-wallet text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- نشاطات أخيرة -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">آخر النشاطات</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full bg-secondary ml-4"></div>
+                            <p class="text-sm text-gray-600 flex-1">تم إنجاز مهمة <span class="font-bold text-primary">"تصميم شعار العميل"</span> من قبل أحمد.</p>
+                            <span class="text-xs text-gray-400">قبل ساعتين</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full bg-green-500 ml-4"></div>
+                            <p class="text-sm text-gray-600 flex-1">تمت إضافة موظف جديد <span class="font-bold text-primary">"سارة محمد"</span>.</p>
+                            <span class="text-xs text-gray-400">أمس</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 rounded-full bg-yellow-500 ml-4"></div>
+                            <p class="text-sm text-gray-600 flex-1">تم استلام دفعة جديدة بقيمة $500 من شركة الأفق.</p>
+                            <span class="text-xs text-gray-400">منذ يومين</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. قسم الموظفين -->
+            <section id="employees" class="section-content hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="relative w-64">
+                        <input type="text" placeholder="ابحث عن موظف..." class="w-full pl-4 pr-10 py-2 border rounded-lg focus:outline-none focus:border-secondary">
+                        <i class="fa-solid fa-search absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button onclick="openModal('employeeModal')" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fa-solid fa-plus ml-2"></i> إضافة موظف
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <table class="w-full text-right">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الاسم</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">القسم</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">المنصب</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الحالة</th>
+                                <th class="p-4 text-sm font-semibold text-gray-600">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employee-table-body" class="divide-y divide-gray-100">
+                            <!-- بيانات تجريبية -->
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 flex items-center">
+                                    <img src="https://ui-avatars.com/api/?name=أحمد+علي&background=random" class="w-8 h-8 rounded-full ml-3">
+                                    <span class="font-medium text-gray-800">أحمد علي</span>
+                                </td>
+                                <td class="p-4 text-gray-600">تقنية المعلومات</td>
+                                <td class="p-4 text-gray-600">مطور ويب</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">نشط</span></td>
+                                <td class="p-4">
+                                    <button class="text-blue-500 hover:text-blue-700 ml-2"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="p-4 flex items-center">
+                                    <img src="https://ui-avatars.com/api/?name=سارة+محمد&background=random" class="w-8 h-8 rounded-full ml-3">
+                                    <span class="font-medium text-gray-800">سارة محمد</span>
+                                </td>
+                                <td class="p-4 text-gray-600">التسويق</td>
+                                <td class="p-4 text-gray-600">مدير حملات</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">نشط</span></td>
+                                <td class="p-4">
+                                    <button class="text-blue-500 hover:text-blue-700 ml-2"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. قسم المهام -->
+            <section id="tasks" class="section-content hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-gray-600">إدارة ومتابعة مهام الفريق</p>
+                    <button class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                        <i class="fa-solid fa-plus ml-2"></i> مهمة جديدة
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- عمود: قيد الانتظار -->
+                    <div class="bg-gray-100 p-4 rounded-xl">
+                        <h3 class="font-bold text-gray-700 mb-4 flex justify-between items-center">
+                            قيد الانتظار <span class="bg-gray-200 text-gray-600 px-2 py-1 rounded text-xs">2</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 border-r-gray-400">
+                                <h4 class="font-bold text-gray-800 text-sm mb-2">تحديث سياسة الخصوصية</h4>
+                                <p class="text-xs text-gray-500 mb-3">مراجعة الشروط والأحكام الجديدة وإضافتها للموقع.</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-red-500 font-semibold"><i class="fa-regular fa-clock"></i> غداً</span>
+                                    <img src="https://ui-avatars.com/api/?name=ع&background=random" class="w-6 h-6 rounded-full" title="علي">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- عمود: قيد التنفيذ -->
+                    <div class="bg-blue-50 p-4 rounded-xl">
+                        <h3 class="font-bold text-primary mb-4 flex justify-between items-center">
+                            قيد التنفيذ <span class="bg-blue-200 text-blue-700 px-2 py-1 rounded text-xs">1</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 border-r-secondary">
+                                <h4 class="font-bold text-gray-800 text-sm mb-2">تطوير واجهة التطبيق</h4>
+                                <p class="text-xs text-gray-500 mb-3">برمجة الشاشات الأساسية باستخدام React.</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500 font-semibold"><i class="fa-regular fa-clock"></i> 15 أبريل</span>
+                                    <img src="https://ui-avatars.com/api/?name=أ&background=random" class="w-6 h-6 rounded-full" title="أحمد">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- عمود: مكتمل -->
+                    <div class="bg-green-50 p-4 rounded-xl">
+                        <h3 class="font-bold text-green-600 mb-4 flex justify-between items-center">
+                            مكتمل <span class="bg-green-200 text-green-700 px-2 py-1 rounded text-xs">1</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 border-r-green-500 opacity-70">
+                                <h4 class="font-bold text-gray-800 text-sm mb-2 line-through">اجتماع مع العميل</h4>
+                                <p class="text-xs text-gray-500 mb-3">مناقشة متطلبات المشروع المبدئية.</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-green-500 font-semibold"><i class="fa-solid fa-check"></i> مكتمل</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 4. قسم العملاء (مبسط) -->
+            <section id="customers" class="section-content hidden animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-gray-600">قائمة عملاء الشركة</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- بطاقة عميل -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-start space-x-4 space-x-reverse">
+                        <div class="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">A</div>
+                        <div>
+                            <h3 class="font-bold text-gray-800">شركة الأفق التقنية</h3>
+                            <p class="text-sm text-gray-500 mb-2">info@alofoq.com</p>
+                            <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">عميل VIP</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </div>
 
-    <!-- 2. ONBOARDING SCREEN -->
-    <div id="onboarding-view" class="hidden fixed inset-0 bg-gray-100 flex items-center justify-center z-40 relative">
-        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border-t-4 border-brand-teal relative z-10">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إعداد الملف الشخصي</h2>
-            <p class="text-gray-500 mb-6 text-center text-sm">مرحباً بك. يرجى إكمال بياناتك للبدء.</p>
-            <form id="onboarding-form" class="space-y-5">
+    <!-- نافذة منبثقة (Modal) لإضافة موظف -->
+    <div id="employeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 overflow-hidden">
+            <div class="bg-primary text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-lg">إضافة موظف جديد</h3>
+                <button onclick="closeModal('employeeModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="addEmployeeForm" onsubmit="addEmployee(event)" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
-                    <input type="text" id="ob-name" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#00839b] outline-none transition-all" />
+                    <label class="block text-sm text-gray-600 mb-1">اسم الموظف</label>
+                    <input type="text" id="empName" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-secondary">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">المسمى الوظيفي</label>
-                    <select id="ob-role" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-[#00839b] outline-none transition-all bg-white">
-                        <option value="" disabled selected>اختر وظيفتك...</option>
-                        <!-- Options injected by JS -->
+                    <label class="block text-sm text-gray-600 mb-1">القسم</label>
+                    <select id="empDept" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-secondary">
+                        <option>تقنية المعلومات</option>
+                        <option>التسويق</option>
+                        <option>المبيعات</option>
+                        <option>المالية</option>
                     </select>
-                    <p id="ob-ceo-warning" class="hidden text-xs text-orange-500 mt-1">منصب الـ CEO تم حجزه مسبقاً.</p>
                 </div>
-                <button type="submit" id="btn-save-profile" class="w-full text-white font-semibold rounded-lg px-4 py-3 mt-4 transition-all shadow-md bg-brand-blue hover:opacity-90">
-                    دخول إلى مساحة العمل
-                </button>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">المنصب</label>
+                    <input type="text" id="empRole" required class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-secondary">
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="closeModal('employeeModal')" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-50">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded hover:bg-primary transition-colors">حفظ الموظف</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <!-- 3. MAIN APP LAYOUT -->
-    <div id="app-layout" class="hidden flex h-screen w-full relative">
-        
-        <!-- Sidebar Overlay -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
+    <style>
+        /* حركة انتقال ناعمة للصفحات */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 
-        <!-- Sidebar -->
-        <aside id="sidebar" class="fixed md:static inset-y-0 right-0 z-30 w-64 text-white transform translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col bg-brand-blue">
-            <div class="flex items-center justify-between p-4 border-b border-white/10">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Quill" class="h-10 bg-white/10 p-1 rounded" />
-                <button id="btn-close-sidebar" class="md:hidden text-white"><i class="ph ph-x text-2xl"></i></button>
-            </div>
-            
-            <div class="p-6 pb-2 border-b border-white/10">
-                <div class="flex items-center gap-3">
-                    <div id="sidebar-user-avatar" class="w-12 h-12 rounded-full bg-white text-brand-blue text-center flex items-center justify-center font-bold text-xl shadow-md">U</div>
-                    <div>
-                        <p id="sidebar-user-name" class="font-semibold text-sm truncate w-32">مستخدم</p>
-                        <p id="sidebar-user-role" class="text-xs text-white/70">غير محدد</p>
-                    </div>
-                </div>
-            </div>
-
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-white/10" data-target="dashboard">
-                    <i class="ph ph-squares-four text-xl"></i> <span>لوحة القيادة</span>
-                </button>
-                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-white/10" data-target="tasks">
-                    <i class="ph ph-check-square-offset text-xl"></i> <span>المهام والمشاريع</span>
-                </button>
-                <button class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg transition-all hover:bg-white/10" data-target="employees">
-                    <i class="ph ph-users text-xl"></i> <span>فريق العمل</span>
-                </button>
-                <button class="nav-btn w-full flex items-center justify-between p-3 rounded-lg transition-all hover:bg-white/10" data-target="chat">
-                    <div class="flex items-center gap-3">
-                        <i class="ph ph-chat-circle-dots text-xl"></i> <span>محادثة الشركة</span>
-                    </div>
-                </button>
-            </nav>
-
-            <div class="p-4 border-t border-white/10">
-                <button id="btn-logout" class="flex items-center gap-3 w-full p-3 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors">
-                    <i class="ph ph-sign-out text-xl"></i> <span>تسجيل الخروج</span>
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-50 relative">
-            
-            <!-- Header -->
-            <header class="bg-white shadow-sm h-16 flex items-center px-4 justify-between z-10 border-b border-gray-200 shrink-0">
-                <div class="flex items-center gap-4">
-                    <button id="btn-open-sidebar" class="md:hidden text-gray-600 hover:text-gray-900">
-                        <i class="ph ph-list text-2xl"></i>
-                    </button>
-                    <h2 id="header-title" class="text-xl font-semibold text-gray-800 hidden sm:block">لوحة القيادة</h2>
-                </div>
-                
-                <div class="flex items-center gap-4">
-                    <!-- Notifications Dropdown -->
-                    <div class="relative">
-                        <button id="btn-notifications" class="text-gray-500 hover:text-brand-teal relative p-2 transition-colors rounded-full hover:bg-gray-100">
-                            <i class="ph ph-bell text-2xl"></i>
-                            <span id="notif-badge" class="hidden absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 flex items-center justify-center rounded-full">0</span>
-                        </button>
-                        
-                        <!-- Dropdown Panel -->
-                        <div id="notif-panel" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden">
-                            <div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                                <h3 class="font-bold text-gray-700 text-sm">الإشعارات</h3>
-                                <button id="btn-read-all-notifs" class="text-xs text-brand-teal hover:underline">تحديد كـ مقروء</button>
-                            </div>
-                            <div id="notif-list" class="max-h-64 overflow-y-auto">
-                                <!-- Notifications injected here -->
-                                <div class="p-4 text-center text-gray-400 text-sm">لا توجد إشعارات</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content Area -->
-            <div id="views-container" class="flex-1 overflow-y-auto p-4 md:p-6">
-                
-                <!-- DASHBOARD VIEW -->
-                <div id="view-dashboard" class="view-section space-y-6 max-w-6xl mx-auto hidden">
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-teal-50 rounded-full -mr-10 -mt-10 opacity-50"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-                                    أهلاً بك، <span id="dash-name">زميلنا</span> 👋
-                                </h1>
-                                <p class="text-gray-500">مساحة عمل Quill الخاصة بك. تابع مهامك وتواصل مع فريقك.</p>
-                            </div>
-                            <div id="dash-role" class="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg font-medium border border-blue-100 inline-block"></div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex justify-between items-center">
-                            <div><p class="text-sm font-medium text-gray-500">مهامي المفتوحة</p><p id="stat-my-tasks" class="text-3xl font-bold text-gray-800">0</p></div>
-                            <div class="p-4 rounded-full bg-orange-50 text-orange-600"><i class="ph ph-check-square-offset text-2xl"></i></div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex justify-between items-center">
-                            <div><p class="text-sm font-medium text-gray-500">إجمالي المهام</p><p id="stat-all-tasks" class="text-3xl font-bold text-gray-800">0</p></div>
-                            <div class="p-4 rounded-full bg-blue-50 text-blue-600"><i class="ph ph-briefcase text-2xl"></i></div>
-                        </div>
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex justify-between items-center">
-                            <div><p class="text-sm font-medium text-gray-500">أعضاء الفريق</p><p id="stat-employees" class="text-3xl font-bold text-gray-800">0</p></div>
-                            <div class="p-4 rounded-full bg-teal-50 text-teal-600"><i class="ph ph-users text-2xl"></i></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TASKS VIEW -->
-                <div id="view-tasks" class="view-section hidden h-full flex-col max-w-7xl mx-auto">
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 shrink-0">
-                        <form id="form-add-task" class="flex flex-col md:flex-row gap-3">
-                            <input type="text" id="task-title" placeholder="ما هي المهمة الجديدة؟" required class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-teal outline-none" />
-                            <select id="task-assignee" class="border border-gray-300 rounded-lg px-4 py-2 text-sm bg-white md:w-48 outline-none">
-                                <option value="">إسناد إلى...</option>
-                            </select>
-                            <button type="submit" class="bg-brand-teal text-white px-6 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 shrink-0">
-                                <i class="ph ph-plus"></i> إضافة
-                            </button>
-                        </form>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 flex-1 items-start">
-                        <!-- Columns injected by JS -->
-                        <div id="col-todo" class="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
-                            <h3 class="font-bold mb-4 text-sm flex justify-between text-gray-700"><span>مهام جديدة</span> <span class="count bg-white px-2 py-0.5 rounded-full text-xs shadow-sm">0</span></h3>
-                            <div class="tasks-container space-y-3"></div>
-                        </div>
-                        <div id="col-in_progress" class="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
-                            <h3 class="font-bold mb-4 text-sm flex justify-between text-blue-600"><span>قيد التنفيذ</span> <span class="count bg-white px-2 py-0.5 rounded-full text-xs shadow-sm">0</span></h3>
-                            <div class="tasks-container space-y-3"></div>
-                        </div>
-                        <div id="col-done" class="bg-gray-100/50 rounded-xl p-4 border border-gray-200">
-                            <h3 class="font-bold mb-4 text-sm flex justify-between text-green-600"><span>مكتملة</span> <span class="count bg-white px-2 py-0.5 rounded-full text-xs shadow-sm">0</span></h3>
-                            <div class="tasks-container space-y-3"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- EMPLOYEES VIEW -->
-                <div id="view-employees" class="view-section hidden max-w-6xl mx-auto">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">هيكل الشركة (<span id="emp-count">0</span> / 10)</h2>
-                    <div id="employees-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        <!-- Injected by JS -->
-                    </div>
-                </div>
-
-                <!-- CHAT VIEW -->
-                <div id="view-chat" class="view-section hidden h-full flex-col max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
-                    
-                    <!-- Chat Header -->
-                    <div class="bg-gray-50 p-4 border-b border-gray-100 flex items-center gap-3 shrink-0">
-                        <div class="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal">
-                            <i class="ph ph-chats text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-800">المحادثة العامة</h3>
-                            <p class="text-xs text-gray-500">تواصل مع جميع أعضاء الشركة</p>
-                        </div>
-                    </div>
-
-                    <!-- Chat Messages Area -->
-                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30">
-                        <!-- Messages injected here -->
-                    </div>
-
-                    <!-- Chat Input Area -->
-                    <div class="p-4 bg-white border-t border-gray-100 relative shrink-0">
-                        
-                        <!-- Mention Menu Popup -->
-                        <div id="mention-menu" class="hidden absolute bottom-full mb-2 right-4 bg-white shadow-xl rounded-xl border border-gray-200 w-56 max-h-48 overflow-y-auto z-20 p-1">
-                            <!-- Injected by JS -->
-                        </div>
-
-                        <form id="form-chat" class="flex items-end gap-2 bg-gray-50 p-2 rounded-xl border border-gray-200 focus-within:border-brand-teal focus-within:bg-white transition-colors">
-                            <button type="button" id="btn-mention" class="p-2 text-gray-400 hover:text-brand-teal rounded-lg hover:bg-gray-100 transition-colors tooltip relative" title="أشر لشخص (Mention)">
-                                <i class="ph ph-at text-xl"></i>
-                            </button>
-                            
-                            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent resize-none outline-none py-2 px-1 text-sm text-gray-800 max-h-24 min-h-[40px]" placeholder="اكتب رسالتك هنا..."></textarea>
-                            
-                            <button type="submit" class="p-2 bg-brand-teal text-white rounded-lg hover:bg-[#006f84] transition-colors h-10 w-10 flex items-center justify-center">
-                                <i class="ph ph-paper-plane-right text-xl"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-    </div>
-
-    <!-- FIREBASE & APP LOGIC -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // === CONFIGURATION ===
-        // We use the fallback config provided originally to ensure the script NEVER crashes.
-        const fallbackConfig = {
-            apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
-            authDomain: "quill-world.firebaseapp.com",
-            projectId: "quill-world",
-            storageBucket: "quill-world.firebasestorage.app",
-            messagingSenderId: "339188796023",
-            appId: "1:339188796023:web:e0a1ba750b49909220d472",
-            measurementId: "G-BMEZ49L6CN"
-        };
-        
-        const firebaseConfig = typeof __firebase_config !== 'undefined' && Object.keys(__firebase_config).length > 0
-            ? JSON.parse(__firebase_config) 
-            : fallbackConfig;
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'quill-app-default';
-        const ROLES = ['CEO', 'HR', 'technical team supervisor', 'Technical Engineer', 'accountant'];
-
-        // === STATE ===
-        let currentUser = null;
-        let dbUser = null;
-        let employeesData = [];
-        let tasksData = [];
-        let messagesData = [];
-        let notificationsData = [];
-        
-        // Listeners
-        let unsubs = [];
-
-        // === DOM ELEMENTS ===
-        const views = {
-            login: document.getElementById('login-view'),
-            onboarding: document.getElementById('onboarding-view'),
-            app: document.getElementById('app-layout')
-        };
-        
-        const contentViews = {
-            dashboard: document.getElementById('view-dashboard'),
-            tasks: document.getElementById('view-tasks'),
-            employees: document.getElementById('view-employees'),
-            chat: document.getElementById('view-chat')
-        };
-
-        // === INTERACTIVE CANVAS BACKGROUND ===
-        function setupInteractiveBackground() {
-            const canvas = document.getElementById('particles-canvas');
-            if(!canvas) return;
-            const ctx = canvas.getContext('2d');
-            
-            let width = canvas.width = window.innerWidth;
-            let height = canvas.height = window.innerHeight;
-
-            window.addEventListener('resize', () => {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
+    <script>
+        // دالة للتنقل بين الأقسام
+        function showSection(sectionId) {
+            // إخفاء كل الأقسام
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
             });
+            // إظهار القسم المطلوب
+            document.getElementById(sectionId).classList.remove('hidden');
 
-            const particles = [];
-            // أضفنا ألواناً إضافية (ذهبي، أخضر، بنفسجي) لتصبح أكثر واقعية وجمالاً
-            const colors = ['#002d74', '#00839b', '#60a5fa', '#f59e0b', '#10b981', '#8b5cf6'];
-            const shapes = ['circle', 'square', 'triangle', 'star'];
-            
-            const mouse = { x: -1000, y: -1000, radius: 150 };
-
-            // تتبع الماوس في كل الشاشة
-            window.addEventListener('mousemove', (e) => {
-                if(views.login.classList.contains('hidden')) return;
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-            });
-
-            // إخفاء تأثير الماوس إذا كان فوق صندوق تسجيل الدخول
-            const loginBox = document.querySelector('#login-view > div.bg-white');
-            if (loginBox) {
-                loginBox.addEventListener('mouseenter', () => mouse.radius = 0);
-                loginBox.addEventListener('mouseleave', () => mouse.radius = 150);
-            }
-
-            class Particle {
-                constructor(x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.size = Math.random() * 5 + 2;
-                    this.speedX = (Math.random() * 2 - 1) * 1.2;
-                    this.speedY = (Math.random() * 2 - 1) * 1.2;
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
-                    this.shape = shapes[Math.floor(Math.random() * shapes.length)];
-                    this.life = 150 + Math.random() * 100;
-                    this.angle = Math.random() * 360;
-                    this.spin = (Math.random() - 0.5) * 0.05;
-                }
-                update() {
-                    // التفاعل مع الماوس (الابتعاد عنه بشكل ديناميكي)
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-                        this.x -= forceDirectionX * force * 3;
-                        this.y -= forceDirectionY * force * 3;
-                    }
-
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    this.angle += this.spin;
-                    
-                    if(this.life < 50) {
-                        this.size *= 0.98; // يصغر قبل أن يختفي
-                    }
-                    this.life--;
-                }
-                draw() {
-                    ctx.save();
-                    ctx.translate(this.x, this.y);
-                    ctx.rotate(this.angle);
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    
-                    if (this.shape === 'circle') {
-                        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-                        ctx.fill();
-                    } else if (this.shape === 'square') {
-                        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
-                    } else if (this.shape === 'triangle') {
-                        ctx.moveTo(0, -this.size);
-                        ctx.lineTo(this.size, this.size);
-                        ctx.lineTo(-this.size, this.size);
-                        ctx.closePath();
-                        ctx.fill();
-                    } else if (this.shape === 'star') {
-                        for (let i = 0; i < 5; i++) {
-                            ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.size, -Math.sin((18 + i * 72) * Math.PI / 180) * this.size);
-                            ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.size/2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.size/2));
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-                    ctx.restore();
-                }
-            }
-
-            function animate() {
-                if(!views.login.classList.contains('hidden')) {
-                    ctx.clearRect(0, 0, width, height);
-                    
-                    // توليد جسيمات باستمرار
-                    if (particles.length < 80) {
-                        particles.push(new Particle(Math.random() * width, Math.random() * height));
-                    }
-
-                    for (let i = 0; i < particles.length; i++) {
-                        particles[i].update();
-                        particles[i].draw();
-                        
-                        // رسم خطوط بين الجسيمات القريبة (تأثير شبكي تقني)
-                        for (let j = i; j < particles.length; j++) {
-                            const dx = particles[i].x - particles[j].x;
-                            const dy = particles[i].y - particles[j].y;
-                            const distance = Math.sqrt(dx * dx + dy * dy);
-                            if (distance < 120) {
-                                ctx.beginPath();
-                                ctx.strokeStyle = particles[i].color;
-                                ctx.globalAlpha = 0.4 * (1 - (distance / 120));
-                                ctx.lineWidth = 1;
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                                ctx.stroke();
-                                ctx.globalAlpha = 1;
-                            }
-                        }
-
-                        // حذف الجسيمات الميتة
-                        if (particles[i].size <= 0.2 || particles[i].life <= 0) {
-                            particles.splice(i, 1);
-                            i--;
-                        }
-                    }
-                }
-                requestAnimationFrame(animate);
-            }
-            animate();
-        }
-
-        // === INITIALIZATION (Instant Load) ===
-        async function init() {
-            setupInteractiveBackground();
-
-            if ("Notification" in window && Notification.permission === "default") {
-                Notification.requestPermission();
-            }
-
-            // انتظار المصادقة لتجنب أخطاء الأذونات (Permission-Denied)
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth init error:", error);
-            }
-
-            // الاستماع لحالة تسجيل الدخول فوراً
-            onAuthStateChanged(auth, async (user) => {
-                currentUser = user;
-                
-                // التأكد من وجود مستخدم قبل الاستمرار (Auth Guard)
-                if (!user) {
-                    cleanupListeners();
-                    if(views.onboarding.classList.contains('hidden')) showView('login');
-                    return;
-                }
-
-                if (!user.isAnonymous) {
-                    checkUserOnboarding();
-                } else {
-                    // إذا كان المستخدم مجهولاً، لا نخرجه من شاشة الإعداد إذا كان فيها
-                    if(views.onboarding.classList.contains('hidden') && views.app.classList.contains('hidden')) {
-                        showView('login');
-                        cleanupListeners();
-                    }
-                }
-            });
-        }
-
-        // === AUTH LOGIC ===
-        document.getElementById('btn-google-login').addEventListener('click', async () => {
-            const btnText = document.getElementById('btn-login-text');
-            const btn = document.getElementById('btn-google-login');
-            
-            const originalText = btnText.innerText;
-            btnText.innerText = 'جاري تسجيل الدخول...';
-            btn.disabled = true;
-
-            try {
-                const provider = new GoogleAuthProvider();
-                provider.setCustomParameters({ prompt: 'select_account' });
-                await signInWithPopup(auth, provider);
-            } catch (e) {
-                console.error("Popup Error:", e);
-                // تم تجاوز مشكلة الحظر هنا بتحويل المستخدم فوراً لشاشة الإعداد
-                alert("سيتم نقلك لإكمال بياناتك كـ 'مستخدم جديد'.");
-                
-                try {
-                    if (!currentUser) {
-                        await signInAnonymously(auth);
-                        currentUser = auth.currentUser;
-                    }
-                    if (currentUser) {
-                        showView('onboarding');
-                        setupOnboarding();
-                    }
-                } catch(fallbackError) {
-                    console.error("Fallback auth error:", fallbackError);
-                    alert("حدث خطأ في النظام. الرجاء المحاولة مرة أخرى.");
-                }
-            } finally {
-                btnText.innerText = originalText;
-                btn.disabled = false;
-            }
-        });
-
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            signOut(auth);
-        });
-
-        async function checkUserOnboarding() {
-            const loginBtn = document.getElementById('btn-google-login');
-            const loginText = document.getElementById('btn-login-text');
-            if(loginText) loginText.innerText = 'جاري تحضير مساحة العمل...';
-            if(loginBtn) loginBtn.disabled = true;
-
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid);
-                const docSnap = await getDoc(docRef);
-                
-                if (docSnap.exists()) {
-                    dbUser = { id: docSnap.id, ...docSnap.data() };
-                    setupAppListeners();
-                    showView('app');
-                    switchContentView('dashboard');
-                } else {
-                    setupOnboarding();
-                    showView('onboarding');
-                }
-            } catch(error) {
-                console.error("Error checking user:", error);
-            }
-
-            if(loginText) loginText.innerText = 'تسجيل الدخول باستخدام Google';
-            if(loginBtn) loginBtn.disabled = false;
-        }
-
-        // === ONBOARDING ===
-        function setupOnboarding() {
-            const nameInput = document.getElementById('ob-name');
-            nameInput.value = currentUser.displayName || '';
-            
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (snap) => {
-                const users = snap.docs.map(d => d.data());
-                const hasCEO = users.some(u => u.role === 'CEO');
-                
-                const select = document.getElementById('ob-role');
-                select.innerHTML = '<option value="" disabled selected>اختر وظيفتك...</option>';
-                
-                ROLES.forEach(r => {
-                    if (r === 'CEO' && hasCEO) return;
-                    const opt = document.createElement('option');
-                    opt.value = r;
-                    opt.innerText = r;
-                    select.appendChild(opt);
-                });
-
-                if(hasCEO) document.getElementById('ob-ceo-warning').classList.remove('hidden');
-            }, (error) => console.error("Onboarding users listener error:", error));
-        }
-
-        document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-profile');
-            btn.disabled = true;
-            btn.innerText = 'جاري الحفظ...';
-
-            const name = document.getElementById('ob-name').value;
-            const role = document.getElementById('ob-role').value;
-
-            const userData = {
-                uid: currentUser.uid,
-                name: name,
-                email: currentUser.email || 'user@quill.world',
-                role: role,
-                photoURL: currentUser.photoURL || null,
-                joinedAt: Date.now()
+            // تغيير العنوان في الشريط العلوي بناءً على القسم
+            const titles = {
+                'dashboard': 'لوحة التحكم',
+                'employees': 'إدارة الموظفين',
+                'tasks': 'إدارة المهام',
+                'customers': 'العملاء'
             };
+            document.getElementById('page-title').innerText = titles[sectionId];
 
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), userData);
-                dbUser = { id: currentUser.uid, ...userData };
-                setupAppListeners();
-                showView('app');
-                switchContentView('dashboard');
-            } catch(e) {
-                alert("حدث خطأ أثناء الحفظ");
-                btn.disabled = false;
-                btn.innerText = 'دخول إلى مساحة العمل';
-            }
-        });
-
-        // === DATA LISTENERS ===
-        function setupAppListeners() {
-            cleanupListeners();
-
-            const uSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (snap) => {
-                employeesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                const current = employeesData.find(e => e.id === currentUser.uid);
-                if(current) dbUser = current;
-                updateUI();
-            }, (error) => console.error("Users listener error:", error));
-
-            const tSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), (snap) => {
-                tasksData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                tasksData.sort((a, b) => b.createdAt - a.createdAt);
-                updateUI();
-            }, (error) => console.error("Tasks listener error:", error));
-
-            const mSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), (snap) => {
-                messagesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                messagesData.sort((a, b) => a.timestamp - b.timestamp);
-                renderChat();
-            }, (error) => console.error("Messages listener error:", error));
-
-            const nSub = onSnapshot(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'notifications'), (snap) => {
-                notificationsData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                notificationsData.sort((a, b) => b.timestamp - a.timestamp);
-                renderNotifications();
-                
-                snap.docChanges().forEach((change) => {
-                    if (change.type === "added" && !change.doc.data().read) {
-                        showBrowserNotification(change.doc.data().title, change.doc.data().body);
-                    }
-                });
-            }, (error) => console.error("Notifications listener error:", error));
-
-            unsubs.push(uSub, tSub, mSub, nSub);
-        }
-
-        function cleanupListeners() {
-            unsubs.forEach(u => u());
-            unsubs = [];
-        }
-
-        // === UI UPDATES ===
-        function showView(viewId) {
-            Object.values(views).forEach(v => v.classList.add('hidden'));
-            if(views[viewId]) views[viewId].classList.remove('hidden');
-        }
-
-        let currentActiveTab = 'dashboard';
-        function switchContentView(target) {
-            currentActiveTab = target;
-            Object.values(contentViews).forEach(v => v.classList.add('hidden'));
-            if(contentViews[target]) contentViews[target].classList.remove('hidden');
-            
+            // تحديث تصميم أزرار القائمة الجانبية (تحديد النشط)
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === target) {
-                    btn.classList.add('bg-white/20', 'font-bold');
-                    btn.classList.remove('hover:bg-white/10');
-                } else {
-                    btn.classList.remove('bg-white/20', 'font-bold');
-                    btn.classList.add('hover:bg-white/10');
-                }
+                btn.classList.remove('bg-secondary', 'text-white');
+                btn.classList.add('text-gray-300');
             });
-
-            const titles = { dashboard: 'لوحة القيادة', tasks: 'المهام والمشاريع', employees: 'دليل الموظفين', chat: 'المحادثة العامة' };
-            document.getElementById('header-title').innerText = titles[target] || '';
             
-            if(window.innerWidth < 768) toggleSidebar(false);
-            if(target === 'chat') setTimeout(scrollChatToBottom, 100);
-            updateUI();
+            // البحث عن الزر الذي تم الضغط عليه وتفعيله
+            const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.getAttribute('onclick').includes(sectionId));
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-300');
+                activeBtn.classList.add('bg-secondary', 'text-white');
+            }
         }
 
-        function updateUI() {
-            if(!dbUser) return;
+        // دوال للتحكم بالنوافذ المنبثقة (Modals)
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.getElementById('addEmployeeForm').reset();
+        }
+
+        // دالة لإضافة موظف للجدول (مؤقتاً في نفس الصفحة)
+        function addEmployee(event) {
+            event.preventDefault(); // منع تحديث الصفحة
             
-            document.getElementById('sidebar-user-name').innerText = dbUser.name;
-            document.getElementById('sidebar-user-role').innerText = dbUser.role;
-            document.getElementById('sidebar-user-avatar').innerText = dbUser.name.charAt(0);
-
-            if(currentActiveTab === 'dashboard') {
-                document.getElementById('dash-name').innerText = dbUser.name.split(' ')[0];
-                document.getElementById('dash-role').innerText = dbUser.role;
-                
-                const myTasks = tasksData.filter(t => t.assigneeId === currentUser.uid && t.status !== 'done').length;
-                document.getElementById('stat-my-tasks').innerText = myTasks;
-                document.getElementById('stat-all-tasks').innerText = tasksData.length;
-                document.getElementById('stat-employees').innerText = employeesData.length;
-            }
-
-            if(currentActiveTab === 'tasks') {
-                renderTasks();
-                const sel = document.getElementById('task-assignee');
-                const currVal = sel.value;
-                sel.innerHTML = `<option value="${currentUser.uid}">إسناد إلي (أنا)</option>`;
-                employeesData.forEach(e => {
-                    if(e.id !== currentUser.uid) sel.innerHTML += `<option value="${e.id}">${e.name}</option>`;
-                });
-                sel.value = currVal || currentUser.uid;
-            }
-
-            if(currentActiveTab === 'employees') {
-                document.getElementById('emp-count').innerText = employeesData.length;
-                const grid = document.getElementById('employees-grid');
-                grid.innerHTML = '';
-                
-                employeesData.forEach(e => {
-                    grid.innerHTML += `
-                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-                            <div class="w-20 h-20 rounded-full mb-4 flex items-center justify-center text-2xl font-bold bg-blue-50 text-brand-blue border-2 border-brand-teal/20">
-                                ${e.photoURL ? `<img src="${e.photoURL}" class="rounded-full w-full h-full object-cover">` : e.name.charAt(0)}
-                            </div>
-                            <h3 class="font-bold text-gray-800 text-lg mb-1">${e.name} ${e.id === currentUser.uid ? '(أنت)' : ''}</h3>
-                            <span class="text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-brand-blue border border-blue-100 mb-3">${e.role}</span>
-                            <a href="mailto:${e.email}" class="text-xs text-gray-500 hover:text-brand-teal truncate w-full">${e.email}</a>
-                        </div>
-                    `;
-                });
-
-                const emptySlots = Math.max(0, 10 - employeesData.length);
-                for(let i=0; i<emptySlots; i++) {
-                    grid.innerHTML += `
-                        <div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center bg-gray-50/50 opacity-60">
-                            <div class="w-16 h-16 rounded-full bg-gray-200 mb-4 flex items-center justify-center text-gray-400">
-                                <i class="ph ph-user-plus text-2xl"></i>
-                            </div>
-                            <p class="font-medium text-gray-500 text-sm">مكان شاغر</p>
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        // === TASKS LOGIC ===
-        function renderTasks() {
-            const cols = { todo: document.getElementById('col-todo'), in_progress: document.getElementById('col-in_progress'), done: document.getElementById('col-done') };
-            Object.values(cols).forEach(c => { c.querySelector('.tasks-container').innerHTML = ''; c.querySelector('.count').innerText = '0'; });
-
-            tasksData.forEach(task => {
-                const col = cols[task.status];
-                if(!col) return;
-                
-                const assignee = employeesData.find(e => e.id === task.assigneeId);
-                const aName = assignee ? assignee.name : 'غير محدد';
-                const aInit = assignee ? assignee.name.charAt(0) : '?';
-                
-                const taskEl = document.createElement('div');
-                taskEl.className = "bg-white p-4 rounded-lg shadow-sm border border-gray-200 relative group";
-                taskEl.innerHTML = `
-                    <p class="text-gray-800 font-medium text-sm mb-3 pr-6">${task.title}</p>
-                    <div class="flex items-center justify-between mt-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 rounded-full bg-blue-50 text-brand-blue flex items-center justify-center text-xs font-bold">${aInit}</div>
-                            <span class="text-xs text-gray-500 truncate w-20">${aName}</span>
-                        </div>
-                        <select onchange="window.updateTaskStatus('${task.id}', this.value)" class="text-xs border border-gray-200 rounded p-1 bg-gray-50 text-gray-600 outline-none focus:border-brand-teal cursor-pointer">
-                            <option value="todo" ${task.status==='todo'?'selected':''}>جديدة</option>
-                            <option value="in_progress" ${task.status==='in_progress'?'selected':''}>قيد التنفيذ</option>
-                            <option value="done" ${task.status==='done'?'selected':''}>مكتملة</option>
-                        </select>
-                    </div>
-                    <button onclick="window.deleteTask('${task.id}')" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <i class="ph ph-trash"></i>
-                    </button>
-                `;
-                col.querySelector('.tasks-container').appendChild(taskEl);
-            });
-
-            Object.keys(cols).forEach(key => {
-                cols[key].querySelector('.count').innerText = tasksData.filter(t => t.status === key).length;
-            });
-        }
-
-        document.getElementById('form-add-task').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('task-title').value;
-            const assigneeId = document.getElementById('task-assignee').value || currentUser.uid;
+            const name = document.getElementById('empName').value;
+            const dept = document.getElementById('empDept').value;
+            const role = document.getElementById('empRole').value;
             
-            if(!title.trim()) return;
-
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
-                title: title,
-                status: 'todo',
-                assigneeId: assigneeId,
-                creatorId: currentUser.uid,
-                createdAt: Date.now()
-            });
-            document.getElementById('task-title').value = '';
-        });
-
-        window.updateTaskStatus = async (taskId, newStatus) => {
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), { status: newStatus });
-        };
-
-        window.deleteTask = async (taskId) => {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId));
-        };
-
-        // === CHAT & MENTION LOGIC ===
-        const chatInput = document.getElementById('chat-input');
-        const mentionMenu = document.getElementById('mention-menu');
-        
-        function renderChat() {
-            const container = document.getElementById('chat-messages');
-            container.innerHTML = '';
+            const tbody = document.getElementById('employee-table-body');
+            const newRow = document.createElement('tr');
+            newRow.className = "hover:bg-gray-50 transition-colors";
             
-            if (messagesData.length === 0) {
-                container.innerHTML = `<div class="h-full flex items-center justify-center text-gray-400 text-sm">لا توجد رسائل بعد. كن أول من يرحب بالفريق!</div>`;
-                return;
-            }
-
-            messagesData.forEach(msg => {
-                const sender = employeesData.find(e => e.id === msg.senderId) || { name: 'مستخدم محذوف', role: '' };
-                const isMe = msg.senderId === currentUser?.uid;
-                
-                let formattedText = msg.text;
-                formattedText = formattedText.replace(/@([\u0600-\u06FFa-zA-Z0-9_ ]+)/g, (match) => {
-                    return `<span class="bg-teal-100 text-teal-800 px-1 rounded text-xs font-bold mx-1" dir="rtl">${match}</span>`;
-                });
-
-                const timeStr = new Date(msg.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-
-                const div = document.createElement('div');
-                div.className = `flex gap-3 ${isMe ? 'flex-row-reverse' : ''}`;
-                
-                div.innerHTML = `
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-brand-blue flex items-center justify-center font-bold text-xs shrink-0 mt-1">
-                        ${sender.name.charAt(0)}
-                    </div>
-                    <div class="max-w-[75%] flex flex-col ${isMe ? 'items-end' : 'items-start'}">
-                        <div class="flex items-baseline gap-2 mb-1 px-1">
-                            <span class="text-xs font-bold text-gray-700">${isMe ? 'أنت' : sender.name}</span>
-                            <span class="text-[10px] text-gray-400">${timeStr}</span>
-                        </div>
-                        <div class="${isMe ? 'bg-brand-teal text-white rounded-br-none' : 'bg-white text-gray-800 rounded-bl-none border border-gray-200'} px-4 py-2 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap shadow-sm inline-block">
-                            ${formattedText}
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-            scrollChatToBottom();
-        }
-
-        function scrollChatToBottom() {
-            const container = document.getElementById('chat-messages');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        document.getElementById('btn-mention').addEventListener('click', (e) => {
-            e.stopPropagation();
-            if(mentionMenu.classList.contains('hidden')) showMentionMenu();
-            else mentionMenu.classList.add('hidden');
-        });
-
-        function showMentionMenu() {
-            mentionMenu.innerHTML = '';
-            employeesData.forEach(emp => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'w-full text-right px-3 py-2 hover:bg-gray-50 text-sm border-b border-gray-50 last:border-0 flex items-center gap-2';
-                btn.innerHTML = `<div class="w-6 h-6 rounded-full bg-gray-200 text-xs flex items-center justify-center text-gray-600">${emp.name.charAt(0)}</div> <span class="truncate">${emp.name}</span>`;
-                btn.onclick = () => {
-                    const currentText = chatInput.value;
-                    chatInput.value = currentText + (currentText.endsWith(' ') || currentText === '' ? '' : ' ') + `@${emp.name} `;
-                    chatInput.focus();
-                    mentionMenu.classList.add('hidden');
-                };
-                mentionMenu.appendChild(btn);
-            });
-            mentionMenu.classList.remove('hidden');
-        }
-
-        document.addEventListener('click', (e) => {
-            if(!mentionMenu.contains(e.target) && e.target.id !== 'btn-mention') {
-                mentionMenu.classList.add('hidden');
-            }
-        });
-
-        document.getElementById('form-chat').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = chatInput.value.trim();
-            if(!text) return;
-
-            chatInput.value = '';
+            // إنشاء صف جديد بالبيانات المدخلة
+            newRow.innerHTML = `
+                <td class="p-4 flex items-center">
+                    <img src="https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=002d74&color=fff" class="w-8 h-8 rounded-full ml-3">
+                    <span class="font-medium text-gray-800">${name}</span>
+                </td>
+                <td class="p-4 text-gray-600">${dept}</td>
+                <td class="p-4 text-gray-600">${role}</td>
+                <td class="p-4"><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">نشط</span></td>
+                <td class="p-4">
+                    <button class="text-blue-500 hover:text-blue-700 ml-2"><i class="fa-solid fa-pen"></i></button>
+                    <button class="text-red-500 hover:text-red-700" onclick="this.closest('tr').remove()"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            `;
             
-            const mentionedUsers = [];
-            employeesData.forEach(emp => {
-                if (text.includes(`@${emp.name}`) && emp.id !== currentUser.uid) {
-                    mentionedUsers.push(emp);
-                }
-            });
-
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
-                text: text,
-                senderId: currentUser.uid,
-                timestamp: Date.now(),
-                mentioned: mentionedUsers.map(u => u.id)
-            });
-
-            for (const emp of mentionedUsers) {
-                await addDoc(collection(db, 'artifacts', appId, 'users', emp.id, 'notifications'), {
-                    title: 'إشارة في المحادثة',
-                    body: `قام ${dbUser.name} بالإشارة إليك في المحادثة العامة`,
-                    timestamp: Date.now(),
-                    read: false,
-                    link: 'chat'
-                });
-            }
-        });
-
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                document.getElementById('form-chat').dispatchEvent(new Event('submit'));
-            }
-        });
-
-        // === NOTIFICATIONS LOGIC ===
-        const notifBadge = document.getElementById('notif-badge');
-        const notifPanel = document.getElementById('notif-panel');
-        
-        document.getElementById('btn-notifications').addEventListener('click', (e) => {
-            e.stopPropagation();
-            notifPanel.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (e) => {
-            if(!notifPanel.contains(e.target) && e.target.id !== 'btn-notifications') {
-                notifPanel.classList.add('hidden');
-            }
-        });
-
-        function renderNotifications() {
-            const unreadCount = notificationsData.filter(n => !n.read).length;
-            
-            if (unreadCount > 0) {
-                notifBadge.innerText = unreadCount;
-                notifBadge.classList.remove('hidden');
-            } else {
-                notifBadge.classList.add('hidden');
-            }
-
-            const list = document.getElementById('notif-list');
-            list.innerHTML = '';
-
-            if(notificationsData.length === 0) {
-                list.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">لا توجد إشعارات</div>';
-                return;
-            }
-
-            notificationsData.forEach(n => {
-                const timeStr = new Date(n.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                const div = document.createElement('div');
-                div.className = `p-3 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition-colors ${n.read ? 'opacity-70' : 'bg-blue-50/30'}`;
-                div.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <div class="p-2 rounded-full ${n.read ? 'bg-gray-100 text-gray-500' : 'bg-brand-teal text-white'} shrink-0 mt-1">
-                            <i class="ph ph-at"></i>
-                        </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-800">${n.title}</p>
-                            <p class="text-xs text-gray-600 mt-1">${n.body}</p>
-                            <p class="text-[10px] text-gray-400 mt-1">${timeStr}</p>
-                        </div>
-                    </div>
-                `;
-                div.onclick = () => {
-                    markNotifRead(n.id);
-                    if(n.link === 'chat') switchContentView('chat');
-                    notifPanel.classList.add('hidden');
-                };
-                list.appendChild(div);
-            });
+            tbody.prepend(newRow); // إضافة الصف في الأعلى
+            closeModal('employeeModal'); // إغلاق النافذة
         }
-
-        async function markNotifRead(id) {
-            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'notifications', id), { read: true });
-        }
-
-        document.getElementById('btn-read-all-notifs').addEventListener('click', () => {
-            notificationsData.filter(n => !n.read).forEach(n => markNotifRead(n.id));
-        });
-
-        function showBrowserNotification(title, body) {
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, {
-                    body: body,
-                    icon: 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png'
-                });
-            }
-        }
-
-        // === SIDEBAR TOGGLES ===
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        
-        function toggleSidebar(show) {
-            if(show) {
-                sidebar.classList.remove('translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        }
-
-        document.getElementById('btn-open-sidebar').addEventListener('click', () => toggleSidebar(true));
-        document.getElementById('btn-close-sidebar').addEventListener('click', () => toggleSidebar(false));
-        overlay.addEventListener('click', () => toggleSidebar(false));
-
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const target = e.currentTarget.dataset.target;
-                switchContentView(target);
-            });
-        });
-
-        // Initialize App
-        init();
-
     </script>
 </body>
 </html>
