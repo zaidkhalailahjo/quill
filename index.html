@@ -50,7 +50,6 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #00839b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* خلفية المحادثة */
         .chat-bg {
             background-color: #fdfdfd;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 15L15 22.5v15L30 45l15-7.5v-15z' stroke='%23f0f0f0' stroke-width='1'/%3E%3Cpath d='M30 15v15l15-7.5M30 30l-15-7.5M30 30v15' stroke='%23f0f0f0' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
@@ -59,7 +58,6 @@
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex relative">
 
-    <!-- شاشة التحميل الأولية -->
     <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
         <p class="text-primary font-bold text-lg">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
@@ -94,13 +92,9 @@
         </div>
     </div>
 
-    <!-- الإشعارات (Toasts) -->
     <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3"></div>
-
-    <!-- تظليل الخلفية للهواتف -->
     <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
 
-    <!-- القائمة الجانبية (متوافقة مع الجوال) -->
     <aside id="sidebar" class="fixed md:relative inset-y-0 right-0 transform translate-x-full md:translate-x-0 transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30 flex-shrink-0">
         <div class="p-6 flex items-center justify-between md:justify-center border-b border-white/10">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-10">
@@ -120,26 +114,30 @@
                 <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المهام</span>
             </button>
             
-            <!-- زر قسم الملفات -->
             <button onclick="window.showSection('drive')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="drive">
                 <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الملفات</span>
             </button>
 
-            <!-- قسم المحادثات المنسدل بسلاسة -->
+            <!-- قسم الاجتماعات الجديد -->
+            <button onclick="window.showSection('meetings')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative" data-section="meetings">
+                <i class="fa-solid fa-video w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الاجتماعات</span>
+            </button>
+
             <div class="mt-2">
-                <button onclick="window.openChatAndToggleMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <button onclick="window.openChatAndToggleMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
                     <div class="flex items-center">
                         <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المحادثات</span>
                     </div>
-                    <i id="chatMenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    <div class="flex items-center gap-2">
+                        <span id="globalChatBadge" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
+                        <i id="chatMenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                    </div>
                 </button>
-                <!-- القائمة المنسدلة للمجموعات -->
                 <div id="chatSubMenu" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
                     <!-- سيتم تعبئة المجموعات هنا برمجياً -->
                 </div>
             </div>
 
-            <!-- قسم الإعدادات -->
             <button onclick="window.showSection('settings')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="settings">
                 <i class="fa-solid fa-gear w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الإعدادات</span>
             </button>
@@ -150,10 +148,7 @@
         </nav>
     </aside>
 
-    <!-- المحتوى الرئيسي -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
-        
-        <!-- الشريط العلوي -->
         <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0">
             <div class="flex items-center">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-4">
@@ -163,6 +158,9 @@
             </div>
             
             <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse">
+                <button onclick="window.requestNotifications()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="تفعيل الإشعارات">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
                 <div class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded transition" onclick="window.showSection('settings')">
                     <img id="userAvatar" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
                     <div class="mr-2 md:mr-3 hidden sm:block text-right">
@@ -176,10 +174,9 @@
             </div>
         </header>
 
-        <!-- الأقسام المتغيرة -->
         <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 relative">
             
-            <!-- 1. لوحة التحكم (للمدير فقط) -->
+            <!-- 1. لوحة التحكم -->
             <section id="dashboard" class="section-content animate-fade-in hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
                     <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-primary">
@@ -197,7 +194,7 @@
                 </div>
             </section>
 
-            <!-- 2. الموظفين (للمدير فقط) -->
+            <!-- 2. الموظفين -->
             <section id="employees" class="section-content hidden animate-fade-in">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600">فريق العمل المسجل في النظام</p>
@@ -211,9 +208,7 @@
                                 <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 hidden text-left">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="employeesList" class="divide-y divide-gray-100">
-                            <!-- Injected by JS -->
-                        </tbody>
+                        <tbody id="employeesList" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </section>
@@ -244,8 +239,6 @@
 
             <!-- 4. قسم الملفات -->
             <section id="drive" class="section-content hidden animate-fade-in">
-                
-                <!-- شريط المساحة التخزينية -->
                 <div class="mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div class="flex justify-between text-sm mb-2 font-bold text-gray-700">
                         <span>المساحة المستخدمة</span>
@@ -268,21 +261,41 @@
                 </div>
                 
                 <h3 class="font-bold text-gray-800 mb-3 border-b pb-2"><i class="fa-solid fa-thumbtack text-primary ml-2"></i>الملفات المثبتة</h3>
-                <div id="pinnedFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                    <!-- سيتم تعبئة الملفات المثبتة هنا -->
-                </div>
+                <div id="pinnedFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"></div>
 
                 <h3 class="font-bold text-gray-800 mb-3 border-b pb-2"><i class="fa-regular fa-folder-open text-secondary ml-2"></i>كل الملفات</h3>
-                <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- سيتم تعبئة باقي الملفات هنا -->
+                <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+
+            <!-- قسم الاجتماعات (مكالمات الفيديو) الجديد -->
+            <section id="meetings" class="section-content hidden animate-fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600">إدارة وجدولة مكالمات الفيديو</p>
+                    <button id="createMeetingBtn" onclick="window.openCreateMeetingModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
+                        <i class="fa-solid fa-video ml-2"></i> بدء / جدولة اجتماع
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-bold text-primary mb-3 border-b border-gray-200 pb-2"><i class="fa-solid fa-calendar-check ml-2"></i>الاجتماعات الحالية والمجدولة</h3>
+                        <div id="activeMeetingsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Injected -->
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-gray-600 mb-3 border-b border-gray-200 pb-2 mt-8"><i class="fa-solid fa-clock-rotate-left ml-2"></i>سجل الاجتماعات السابقة</h3>
+                        <div id="pastMeetingsList" class="space-y-3">
+                            <!-- Injected -->
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- 5. المحادثات -->
             <section id="chat" class="section-content hidden animate-fade-in h-full pb-4">
                 <div class="flex flex-col h-[75vh] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
-                    
-                    <!-- الهيدر الخاص بالمحادثة -->
                     <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 z-10 shadow-sm flex-shrink-0">
                         <div class="flex items-center gap-3 w-full sm:w-auto">
                             <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
@@ -299,25 +312,15 @@
                             </div>
                         </div>
                         
-                        <!-- أزرار التحكم بالدردشة -->
                         <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <!-- زر بدء مكالمة فيديو -->
-                            <button id="startCallBtn" onclick="window.startVideoCall()" class="w-full sm:w-auto text-xs md:text-sm bg-green-50 hover:bg-green-100 text-green-600 border border-green-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-video"></i> <span>مكالمة فيديو</span>
-                            </button>
-                            <!-- زر مسح المحادثة (للمدير) -->
                             <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden w-full sm:w-auto text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
                                 <i class="fa-solid fa-trash-can"></i> <span id="clearChatBtnText">مسح الدردشة</span>
                             </button>
                         </div>
                     </div>
                     
-                    <!-- منطقة الرسائل -->
-                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative">
-                        <!-- الرسائل ستظهر هنا -->
-                    </div>
+                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
 
-                    <!-- منطقة عرض المرفق قبل الإرسال -->
                     <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
                         <div class="flex items-center gap-2 text-sm text-primary font-bold">
                             <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
@@ -325,15 +328,9 @@
                         <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i> إزالة</button>
                     </div>
                     
-                    <!-- منطقة الإدخال -->
                     <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10 flex-shrink-0">
-                        
-                        <!-- قائمة المنشن العائمة -->
-                        <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20">
-                            <!-- سيتم حقن الأسماء هنا -->
-                        </div>
+                        <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
 
-                        <!-- لوحة الألوان العائمة للدردشة -->
                         <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-2 z-20">
                             <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
                             <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
@@ -345,18 +342,13 @@
 
                         <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
                             <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg ml-2 transition-colors font-bold" title="ذكر شخص">@</button>
-                            
-                            <!-- إرفاق ملف في الدردشة -->
                             <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
                             <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="إرفاق ملف (صورة/فيديو/pdf)">
                                 <i class="fa-solid fa-paperclip"></i>
                             </button>
-
-                            <!-- لوحة الألوان للدردشة -->
                             <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="تغيير لون الرسالة">
                                 <i class="fa-solid fa-palette"></i>
                             </button>
-                            
                             <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700" autocomplete="off">
                             <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow">
                                 <i class="fa-regular fa-paper-plane transform -scale-x-100"></i>
@@ -375,7 +367,6 @@
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-xl mx-auto md:mx-0">
                     <h3 class="font-bold text-primary mb-6 border-b border-gray-100 pb-3 text-lg"><i class="fa-solid fa-user-gear ml-2"></i>معلومات الحساب الأساسية</h3>
                     
-                    <!-- الصورة الشخصية -->
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-right">
                         <div class="relative group">
                             <img id="settingsAvatarPreview" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-24 h-24 rounded-full border-4 border-gray-50 object-cover shadow-md">
@@ -394,7 +385,6 @@
                     </div>
 
                     <div class="space-y-5">
-                        <!-- الاسم -->
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل <span class="text-[10px] text-red-400 font-normal mr-1">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
@@ -402,8 +392,6 @@
                                 <input type="text" id="settingsName" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
-                        
-                        <!-- الوظيفة -->
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور) <span class="text-[10px] text-red-400 font-normal mr-1">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
@@ -411,8 +399,6 @@
                                 <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
-
-                        <!-- إعدادات وسائط الدردشة -->
                         <div class="pt-4 border-t border-gray-100">
                             <label class="block text-sm font-bold text-gray-700 mb-1">ترتيب عرض وسائط المحادثة</label>
                             <p class="text-xs text-gray-500 mb-2">اختر طريقة عرض النص مع الصور أو الفيديوهات في رسائلك.</p>
@@ -442,9 +428,7 @@
                                 <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الحدث</th>
                             </tr>
                         </thead>
-                        <tbody id="logsList" class="divide-y divide-gray-100">
-                            <!-- Injected by JS -->
-                        </tbody>
+                        <tbody id="logsList" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </section>
@@ -490,13 +474,39 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">إضافة الأعضاء</label>
-                    <div id="groupMembersSelection" class="border border-gray-200 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50">
-                        <!-- سيتم تعبئة الموظفين هنا لاختيارهم -->
-                    </div>
+                    <div id="groupMembersSelection" class="border border-gray-200 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50"></div>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
                     <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
                     <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base">تأكيد الإنشاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: إنشاء/جدولة اجتماع (مكالمة فيديو) -->
+    <div id="createMeetingModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-green-600 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg">بدء أو جدولة اجتماع فيديو</h3>
+                <button onclick="window.closeModal('createMeetingModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="createMeetingForm" class="p-4 md:p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">عنوان الاجتماع</label>
+                    <input type="text" id="newMeetingTitle" required placeholder="مثال: مناقشة المشروع الجديد" class="w-full border rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">وقت الاجتماع (اتركه فارغاً للبدء فوراً)</label>
+                    <input type="datetime-local" id="newMeetingTime" class="w-full border rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">المدعوين للاجتماع</label>
+                    <div id="meetingMembersSelection" class="border border-gray-200 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50"></div>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('createMeetingModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base">إنشاء الاجتماع</button>
                 </div>
             </form>
         </div>
@@ -531,12 +541,10 @@
         </div>
     </div>
 
-    <!-- Modal: عرض الوسائط (صور / فيديو) -->
+    <!-- Modal: عرض الوسائط -->
     <div id="mediaModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-50 p-4" onclick="window.closeMediaModal()">
         <button class="absolute top-4 right-4 md:top-6 md:right-6 text-white text-3xl hover:text-gray-300 transition-colors z-10"><i class="fa-solid fa-xmark"></i></button>
-        <div id="mediaContainer" class="max-w-5xl w-full max-h-[90vh] flex items-center justify-center pointer-events-none" onclick="event.stopPropagation()">
-            <!-- Media injected here -->
-        </div>
+        <div id="mediaContainer" class="max-w-5xl w-full max-h-[90vh] flex items-center justify-center pointer-events-none" onclick="event.stopPropagation()"></div>
     </div>
 
     <!-- Modal: مكالمة الفيديو عبر Jitsi -->
@@ -557,7 +565,6 @@
         </div>
     </div>
 
-    <!-- Firebase و JavaScript Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -578,9 +585,6 @@
         const db = getFirestore(app);
         const appId = 'quill-world-system';
 
-        // ==========================================
-        // إعدادات EmailJS
-        // ==========================================
         const EMAILJS_SERVICE_ID = 'service_ibewued'; 
         const EMAILJS_TEMPLATE_ID = 'template_iro6gon'; 
         const EMAILJS_REMINDER_TEMPLATE_ID = 'template_6pbna5z'; 
@@ -596,18 +600,20 @@
         let globalChat = [];
         let globalFiles = []; 
         let globalGroups = []; 
+        let globalMeetings = [];
+        
         let currentGroupId = 'global'; 
+        let currentMeetingId = null;
         let initialTaskLoad = true; 
+        let initialChatLoad = true;
         let knownTaskIds = new Set();
+        let groupReadTimestamps = {}; // { groupId: timestamp }
         
         let pendingChatFileData = null;
         let pendingChatFileType = null;
-        
         let selectedChatColor = 'bg-[#00839b]'; 
-
         const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; 
-        
-        let jitsiApi = null; // مرجع لـ API مكالمة الفيديو
+        let jitsiApi = null; 
 
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -618,16 +624,94 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
-        // ------------------ مكالمات الفيديو (Jitsi Meet) ------------------
-        window.startVideoCall = async () => {
-            if(!currentUserData) return;
+        // ------------------ إشعارات المتصفح ------------------
+        let hasRequestedNotification = false;
+        window.requestNotifications = () => {
+            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") showToast('تم تفعيل إشعارات المتصفح بنجاح', 'success');
+                });
+            } else if (Notification.permission === "granted") {
+                showToast('الإشعارات مفعلة مسبقاً', 'success');
+            } else {
+                showToast('الإشعارات محظورة من قبل المتصفح، يرجى تفعيلها من الإعدادات', 'warning');
+            }
+        };
 
-            // تحديد اسم الغرفة (يجب أن يكون فريد وآمن للشركة والمجموعة الحالية)
-            // إزالة المسافات والرموز لتجنب أخطاء Jitsi
-            const cleanGroupId = currentGroupId.replace(/[^a-zA-Z0-9]/g, "");
-            const roomName = `QuillWorldApp_${appId.substring(0,5)}_${cleanGroupId}`;
+        function sendPushNotification(title, body) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification(title, { 
+                    body: body, 
+                    icon: 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png'
+                });
+            }
+        }
 
-            // إظهار واجهة المكالمة
+        // ------------------ مكالمات الفيديو والاجتماعات ------------------
+        window.openCreateMeetingModal = () => {
+            const container = document.getElementById('meetingMembersSelection');
+            container.innerHTML = '';
+            
+            globalUsers.forEach(emp => {
+                if(emp.id !== currentUserData.uid) {
+                    container.innerHTML += `
+                        <label class="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer border border-transparent hover:border-gray-200 transition">
+                            <input type="checkbox" value="${emp.id}" class="meeting-member-checkbox w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500">
+                            <img src="${emp.photoURL}" class="w-6 h-6 rounded-full">
+                            <span class="text-sm font-medium text-gray-700">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
+                        </label>
+                    `;
+                }
+            });
+            window.openModal('createMeetingModal');
+        };
+
+        document.getElementById('createMeetingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(currentUserData.role !== 'CEO') return;
+
+            const title = document.getElementById('newMeetingTitle').value;
+            const timeVal = document.getElementById('newMeetingTime').value;
+            let scheduledTime = null;
+            let status = 'active';
+
+            if (timeVal) {
+                scheduledTime = new Date(timeVal).getTime();
+                if (scheduledTime > Date.now()) {
+                    status = 'scheduled';
+                }
+            }
+
+            const checkboxes = document.querySelectorAll('.meeting-member-checkbox:checked');
+            const invited = Array.from(checkboxes).map(cb => cb.value);
+            invited.push(currentUserData.uid); // المدير دائماً مدعو
+
+            try {
+                await addDoc(getColRef('meetings'), {
+                    title: title,
+                    scheduledFor: scheduledTime,
+                    createdBy: currentUserData.uid,
+                    creatorName: currentUserData.name,
+                    invitedUsers: invited,
+                    status: status,
+                    startedAt: status === 'active' ? Date.now() : null,
+                    endedAt: null,
+                    events: [], // لتسجيل من دخل وخرج
+                    timestamp: Date.now()
+                });
+
+                window.closeModal('createMeetingModal');
+                showToast(status === 'scheduled' ? 'تمت جدولة الاجتماع بنجاح' : 'تم بدء الاجتماع', 'success');
+                logAction('اجتماع', `أنشأ اجتماع: ${title}`);
+            } catch(e) {}
+        });
+
+        window.joinMeeting = async (meetingId, title) => {
+            currentMeetingId = meetingId;
+            const cleanId = meetingId.replace(/[^a-zA-Z0-9]/g, "");
+            const roomName = `QuillWorldApp_${appId.substring(0,5)}_${cleanId}`;
+
+            document.getElementById('videoCallTitle').innerText = `اجتماع: ${title}`;
             document.getElementById('videoCallModal').classList.remove('hidden');
             document.getElementById('videoCallModal').classList.add('flex');
 
@@ -637,68 +721,174 @@
                 width: '100%',
                 height: '100%',
                 parentNode: document.querySelector('#jitsiContainer'),
-                userInfo: {
-                    displayName: currentUserData.name
-                },
-                configOverwrite: { 
-                    startWithAudioMuted: false, 
-                    startWithVideoMuted: false,
-                    prejoinPageEnabled: false // تخطي شاشة الانتظار للدخول السريع
-                },
-                interfaceConfigOverwrite: { 
-                    SHOW_JITSI_WATERMARK: false,
-                    TOOLBAR_BUTTONS: [
-                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
-                        'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
-                        'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
-                        'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
-                        'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
-                    ]
-                }
+                userInfo: { displayName: currentUserData.name },
+                configOverwrite: { prejoinPageEnabled: false },
+                interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false }
             };
             
-            // تفريغ الحاوية أولاً في حال كان هناك اتصال سابق
             document.querySelector('#jitsiContainer').innerHTML = '';
-            
-            // إنشاء المكالمة
             jitsiApi = new JitsiMeetExternalAPI(domain, options);
 
-            // إرسال تنبيه في الشات بأن هناك مكالمة بدأت
-            try {
-                const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'هذه المجموعة';
-                await addDoc(getColRef('chat'), {
-                    text: `📞 انضممت إلى مكالمة فيديو في ${groupName}. يمكنكم الانضمام بالضغط على زر "مكالمة فيديو" في الأعلى.`,
-                    uid: currentUserData.uid,
-                    senderName: currentUserData.name,
-                    photoURL: currentUserData.photoURL,
-                    groupId: currentGroupId,
-                    color: 'bg-green-600', // لون مميز لرسالة النظام
-                    timestamp: Date.now()
-                });
-                logAction('مكالمة فيديو', `بدأ مكالمة فيديو في ${groupName}`);
-            } catch(e) {}
+            // تسجيل الدخول في قاعدة البيانات
+            logMeetingEvent(meetingId, 'joined');
+
+            // إذا كان المدير يدخل اجتماعاً مجدولاً، حوله لـ Active
+            if (currentUserData.role === 'CEO') {
+                const meeting = globalMeetings.find(m => m.id === meetingId);
+                if (meeting && meeting.status === 'scheduled') {
+                    updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'meetings', meetingId), {
+                        status: 'active',
+                        startedAt: Date.now()
+                    });
+                }
+            }
+
+            jitsiApi.addEventListener('videoConferenceLeft', () => {
+                logMeetingEvent(meetingId, 'left');
+                window.endVideoCall();
+            });
         };
 
         window.endVideoCall = () => {
             if(jitsiApi) {
-                jitsiApi.dispose(); // تدمير الاتصال
+                jitsiApi.dispose(); 
                 jitsiApi = null;
+                if(currentMeetingId) logMeetingEvent(currentMeetingId, 'left');
             }
             document.getElementById('videoCallModal').classList.add('hidden');
             document.getElementById('videoCallModal').classList.remove('flex');
             document.querySelector('#jitsiContainer').innerHTML = '';
+            currentMeetingId = null;
         };
+
+        window.endMeetingForEveryone = async (meetingId) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل تريد إنهاء الاجتماع للجميع ونقله للسجل؟')) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'meetings', meetingId), {
+                    status: 'ended',
+                    endedAt: Date.now()
+                });
+                showToast('تم إنهاء الاجتماع بنجاح', 'success');
+            }
+        };
+
+        window.shareMeetingWhatsApp = (title) => {
+            const link = window.location.origin + window.location.pathname + '#meetings';
+            const text = encodeURIComponent(`مرحباً، أنت مدعو لاجتماع: "${title}".\nللانضمام، اضغط هنا: ${link}`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        };
+
+        async function logMeetingEvent(meetingId, actionType) {
+            if(!currentUserData) return;
+            try {
+                const meetingRef = doc(db, 'artifacts', appId, 'public', 'data', 'meetings', meetingId);
+                const meetingDoc = await getDoc(meetingRef);
+                if(meetingDoc.exists()) {
+                    let events = meetingDoc.data().events || [];
+                    events.push({
+                        uid: currentUserData.uid,
+                        name: currentUserData.name,
+                        action: actionType,
+                        timestamp: Date.now()
+                    });
+                    await updateDoc(meetingRef, { events: events });
+                }
+            } catch(e) {}
+        }
+
+        function renderMeetings() {
+            const activeList = document.getElementById('activeMeetingsList');
+            const pastList = document.getElementById('pastMeetingsList');
+            activeList.innerHTML = '';
+            pastList.innerHTML = '';
+            
+            let hasPast = false;
+            let hasActive = false;
+
+            globalMeetings.forEach(meeting => {
+                const isInvited = meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO';
+                if(!isInvited) return;
+
+                const isCEO = currentUserData.role === 'CEO';
+                let timeStr = meeting.scheduledFor ? new Date(meeting.scheduledFor).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'الآن';
+                
+                if (meeting.status === 'scheduled' || meeting.status === 'active') {
+                    hasActive = true;
+                    let statusBadge = meeting.status === 'active' 
+                        ? `<span class="bg-red-100 text-red-600 text-[10px] px-2 py-1 rounded animate-pulse">🔴 جاري الآن</span>`
+                        : `<span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-1 rounded">مجدول</span>`;
+                    
+                    let actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video ml-1"></i> انضمام</button>`;
+                    
+                    if (isCEO) {
+                        actionsHtml += `
+                            <button onclick="window.shareMeetingWhatsApp('${meeting.title}')" class="bg-green-100 text-green-700 hover:bg-green-200 w-8 h-8 flex items-center justify-center rounded transition" title="مشاركة واتساب"><i class="fa-brands fa-whatsapp"></i></button>
+                            <button onclick="window.endMeetingForEveryone('${meeting.id}')" class="bg-red-100 text-red-600 hover:bg-red-200 w-8 h-8 flex items-center justify-center rounded transition" title="إنهاء الاجتماع"><i class="fa-solid fa-power-off"></i></button>
+                        `;
+                    }
+
+                    activeList.innerHTML += `
+                        <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="font-bold text-gray-800 text-sm">${meeting.title}</h4>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4"><i class="fa-regular fa-clock ml-1"></i> ${timeStr}</p>
+                            <div class="flex items-center gap-2">
+                                ${actionsHtml}
+                            </div>
+                        </div>
+                    `;
+                } else if (meeting.status === 'ended') {
+                    // للموظف العادي: يجب أن يكون قد دخل المكالمة لتظهر له
+                    const myEvents = meeting.events ? meeting.events.filter(e => e.uid === currentUserData.uid) : [];
+                    if (!isCEO && myEvents.length === 0) return;
+
+                    hasPast = true;
+                    let duration = meeting.endedAt && meeting.startedAt ? Math.round((meeting.endedAt - meeting.startedAt) / 60000) : 0;
+                    
+                    let detailsHtml = '';
+                    if (isCEO) {
+                        // المدير يرى كل التفاصيل
+                        const participants = [...new Set((meeting.events || []).map(e => e.name))].join('، ');
+                        detailsHtml = `<p class="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">المشاركون: ${participants || 'لا أحد'}</p>`;
+                    } else {
+                        // الموظف يرى من كان معه ومتى دخل
+                        const joinTime = myEvents.find(e => e.action === 'joined')?.timestamp;
+                        const joinStr = joinTime ? new Date(joinTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
+                        const others = [...new Set((meeting.events || []).map(e => e.name))].filter(n => n !== currentUserData.name).join('، ');
+                        detailsHtml = `<p class="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">وقت دخولك: ${joinStr} | الحضور: ${others || 'فقط أنت'}</p>`;
+                    }
+
+                    pastList.innerHTML += `
+                        <div class="bg-white border border-gray-200 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div class="flex-1 w-full">
+                                <h4 class="font-bold text-gray-700 text-sm">${meeting.title}</h4>
+                                <div class="flex gap-4 text-xs text-gray-400 mt-1">
+                                    <span><i class="fa-regular fa-calendar ml-1"></i> ${new Date(meeting.startedAt || meeting.timestamp).toLocaleDateString('ar-EG')}</span>
+                                    <span><i class="fa-solid fa-stopwatch ml-1"></i> المدة: ${duration} دقيقة</span>
+                                </div>
+                                ${detailsHtml}
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded whitespace-nowrap"><i class="fa-solid fa-check ml-1"></i> منتهي</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if(!hasActive) activeList.innerHTML = '<p class="text-sm text-gray-400 col-span-full">لا يوجد اجتماعات قادمة أو فعالة حالياً.</p>';
+            if(!hasPast) pastList.innerHTML = '<p class="text-sm text-gray-400">لا يوجد سجل مكالمات سابقة.</p>';
+        }
 
         // ------------------ معالجة الروابط (Hash Routing) ------------------
         function handleHashChange() {
             if(!currentUserData) return; 
             
             const hash = window.location.hash.replace('#', '');
-            const validSections = ['dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings'];
+            const validSections = ['dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings', 'meetings'];
             
             let targetSection = hash;
             
-            // تحديد الصلاحيات للصفحات حسب نوع الموظف
             if (currentUserData.role !== 'CEO') {
                 if (['dashboard', 'employees', 'logs'].includes(targetSection) || !targetSection) {
                     targetSection = 'tasks';
@@ -753,6 +943,7 @@
                 'employees': 'إدارة الموظفين', 
                 'tasks': 'المهام', 
                 'drive': 'الملفات',
+                'meetings': 'الاجتماعات',
                 'logs': 'سجل النظام', 
                 'chat': 'المحادثات',
                 'settings': 'الإعدادات'
@@ -777,10 +968,24 @@
                 document.getElementById('mobileOverlay').classList.add('hidden');
             }
             if(sectionId === 'chat') {
+                // عند فتح الشات، قم بتحديث وقت القراءة
+                updateReadReceipt(currentGroupId);
                 const chatBox = document.getElementById('chatMessages');
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
         };
+
+        // تحديث وقت قراءة الرسائل للمجموعة
+        async function updateReadReceipt(groupId) {
+            if(!currentUserData) return;
+            groupReadTimestamps[groupId] = Date.now();
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    readReceipts: groupReadTimestamps
+                });
+                renderChatSubMenu(); // لإعادة حساب الإشعارات وإخفائها
+            } catch(e) {}
+        }
 
         window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
         window.closeModal = (id) => {
@@ -788,6 +993,7 @@
             if(id === 'taskModal') document.getElementById('addTaskForm').reset();
             if(id === 'createGroupModal') document.getElementById('createGroupForm').reset();
             if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm').reset();
+            if(id === 'createMeetingModal') document.getElementById('createMeetingForm').reset();
         };
 
         window.openMedia = (dataUrl, type) => {
@@ -812,24 +1018,6 @@
                 select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.role})</option>`;
             });
             window.openModal('taskModal');
-        };
-
-        window.openCreateGroupModal = () => {
-            const container = document.getElementById('groupMembersSelection');
-            container.innerHTML = '';
-            
-            globalUsers.forEach(emp => {
-                if(emp.id !== currentUserData.uid) {
-                    container.innerHTML += `
-                        <label class="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer border border-transparent hover:border-gray-200 transition">
-                            <input type="checkbox" value="${emp.id}" class="group-member-checkbox w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
-                            <img src="${emp.photoURL}" class="w-6 h-6 rounded-full">
-                            <span class="text-sm font-medium text-gray-700">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
-                        </label>
-                    `;
-                }
-            });
-            window.openModal('createGroupModal');
         };
 
         function showToast(message, type = 'info') {
@@ -863,7 +1051,6 @@
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
                 };
-
                 await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_REMINDER_TEMPLATE_ID, templateParams);
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
@@ -902,35 +1089,23 @@
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
                 };
-
                 await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-                showToast(`تم إرسال بريد إلكتروني للموظف (${assigneeName}) بنجاح.`, 'success');
-            } catch (error) {
-                let actualErrorMsg = error.text || 'خطأ غير معروف';
-                showToast(`فشل الإيميل: ${actualErrorMsg}`, 'warning');
-            }
+            } catch (error) {}
         }
 
         window.handleProfilePicChange = (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            
-            if(file.size > 500 * 1024) {
-                showToast('الصورة كبيرة جداً، الحد الأقصى 500KB', 'warning');
-                return;
-            }
+            if(file.size > 500 * 1024) { showToast('الصورة كبيرة جداً، الحد الأقصى 500KB', 'warning'); return; }
 
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
-                    const newUrl = ev.target.result;
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
-                        photoURL: newUrl
+                        photoURL: ev.target.result
                     });
                     showToast('تم تحديث صورتك الشخصية بنجاح!', 'success');
-                } catch(e) {
-                    showToast('حدث خطأ أثناء تحديث الصورة.', 'warning');
-                }
+                } catch(e) {}
             };
             reader.readAsDataURL(file);
         };
@@ -944,9 +1119,7 @@
                 currentUserData.chatLayout = value; 
                 showToast('تم حفظ تفضيلات الدردشة بنجاح', 'success');
                 renderChat(); 
-            } catch(e) {
-                showToast('حدث خطأ أثناء حفظ الإعدادات', 'warning');
-            }
+            } catch(e) {}
         };
 
         window.toggleChatColorPicker = () => {
@@ -984,12 +1157,7 @@
         window.handleChatAttachment = (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            
-            if(file.size > MAX_FILE_SIZE) {
-                showToast('حجم الملف كبير جداً! الحد الأقصى 600KB.', 'warning');
-                e.target.value = '';
-                return;
-            }
+            if(file.size > MAX_FILE_SIZE) { showToast('حجم الملف كبير جداً! الحد الأقصى 600KB.', 'warning'); e.target.value = ''; return; }
 
             const reader = new FileReader();
             reader.onload = (ev) => {
@@ -1012,22 +1180,12 @@
         window.handleDriveFileSelect = (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            
-            if(file.size > MAX_FILE_SIZE) {
-                showToast('حجم الملف كبير جداً! الحد الأقصى المسموح للرفع هو 600 كيلوبايت.', 'warning');
-                e.target.value = '';
-                return;
-            }
+            if(file.size > MAX_FILE_SIZE) { showToast('الحد الأقصى للرفع هو 600 كيلوبايت.', 'warning'); e.target.value = ''; return; }
 
             const currentStorage = globalFiles.reduce((acc, f) => acc + (f.size || 0), 0);
-            if(currentStorage + file.size > MAX_GLOBAL_STORAGE) {
-                showToast('المساحة التخزينية ممتلئة! يرجى حذف بعض الملفات.', 'warning');
-                e.target.value = '';
-                return;
-            }
+            if(currentStorage + file.size > MAX_GLOBAL_STORAGE) { showToast('المساحة ممتلئة! يرجى الحذف أولاً.', 'warning'); e.target.value = ''; return; }
 
             const sizeStr = formatBytes(file.size);
-
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
@@ -1043,21 +1201,15 @@
                         timestamp: Date.now()
                     });
                     showToast('تم رفع الملف بنجاح!', 'success');
-                    logAction('رفع ملف', `تم رفع ملف جديد: ${file.name} (${sizeStr})`);
-                } catch (err) {
-                    showToast('حدث خطأ أثناء رفع الملف', 'warning');
-                }
+                    logAction('رفع ملف', `تم رفع ملف جديد: ${file.name}`);
+                } catch (err) {}
                 e.target.value = '';
             };
             reader.readAsDataURL(file);
         };
 
         window.togglePinFile = async (fileId, currentPinStatus) => {
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'files', fileId), {
-                    pinned: !currentPinStatus
-                });
-            } catch(e) {}
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'files', fileId), { pinned: !currentPinStatus }); } catch(e) {}
         };
 
         window.deleteDriveFile = async (fileId, fileName) => {
@@ -1085,12 +1237,11 @@
                     const docSnap = await getDoc(userDocRef);
                     if (docSnap.exists()) {
                         currentUserData = docSnap.data();
+                        groupReadTimestamps = currentUserData.readReceipts || {};
                         document.getElementById('setupProfileScreen').classList.add('hidden');
                         finishLoginSetup();
                     } else {
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
-                        if(user.displayName) document.getElementById('setupName').value = user.displayName;
-                        checkCEOAvailability(); 
                     }
                 } catch(e) { console.error(e); }
             } else {
@@ -1103,17 +1254,6 @@
             signOut(auth);
             window.location.reload();
         });
-
-        function checkCEOAvailability() {
-            onSnapshot(getColRef('users'), (snapshot) => {
-                let ceoExists = false;
-                snapshot.forEach(doc => { if(doc.data().role === 'CEO') ceoExists = true; });
-                
-                const roleSelect = document.getElementById('setupRole');
-                const ceoOption = roleSelect.querySelector('option[value="CEO"]');
-                if(ceoExists && ceoOption) ceoOption.remove();
-            });
-        }
 
         document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1128,12 +1268,14 @@
                     uid: currentUserAuth.uid,
                     email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                    chatLayout: 'media-top', 
+                    chatLayout: 'media-top',
+                    readReceipts: {},
                     timestamp: Date.now()
                 };
                 
                 await setDoc(userDocRef, newUserData);
                 currentUserData = newUserData;
+                groupReadTimestamps = {};
                 
                 document.getElementById('setupProfileScreen').classList.add('hidden');
                 finishLoginSetup();
@@ -1142,6 +1284,11 @@
 
         function finishLoginSetup() {
             updateUIWithUserData();
+            
+            // طلب الإشعارات
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
 
             if(currentUserData.role === 'CEO') {
                 document.getElementById('nav-dashboard-btn').classList.remove('hidden');
@@ -1153,6 +1300,7 @@
                 
                 document.getElementById('createGroupBtn').classList.remove('hidden');
                 document.getElementById('clearChatBtn').classList.remove('hidden');
+                document.getElementById('createMeetingBtn').classList.remove('hidden');
             } else {
                 document.getElementById('nav-dashboard-btn').classList.add('hidden');
                 document.getElementById('nav-employees-btn').classList.add('hidden');
@@ -1178,21 +1326,12 @@
             document.getElementById('settingsRole').value = currentUserData.role;
             
             const layoutSelect = document.getElementById('settingsChatLayout');
-            if (layoutSelect) {
-                layoutSelect.value = currentUserData.chatLayout || 'media-top';
-            }
+            if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
         }
 
         async function logAction(action, details) {
             if(!currentUserData) return;
-            try {
-                await addDoc(getColRef('logs'), {
-                    action: action,
-                    details: details,
-                    userName: currentUserData.name,
-                    timestamp: Date.now()
-                });
-            } catch(e) {}
+            try { await addDoc(getColRef('logs'), { action: action, details: details, userName: currentUserData.name, timestamp: Date.now() }); } catch(e) {}
         }
 
         function startDatabaseListeners() {
@@ -1203,6 +1342,7 @@
                     globalUsers.push(uData);
                     if(currentUserData && uData.id === currentUserData.uid) {
                         currentUserData = uData;
+                        groupReadTimestamps = currentUserData.readReceipts || {};
                         updateUIWithUserData();
                     }
                 });
@@ -1239,7 +1379,10 @@
                     }
                 });
 
-                if(hasNewAssignedTask) showToast(`مهمة جديدة: ${latestTaskName}`, 'warning');
+                if(hasNewAssignedTask) {
+                    showToast(`مهمة جديدة: ${latestTaskName}`, 'warning');
+                    sendPushNotification('مهمة جديدة', `تم إسناد مهمة جديدة إليك: ${latestTaskName}`);
+                }
                 initialTaskLoad = false;
                 renderTasks();
                 updateDashboardStats();
@@ -1253,6 +1396,14 @@
                 updateStorageProgress();
             });
 
+            // الاستماع للاجتماعات
+            onSnapshot(getColRef('meetings'), (snapshot) => {
+                globalMeetings = [];
+                snapshot.forEach(doc => globalMeetings.push({ id: doc.id, ...doc.data() }));
+                globalMeetings.sort((a, b) => b.timestamp - a.timestamp);
+                renderMeetings();
+            });
+
             onSnapshot(getColRef('groups'), (snapshot) => {
                 globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
                 snapshot.forEach(doc => {
@@ -1262,71 +1413,100 @@
                     }
                 });
                 
-                if(!globalGroups.find(g => g.id === currentGroupId)) {
-                    currentGroupId = 'global';
-                }
+                if(!globalGroups.find(g => g.id === currentGroupId)) currentGroupId = 'global';
                 
                 renderChatSubMenu();
                 renderChat();
             });
 
             onSnapshot(getColRef('chat'), (snapshot) => {
+                const oldChatCount = globalChat.length;
                 globalChat = [];
-                snapshot.forEach(doc => globalChat.push({ id: doc.id, ...doc.data() }));
+                let newMessages = [];
+                
+                snapshot.forEach(doc => {
+                    const msg = { id: doc.id, ...doc.data() };
+                    globalChat.push(msg);
+                });
                 globalChat.sort((a, b) => a.timestamp - b.timestamp);
+                
+                // البحث عن الرسائل الجديدة لإرسال إشعارات
+                if (!initialChatLoad && globalChat.length > oldChatCount) {
+                    // آخر رسالة
+                    const latestMsg = globalChat[globalChat.length - 1];
+                    if (latestMsg && latestMsg.uid !== currentUserData.uid) {
+                        const isMention = latestMsg.text && latestMsg.text.includes(`@${currentUserData.name}`);
+                        const groupName = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'))?.name || 'الشركة';
+                        
+                        sendPushNotification(
+                            isMention ? `ذكرك ${latestMsg.senderName} في ${groupName}` : `رسالة من ${latestMsg.senderName} في ${groupName}`,
+                            latestMsg.text || 'أرسل مرفقاً'
+                        );
+                    }
+                }
+
+                // إذا كنا داخل الشات، نحدث وقت القراءة للمجموعة الحالية فوراً
+                if (!document.getElementById('chat').classList.contains('hidden')) {
+                    updateReadReceipt(currentGroupId);
+                }
+
+                initialChatLoad = false;
+                renderChatSubMenu(); // لتحديث إشعارات الأرقام والمنشن
                 renderChat();
             });
         }
 
-        function updateStorageProgress() {
-            const currentStorage = globalFiles.reduce((acc, file) => acc + (file.size || 0), 0);
-            const percentage = Math.min((currentStorage / MAX_GLOBAL_STORAGE) * 100, 100);
+        // ------------------ إحصائيات وعدادات الشات ------------------
+        function getGroupUnreadInfo(groupId) {
+            const lastRead = groupReadTimestamps[groupId] || 0;
+            const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
             
-            const bar = document.getElementById('storageBar');
-            const text = document.getElementById('storageText');
-            const warning = document.getElementById('storageWarning');
-            const uploadBtn = document.getElementById('uploadFileBtn');
-            const inputField = document.getElementById('driveFileInput');
-
-            text.innerText = `${formatBytes(currentStorage, 1)} / 15 MB`;
-            bar.style.width = `${percentage}%`;
-
-            bar.classList.remove('bg-green-500', 'bg-orange-500', 'bg-red-600');
-            if(percentage < 50) {
-                bar.classList.add('bg-green-500');
-                warning.classList.add('hidden');
-                uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                inputField.disabled = false;
-            } else if (percentage < 80) {
-                bar.classList.add('bg-orange-500');
-                warning.classList.add('hidden');
-                uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                inputField.disabled = false;
-            } else if (percentage < 100) {
-                bar.classList.add('bg-red-600');
-                warning.classList.add('hidden');
-                uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                inputField.disabled = false;
-            } else {
-                bar.classList.add('bg-red-600');
-                warning.classList.remove('hidden');
-                uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                inputField.disabled = true; 
-            }
+            let unreadCount = groupMessages.length;
+            let hasMention = groupMessages.some(m => m.text && m.text.includes(`@${currentUserData.name}`));
+            
+            return { count: unreadCount, hasMention: hasMention };
         }
 
         function renderChatSubMenu() {
             const subMenu = document.getElementById('chatSubMenu');
             subMenu.innerHTML = '';
             
+            let totalUnreadCount = 0;
+            let totalMentions = false;
+
             globalGroups.forEach(g => {
                 const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
+                
+                const unreadInfo = getGroupUnreadInfo(g.id);
+                totalUnreadCount += unreadInfo.count;
+                if(unreadInfo.hasMention) totalMentions = true;
+
+                let badgeHtml = '';
+                if(unreadInfo.hasMention) {
+                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">@</span>`;
+                } else if(unreadInfo.count > 0) {
+                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                }
+
                 subMenu.innerHTML += `
                     <button onclick="window.selectGroup('${g.id}')" class="text-right w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
                         <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center ml-2"></i> ${g.name}
+                        ${badgeHtml}
                     </button>
                 `;
             });
+            
+            // تحديث الشارة الرئيسية للمحادثات
+            const mainBadge = document.getElementById('globalChatBadge');
+            if(totalMentions) {
+                mainBadge.innerText = '@';
+                mainBadge.className = 'bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full block';
+            } else if(totalUnreadCount > 0) {
+                mainBadge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
+                mainBadge.className = 'bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full block';
+            } else {
+                mainBadge.className = 'hidden';
+            }
             
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(activeGroup) {
@@ -1343,7 +1523,7 @@
 
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
-            window.showSection('chat');
+            window.showSection('chat'); // تقوم بتحديث updateReadReceipt
             renderChatSubMenu(); 
             renderChat();
             
@@ -1359,7 +1539,6 @@
             
             const groupName = document.getElementById('newGroupName').value;
             const checkboxes = document.querySelectorAll('.group-member-checkbox:checked');
-            
             const members = Array.from(checkboxes).map(cb => cb.value);
             members.push(currentUserData.uid);
 
@@ -1422,13 +1601,11 @@
         window.openEditEmployeeModal = (id, name, role) => {
             document.getElementById('editEmpId').value = id;
             document.getElementById('editEmpName').value = name;
-            
             const selectRole = document.getElementById('editEmpRole');
             if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
                 selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
             }
             selectRole.value = role;
-            
             window.openModal('editEmployeeModal');
         };
 
@@ -1441,17 +1618,11 @@
             const newRole = document.getElementById('editEmpRole').value;
 
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), {
-                    name: newName,
-                    role: newRole
-                });
-                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { name: newName, role: newRole });
                 window.closeModal('editEmployeeModal');
                 showToast('تم تحديث بيانات الموظف بنجاح', 'success');
                 logAction('تعديل موظف', `تم تعديل بيانات الموظف إلى ${newName} (${newRole})`);
-            } catch(error) {
-                showToast('فشل في تعديل البيانات', 'warning');
-            }
+            } catch(error) {}
         });
 
         function renderEmployees() {
@@ -1499,7 +1670,6 @@
                 if (!isCEO && !isMyTask) return;
 
                 let actionsHtml = '';
-                
                 if(isMyTask && !isCEO) {
                     if(task.status === 'pending') {
                         actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">البدء بالتنفيذ</button>`;
@@ -1531,79 +1701,6 @@
             });
         }
 
-        function renderDriveFiles() {
-            const pinnedContainer = document.getElementById('pinnedFilesContainer');
-            const allContainer = document.getElementById('allFilesContainer');
-            
-            pinnedContainer.innerHTML = '';
-            allContainer.innerHTML = '';
-
-            let hasPinned = false;
-
-            globalFiles.forEach(file => {
-                const fileSizeText = file.sizeStr ? ` • ${file.sizeStr}` : '';
-                
-                let fileIcon = 'fa-file text-gray-500';
-                if(file.type.startsWith('image/')) fileIcon = 'fa-file-image text-blue-500';
-                else if(file.type.startsWith('video/')) fileIcon = 'fa-file-video text-red-500';
-                else if(file.type.includes('pdf')) fileIcon = 'fa-file-pdf text-red-600';
-                else if(file.type.includes('word') || file.type.includes('document')) fileIcon = 'fa-file-word text-blue-700';
-
-                let controlsHtml = `
-                    <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-gray-500 hover:text-red-500 w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="حذف">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                    <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-yellow-500 bg-yellow-50' : 'text-gray-500 hover:text-yellow-500 bg-gray-100'} w-8 h-8 flex items-center justify-center rounded transition" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}">
-                        <i class="fa-solid fa-thumbtack"></i>
-                    </button>
-                `;
-
-                let previewHtml = `<div class="h-24 bg-gray-50 flex items-center justify-center text-4xl"><i class="fa-solid ${fileIcon}"></i></div>`;
-                if(file.type.startsWith('image/')) {
-                    previewHtml = `<div class="h-24 bg-gray-200 cursor-pointer" onclick="window.openMedia('${file.data}', '${file.type}')"><img src="${file.data}" class="w-full h-full object-cover hover:opacity-80 transition"></div>`;
-                } else if(file.type.startsWith('video/')) {
-                    previewHtml = `<div class="h-24 bg-black relative flex items-center justify-center cursor-pointer hover:bg-gray-800 transition" onclick="window.openMedia('${file.data}', '${file.type}')">
-                        <video src="${file.data}" class="w-full h-full object-cover opacity-50"></video>
-                        <i class="fa-solid fa-circle-play text-white text-3xl absolute"></i>
-                    </div>`;
-                }
-
-                const fileCard = `
-                    <div class="bg-white rounded-xl shadow-sm border ${file.pinned ? 'border-yellow-300 shadow-yellow-100' : 'border-gray-200'} overflow-hidden relative flex flex-col group transition-all hover:shadow-md pb-8">
-                        ${previewHtml}
-                        <div class="p-3 flex-1 flex flex-col">
-                            <p class="font-bold text-gray-800 text-xs truncate mb-1" title="${file.name}">${file.name}</p>
-                            <p class="text-[10px] text-gray-500 mt-auto">بواسطة: ${file.uploaderName}${fileSizeText}</p>
-                        </div>
-                        
-                        <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity border-t border-gray-100 pointer-events-none flex justify-end">
-                            <div class="pointer-events-auto flex items-center gap-2">
-                                <a href="${file.data}" download="${file.name}" class="text-gray-500 hover:text-primary w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="تحميل">
-                                    <i class="fa-solid fa-download"></i>
-                                </a>
-                                ${controlsHtml}
-                            </div>
-                        </div>
-                        ${file.pinned ? '<div class="absolute top-2 right-2 text-yellow-400 drop-shadow-md"><i class="fa-solid fa-star"></i></div>' : ''}
-                    </div>
-                `;
-
-                if(file.pinned) {
-                    pinnedContainer.innerHTML += fileCard;
-                    hasPinned = true;
-                } else {
-                    allContainer.innerHTML += fileCard;
-                }
-            });
-
-            if(!hasPinned) {
-                pinnedContainer.innerHTML = '<div class="col-span-full text-center py-4 bg-gray-50 border border-dashed border-gray-200 rounded-lg text-gray-400 text-xs"><i class="fa-solid fa-thumbtack mb-1"></i><p>لا توجد ملفات مثبتة حالياً</p></div>';
-            }
-            if(allContainer.innerHTML === '') {
-                allContainer.innerHTML = '<div class="col-span-full text-center py-10 bg-gray-50 border border-dashed border-gray-200 rounded-lg text-gray-400"><i class="fa-regular fa-folder-open text-4xl mb-3"></i><p class="text-sm font-semibold">مساحة الملفات فارغة</p><p class="text-xs mt-1">ابدأ برفع الملفات لمشاركتها مع فريقك</p></div>';
-            }
-        }
-
         function renderLogs() {
             const list = document.getElementById('logsList');
             list.innerHTML = '';
@@ -1616,6 +1713,7 @@
                 if(log.action.includes('مجموعة')) icon = 'fa-users text-purple-500';
                 if(log.action.includes('تعديل')) icon = 'fa-pen text-blue-500';
                 if(log.action.includes('ملف')) icon = 'fa-file text-secondary';
+                if(log.action.includes('اجتماع') || log.action.includes('فيديو')) icon = 'fa-video text-green-500';
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
@@ -1651,7 +1749,6 @@
                 const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 font-bold';
                 
                 const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
-                
                 const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName)}&background=00839b&color=fff`;
 
                 let attachmentHtml = '';
@@ -1682,7 +1779,7 @@
                     <div class="flex ${alignClass} mb-4 items-end gap-2">
                         ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" alt="Avatar">` : ''}
                         <div class="max-w-[85%] md:max-w-[70%] min-w-[150px]">
-                            <span class="text-xs ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
+                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
                             <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
                                 ${messageBody}
                             </div>
@@ -1761,9 +1858,7 @@
 
         window.updateTaskStatus = async (id, newStatus, taskTitle) => {
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
-                    status: newStatus
-                });
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
                 let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
                 logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
                 if(newStatus === 'completed') showToast('أحسنت! تم إنجاز المهمة.', 'success');
