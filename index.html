@@ -74,7 +74,7 @@
             <div class="text-center mb-8">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Quill Logo" class="h-16 mx-auto mb-4 bg-navy p-2 rounded-xl" />
                 <h2 class="text-2xl font-bold text-navy">أهلاً بك في مساحة العمل</h2>
-                <p class="text-gray-500 mt-2">يرجى إكمال بياناتك للانضمام للفريق</p>
+                <p class="text-gray-500 mt-2">يرجى إكمال بياناتك وتحديد وظيفتك للانضمام للفريق</p>
             </div>
             <form id="profile-form" class="space-y-4" onsubmit="window.handleSaveProfile(event)">
                 <div>
@@ -83,7 +83,10 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">المسمى الوظيفي</label>
-                    <input type="text" id="profile-role" required class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal outline-none transition-all" placeholder="مثال: مطور، مدير مبيعات..." />
+                    <select id="profile-role" required class="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal outline-none transition-all appearance-none bg-white">
+                        <option value="" disabled selected>-- اختر وظيفتك --</option>
+                        <!-- Options will be injected via JS to handle CEO logic -->
+                    </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
@@ -94,6 +97,28 @@
                     انضمام لمساحة العمل
                 </button>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal (Hidden by default, opened via Ctrl+Enter) -->
+    <div id="admin-panel" class="hidden-view fixed inset-0 bg-navy/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 max-h-[85vh] flex flex-col border-t-4 border-red-500">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-black text-navy flex items-center gap-2">
+                        <i data-lucide="shield" class="w-6 h-6 text-red-500"></i> لوحة الإدارة المخفية
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">يمكنك من هنا رؤية وحذف الأعضاء المنضمين למساحة العمل.</p>
+                </div>
+                <button onclick="document.getElementById('admin-panel').classList.add('hidden-view')" class="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors text-gray-500 hover:text-red-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto pr-2">
+                <div id="admin-users-list" class="space-y-3">
+                    <!-- Users inject here -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -282,7 +307,7 @@
                     </div>
                 </div>
 
-                <!-- 3. CRM View (NEW) -->
+                <!-- 3. CRM View -->
                 <div id="view-crm" class="view-section hidden-view space-y-6 animate-fade-in h-full flex flex-col">
                     <div class="flex justify-between items-center shrink-0">
                         <div>
@@ -319,7 +344,7 @@
                     </div>
                 </div>
 
-                <!-- 4. Chat View (NEW) -->
+                <!-- 4. Chat View -->
                 <div id="view-chat" class="view-section hidden-view animate-fade-in h-[calc(100vh-150px)]">
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 flex flex-col h-full overflow-hidden">
                         <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center">
@@ -346,7 +371,7 @@
                     </div>
                 </div>
 
-                <!-- 5. Drive View (NEW) -->
+                <!-- 5. Drive View -->
                 <div id="view-drive" class="view-section hidden-view space-y-6 animate-fade-in">
                     <div class="flex justify-between items-center">
                         <div>
@@ -453,7 +478,6 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                // بدلاً من إخفاء الشاشة فوراً، نغير حالة الزر ليدل على التحميل
                 const btn = document.getElementById('google-login-btn');
                 if (btn) {
                     btn.disabled = true;
@@ -465,16 +489,15 @@
                 userProfile = null;
                 unsubscribeAll();
                 
-                // إظهار شاشة الدخول فقط
                 document.getElementById('main-app').classList.add('hidden-view');
                 document.getElementById('profile-screen').classList.add('hidden-view');
                 document.getElementById('login-screen').classList.remove('hidden-view');
+                document.getElementById('admin-panel').classList.add('hidden-view');
 
-                // إعادة تعيين زر جوجل في حال كان في وضع التحميل
                 const btn = document.getElementById('google-login-btn');
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = `<svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> تسجيل الدخول باستخدام جوجل`;
+                    btn.innerHTML = `<svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> تسجيل الدخول باستخدام جوجل`;
                 }
             }
         });
@@ -492,7 +515,7 @@
                 alert("حدث خطأ أثناء تسجيل الدخول. تأكد من تفعيل Google Provider في Firebase.");
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = `<svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> تسجيل الدخول باستخدام جوجل`;
+                    btn.innerHTML = `<svg class="w-6 h-6" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> تسجيل الدخول باستخدام جوجل`;
                 }
             }
         };
@@ -506,6 +529,43 @@
         function unsubscribeAll() {
             unsubscribeArr.forEach(unsub => unsub());
             unsubscribeArr = [];
+        }
+
+        // --- Keyboard Shortcut for Admin Panel (Ctrl + Enter) ---
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                // يمكن فتحها فقط إذا كان المستخدم مسجل دخول
+                if (currentUser) {
+                    document.getElementById('admin-panel').classList.remove('hidden-view');
+                    renderAdminPanel();
+                }
+            }
+        });
+
+        // --- Update Job Titles Select Dropdown ---
+        function updateProfileRoleOptions() {
+            const select = document.getElementById('profile-role');
+            if(!select) return;
+            
+            // تحقق إذا كان هناك شخص أخذ منصب CEO مسبقاً
+            const ceoExists = teamMembers.some(m => m.role === 'CEO');
+            
+            let optionsHTML = '<option value="" disabled selected>-- اختر وظيفتك --</option>';
+            
+            // إذا لم يكن هناك CEO، أضف الخيار
+            if (!ceoExists) {
+                optionsHTML += '<option value="CEO" class="font-bold text-navy">CEO (مدير تنفيذي)</option>';
+            }
+            
+            optionsHTML += `
+                <option value="HR">HR (موارد بشرية)</option>
+                <option value="technical team supervisor">Technical Team Supervisor</option>
+                <option value="Technical Engineer">Technical Engineer</option>
+                <option value="accountant">Accountant (محاسب)</option>
+            `;
+            
+            select.innerHTML = optionsHTML;
         }
 
         // --- 2. Firestore Listeners ---
@@ -530,11 +590,17 @@
                     document.getElementById('main-app').classList.remove('hidden-view');
                     updateUI();
                 } else {
-                    // لم يكمل ملفه الشخصي بعد - سحب البيانات من حساب جوجل
                     document.getElementById('profile-name').value = currentUser.displayName || '';
                     document.getElementById('profile-email').value = currentUser.email || '';
+                    updateProfileRoleOptions(); // تحديث القائمة المنسدلة بناءً على الأعضاء الموجودين
                     document.getElementById('profile-screen').classList.remove('hidden-view');
                 }
+
+                // If admin panel is open, refresh it
+                if (!document.getElementById('admin-panel').classList.contains('hidden-view')) {
+                    renderAdminPanel();
+                }
+
             }, err => console.error(err)));
 
             unsubscribeArr.push(onSnapshot(cTasks, (snap) => {
@@ -605,6 +671,35 @@
             renderNotifications();
             renderTeamMembers();
             renderTasks();
+            lucide.createIcons();
+        }
+
+        function renderAdminPanel() {
+            const list = document.getElementById('admin-users-list');
+            if(!list) return;
+
+            if (teamMembers.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 p-4">لا يوجد موظفين حالياً.</p>';
+                return;
+            }
+
+            list.innerHTML = teamMembers.map(m => `
+                <div class="flex justify-between items-center p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-teal transition-all">
+                    <div class="flex items-center gap-4">
+                        <img src="${m.avatar}" class="w-12 h-12 rounded-full object-cover shadow-sm border border-white" />
+                        <div>
+                            <div class="font-bold text-navy flex items-center gap-2">
+                                ${escapeHTML(m.name)}
+                                ${m.role === 'CEO' ? '<span class="bg-teal text-white text-[10px] px-2 py-0.5 rounded-full">CEO</span>' : ''}
+                            </div>
+                            <div class="text-xs text-gray-500">${escapeHTML(m.role)} • ${escapeHTML(m.email)}</div>
+                        </div>
+                    </div>
+                    <button onclick="window.deleteWorkspaceUser('${m.id}')" class="text-red-400 hover:text-white hover:bg-red-500 p-2.5 rounded-xl transition-colors shadow-sm flex items-center gap-2 text-sm font-bold">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> حذف
+                    </button>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
 
@@ -780,16 +875,34 @@
             const name = document.getElementById('profile-name').value;
             const role = document.getElementById('profile-role').value;
             const email = document.getElementById('profile-email').value;
-            if (!name || !role) return;
+            if (!name || !role) {
+                alert("يرجى التأكد من كتابة الاسم واختيار الوظيفة");
+                return;
+            }
             
             // استخدام صورة جوجل إذا وجدت، وإلا استخدام الصورة الافتراضية
             const avatarUrl = currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=002d74&color=fff&bold=true`;
+
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>';
+            btn.disabled = true;
 
             await setDoc(doc(db, ...basePath, 'users', currentUser.uid), {
                 name, role, email,
                 avatar: avatarUrl,
                 joinedAt: Date.now()
             });
+        };
+
+        // حذف مستخدم من الإدارة
+        window.deleteWorkspaceUser = async (id) => {
+            if(confirm('تحذير: هل أنت متأكد من رغبتك في حذف هذا الموظف نهائياً من مساحة العمل؟')) {
+                await deleteDoc(doc(db, ...basePath, 'users', id));
+                // If they deleted themselves
+                if (id === currentUser.uid) {
+                    window.location.reload();
+                }
+            }
         };
 
         window.handleAddTask = async (e) => {
