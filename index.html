@@ -436,13 +436,20 @@
         const initAuth = async () => {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
+                    try {
+                        // محاولة تسجيل الدخول بالرمز الافتراضي (ستفشل لأننا نستخدم إعدادات مخصصة)
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } catch (tokenError) {
+                        console.warn("Custom token mismatch, falling back to anonymous auth:", tokenError);
+                        // في حال فشل التطابق (وهو المتوقع)، نستخدم تسجيل الدخول المجهول للوصول لقاعدة بياناتك
+                        await signInAnonymously(auth);
+                    }
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (error) {
                 console.error("Auth error:", error);
-                document.getElementById('loading-screen').innerHTML = `<p class="text-red-500 font-bold p-8 text-center">حدث خطأ في الاتصال بقاعدة البيانات. يرجى التحقق من إعدادات Firebase.</p>`;
+                document.getElementById('loading-screen').innerHTML = `<p class="text-red-500 font-bold p-8 text-center">حدث خطأ في الاتصال. يرجى التأكد من تفعيل خيار تسجيل الدخول (Anonymous) في إعدادات Authentication داخل مشروع Firebase الخاص بك.</p>`;
             }
         };
 
