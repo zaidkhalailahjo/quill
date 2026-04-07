@@ -110,7 +110,7 @@
     <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
 
     <!-- القائمة الجانبية (متوافقة مع الجوال) -->
-    <aside id="sidebar" class="fixed md:relative inset-y-0 right-0 transform translate-x-full md:translate-x-0 transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30">
+    <aside id="sidebar" class="fixed md:relative inset-y-0 right-0 transform translate-x-full md:translate-x-0 transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30 flex-shrink-0">
         <div class="p-6 flex items-center justify-between md:justify-center border-b border-white/10">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-10">
             <button onclick="window.toggleSidebar()" class="md:hidden text-white hover:text-gray-300">
@@ -131,19 +131,19 @@
             
             <!-- زر قسم الملفات -->
             <button onclick="window.showSection('drive')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="drive">
-                <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الملفات المشتركة</span>
+                <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الملفات</span>
             </button>
 
-            <!-- قسم المحادثات المنسدل -->
+            <!-- قسم المحادثات المنسدل بسلاسة -->
             <div class="mt-2">
-                <button onclick="window.toggleChatMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                <button onclick="window.openChatAndToggleMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
                     <div class="flex items-center">
-                        <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">محادثات الفريق</span>
+                        <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المحادثات</span>
                     </div>
-                    <i id="chatMenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform"></i>
+                    <i id="chatMenuIcon" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                 </button>
                 <!-- القائمة المنسدلة للمجموعات -->
-                <div id="chatSubMenu" class="hidden flex-col pr-8 pl-4 space-y-1 mt-1 mb-2">
+                <div id="chatSubMenu" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
                     <!-- سيتم تعبئة المجموعات هنا برمجياً -->
                 </div>
             </div>
@@ -155,10 +155,10 @@
     </aside>
 
     <!-- المحتوى الرئيسي -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
+    <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         
         <!-- الشريط العلوي -->
-        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
+        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0">
             <div class="flex items-center">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-4">
                     <i class="fa-solid fa-bars text-xl"></i>
@@ -246,7 +246,7 @@
                 </div>
             </section>
 
-            <!-- 4. قسم الملفات المشتركة (جديد) -->
+            <!-- 4. قسم الملفات (تم التحديث) -->
             <section id="drive" class="section-content hidden animate-fade-in">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 600KB للملف الواحد)</p>
@@ -269,12 +269,12 @@
                 </div>
             </section>
 
-            <!-- 5. محادثة الفريق -->
+            <!-- 5. المحادثات -->
             <section id="chat" class="section-content hidden animate-fade-in h-full pb-4">
                 <div class="flex flex-col h-[75vh] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
                     
                     <!-- الهيدر الخاص بالمحادثة -->
-                    <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 z-10 shadow-sm">
+                    <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 z-10 shadow-sm flex-shrink-0">
                         <div class="flex items-center gap-3 w-full sm:w-auto">
                             <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                                 <i class="fa-solid fa-hashtag"></i>
@@ -302,7 +302,7 @@
                     </div>
 
                     <!-- منطقة عرض المرفق قبل الإرسال -->
-                    <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between">
+                    <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
                         <div class="flex items-center gap-2 text-sm text-primary font-bold">
                             <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
                         </div>
@@ -310,7 +310,7 @@
                     </div>
                     
                     <!-- منطقة الإدخال -->
-                    <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10">
+                    <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10 flex-shrink-0">
                         
                         <!-- قائمة المنشن العائمة -->
                         <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <!-- Modal: إنشاء مجموعة محادثة (للمدير فقط) -->
+    <!-- Modal: إنشاء مجموعة محادثة -->
     <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-primary text-white p-4 flex justify-between items-center">
@@ -406,6 +406,14 @@
                     <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base">تأكيد الإنشاء</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal: عرض الوسائط (صور / فيديو) -->
+    <div id="mediaModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-50 p-4" onclick="window.closeMediaModal()">
+        <button class="absolute top-4 right-4 md:top-6 md:right-6 text-white text-3xl hover:text-gray-300 transition-colors z-10"><i class="fa-solid fa-xmark"></i></button>
+        <div id="mediaContainer" class="max-w-5xl w-full max-h-[90vh] flex items-center justify-center pointer-events-none" onclick="event.stopPropagation()">
+            <!-- Media injected here -->
         </div>
     </div>
 
@@ -435,13 +443,10 @@
         // ==========================================
         const EMAILJS_SERVICE_ID = 'service_ibewued'; 
         const EMAILJS_TEMPLATE_ID = 'template_iro6gon'; 
-        const EMAILJS_REMINDER_TEMPLATE_ID = 'template_6pbna5z'; // تم إضافة الـ ID الجديد
+        const EMAILJS_REMINDER_TEMPLATE_ID = 'template_6pbna5z'; 
         const EMAILJS_PUBLIC_KEY = '1jeick6OIh3v4znyt';
 
-        // تهيئة EmailJS مرة واحدة عند تحميل الصفحة
-        emailjs.init({
-            publicKey: EMAILJS_PUBLIC_KEY,
-        });
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -449,15 +454,24 @@
         let globalTasks = [];
         let globalLogs = [];
         let globalChat = [];
-        let globalFiles = []; // مصفوفة الملفات المشتركة
+        let globalFiles = []; 
         let globalGroups = []; 
         let currentGroupId = 'global'; 
         let initialTaskLoad = true; 
         let knownTaskIds = new Set();
         
-        // متغيرات مؤقتة لمرفقات الدردشة
         let pendingChatFileData = null;
         let pendingChatFileType = null;
+
+        // دالة مساعدة لتنسيق حجم الملف (بالبايت والكيلوبايت والميجابايت)
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
 
         // ------------------ معالجة الروابط (Hash Routing) ------------------
         function handleHashChange() {
@@ -483,17 +497,26 @@
             document.getElementById('mobileOverlay').classList.toggle('hidden');
         };
 
-        // فتح/إغلاق قائمة المجموعات في الـ Sidebar
+        // فتح/إغلاق قائمة المحادثات بشكل سلس + الانتقال للمحادثة العامة
+        window.openChatAndToggleMenu = () => {
+            window.selectGroup('global'); // الدخول للعامة فوراً
+            window.toggleChatMenu();      // فتح القائمة المنسدلة للتنقل
+        };
+
         window.toggleChatMenu = () => {
             const menu = document.getElementById('chatSubMenu');
             const icon = document.getElementById('chatMenuIcon');
-            menu.classList.toggle('hidden');
-            menu.classList.toggle('flex');
             
-            if(menu.classList.contains('hidden')) {
-                icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            if(menu.classList.contains('max-h-0')) {
+                // فتح بسلاسة
+                menu.classList.remove('max-h-0', 'opacity-0');
+                menu.classList.add('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.add('rotate-180');
             } else {
-                icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                // إغلاق بسلاسة
+                menu.classList.add('max-h-0', 'opacity-0');
+                menu.classList.remove('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.remove('rotate-180');
             }
         };
 
@@ -509,9 +532,9 @@
                 'dashboard': 'لوحة التحكم', 
                 'employees': 'إدارة الموظفين', 
                 'tasks': 'المهام', 
-                'drive': 'الملفات المشتركة',
+                'drive': 'الملفات',
                 'logs': 'سجل النظام', 
-                'chat': 'محادثة الفريق' 
+                'chat': 'المحادثات' 
             };
             document.getElementById('page-title').innerText = titles[sectionId];
             
@@ -519,7 +542,8 @@
                 b.classList.remove('bg-secondary', 'text-white');
                 b.classList.add('text-gray-300');
             });
-            // تجاهل زر المحادثة الرئيسي من التحديد المباشر لكي لا يلغي تحديد الـ Sidebar الأساسي
+            
+            // إذا لم يكن القسم هو المحادثة، قم بتلوين الزر العادي
             if(sectionId !== 'chat') {
                 const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
                 if(activeBtn) {
@@ -543,6 +567,22 @@
             document.getElementById(id).classList.add('hidden');
             if(id === 'taskModal') document.getElementById('addTaskForm').reset();
             if(id === 'createGroupModal') document.getElementById('createGroupForm').reset();
+        };
+
+        // فتح وإغلاق عارض الوسائط
+        window.openMedia = (dataUrl, type) => {
+            const container = document.getElementById('mediaContainer');
+            if(type.startsWith('image/')) {
+                container.innerHTML = `<img src="${dataUrl}" class="max-w-full max-h-[90vh] object-contain pointer-events-auto rounded-lg shadow-2xl">`;
+            } else if(type.startsWith('video/')) {
+                container.innerHTML = `<video src="${dataUrl}" controls autoplay class="max-w-full max-h-[90vh] pointer-events-auto rounded-lg shadow-2xl bg-black"></video>`;
+            }
+            window.openModal('mediaModal');
+        };
+
+        window.closeMediaModal = () => {
+            window.closeModal('mediaModal');
+            document.getElementById('mediaContainer').innerHTML = ''; // لإيقاف الفيديو
         };
 
         window.openTaskModal = () => {
@@ -648,7 +688,7 @@
                     company_name: 'نظام شركتي'
                 };
 
-                const response = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
                 showToast(`تم إرسال بريد إلكتروني للموظف (${assigneeName}) بنجاح.`, 'success');
             } catch (error) {
                 let actualErrorMsg = error.text || 'خطأ غير معروف، تأكد من الإعدادات';
@@ -692,10 +732,12 @@
             if(!file) return;
             
             if(file.size > MAX_FILE_SIZE) {
-                showToast('حجم الملف كبير جداً! الحد الأقصى المسموح للرفع في هذه النسخة هو 600 كيلوبايت.', 'warning');
+                showToast('حجم الملف كبير جداً! الحد الأقصى المسموح للرفع هو 600 كيلوبايت.', 'warning');
                 e.target.value = '';
                 return;
             }
+
+            const sizeStr = formatBytes(file.size);
 
             const reader = new FileReader();
             reader.onload = async (ev) => {
@@ -703,6 +745,7 @@
                     await addDoc(getColRef('files'), {
                         name: file.name,
                         type: file.type,
+                        sizeStr: sizeStr,
                         data: ev.target.result,
                         uploaderName: currentUserData.name,
                         uploaderId: currentUserData.uid,
@@ -710,7 +753,7 @@
                         timestamp: Date.now()
                     });
                     showToast('تم رفع الملف بنجاح!', 'success');
-                    logAction('رفع ملف', `تم رفع ملف جديد: ${file.name}`);
+                    logAction('رفع ملف', `تم رفع ملف جديد: ${file.name} (${sizeStr})`);
                 } catch (err) {
                     showToast('حدث خطأ أثناء رفع الملف', 'warning');
                 }
@@ -905,7 +948,7 @@
             onSnapshot(getColRef('files'), (snapshot) => {
                 globalFiles = [];
                 snapshot.forEach(doc => globalFiles.push({ id: doc.id, ...doc.data() }));
-                globalFiles.sort((a, b) => b.timestamp - a.timestamp); // الأحدث أولاً
+                globalFiles.sort((a, b) => b.timestamp - a.timestamp); 
                 renderDriveFiles();
             });
 
@@ -949,7 +992,6 @@
                 `;
             });
             
-            // تحديث الهيدر الخاص بالدردشة
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(activeGroup) {
                 document.getElementById('chatHeaderTitle').innerText = activeGroup.name;
@@ -967,7 +1009,7 @@
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
             window.showSection('chat');
-            renderChatSubMenu(); // لتحديث التصميم (اللون النشط)
+            renderChatSubMenu(); 
             renderChat();
             
             // إغلاق المنيو في الهواتف
@@ -1122,8 +1164,7 @@
             let hasPinned = false;
 
             globalFiles.forEach(file => {
-                const isCEO = currentUserData && currentUserData.role === 'CEO';
-                const isOwner = file.uploaderId === currentUserData.uid;
+                const fileSizeText = file.sizeStr ? ` • ${file.sizeStr}` : '';
                 
                 // تحديد أيقونة الملف بناءً على النوع
                 let fileIcon = 'fa-file text-gray-500';
@@ -1132,43 +1173,42 @@
                 else if(file.type.includes('pdf')) fileIcon = 'fa-file-pdf text-red-600';
                 else if(file.type.includes('word') || file.type.includes('document')) fileIcon = 'fa-file-word text-blue-700';
 
-                // أزرار التحكم (حذف / تثبيت)
-                let controlsHtml = '';
-                if(isCEO || isOwner) {
-                    controlsHtml += `
-                        <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 p-1" title="حذف">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    `;
-                }
-                if(isCEO) {
-                    controlsHtml += `
-                        <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-500'} p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}">
-                            <i class="fa-solid fa-thumbtack"></i>
-                        </button>
-                    `;
-                }
+                // أزرار التحكم (أصبحت متاحة للجميع)
+                let controlsHtml = `
+                    <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 p-1" title="حذف">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-500'} p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}">
+                        <i class="fa-solid fa-thumbtack"></i>
+                    </button>
+                `;
 
-                // عرض معاينة إن كانت صورة
+                // عرض معاينة إن كانت صورة أو فيديو بحيث تفتح في المودال
                 let previewHtml = `<div class="h-24 bg-gray-50 flex items-center justify-center text-4xl"><i class="fa-solid ${fileIcon}"></i></div>`;
                 if(file.type.startsWith('image/')) {
-                    previewHtml = `<div class="h-24 bg-gray-200"><img src="${file.data}" class="w-full h-full object-cover"></div>`;
+                    previewHtml = `<div class="h-24 bg-gray-200 cursor-pointer" onclick="window.openMedia('${file.data}', '${file.type}')"><img src="${file.data}" class="w-full h-full object-cover hover:opacity-80 transition"></div>`;
+                } else if(file.type.startsWith('video/')) {
+                    previewHtml = `<div class="h-24 bg-black relative flex items-center justify-center cursor-pointer hover:bg-gray-800 transition" onclick="window.openMedia('${file.data}', '${file.type}')">
+                        <video src="${file.data}" class="w-full h-full object-cover opacity-50"></video>
+                        <i class="fa-solid fa-circle-play text-white text-3xl absolute"></i>
+                    </div>`;
                 }
 
                 const fileCard = `
-                    <div class="bg-white rounded-xl shadow-sm border ${file.pinned ? 'border-yellow-300 shadow-yellow-100' : 'border-gray-200'} overflow-hidden relative flex flex-col group">
+                    <div class="bg-white rounded-xl shadow-sm border ${file.pinned ? 'border-yellow-300 shadow-yellow-100' : 'border-gray-200'} overflow-hidden relative flex flex-col group transition-all hover:shadow-md">
                         ${previewHtml}
                         <div class="p-3 flex-1 flex flex-col">
                             <p class="font-bold text-gray-800 text-xs truncate mb-1" title="${file.name}">${file.name}</p>
-                            <p class="text-[10px] text-gray-500 mt-auto">بواسطة: ${file.uploaderName}</p>
+                            <p class="text-[10px] text-gray-500 mt-auto">بواسطة: ${file.uploaderName}${fileSizeText}</p>
                         </div>
                         
-                        <!-- أزرار تحميل و تحكم تظهر عند التحويم -->
-                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                            <a href="${file.data}" download="${file.name}" class="bg-white text-gray-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-secondary hover:text-white transition" title="تحميل">
-                                <i class="fa-solid fa-download"></i>
-                            </a>
-                            ${controlsHtml}
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 pointer-events-none">
+                            <div class="pointer-events-auto flex items-center gap-3">
+                                <a href="${file.data}" download="${file.name}" class="bg-white text-gray-800 w-8 h-8 rounded-full flex items-center justify-center hover:bg-secondary hover:text-white transition" title="تحميل">
+                                    <i class="fa-solid fa-download"></i>
+                                </a>
+                                ${controlsHtml}
+                            </div>
                         </div>
                         ${file.pinned ? '<div class="absolute top-2 right-2 text-yellow-400 drop-shadow-md"><i class="fa-solid fa-star"></i></div>' : ''}
                     </div>
@@ -1182,11 +1222,12 @@
                 }
             });
 
+            // حالات إذا كانت القائمة فارغة
             if(!hasPinned) {
-                pinnedContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-full">لا توجد ملفات مثبتة حالياً.</p>';
+                pinnedContainer.innerHTML = '<div class="col-span-full text-center py-4 bg-gray-50 border border-dashed border-gray-200 rounded-lg text-gray-400 text-xs"><i class="fa-solid fa-thumbtack mb-1"></i><p>لا توجد ملفات مثبتة حالياً</p></div>';
             }
             if(allContainer.innerHTML === '') {
-                allContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-full">لا توجد ملفات أخرى.</p>';
+                allContainer.innerHTML = '<div class="col-span-full text-center py-10 bg-gray-50 border border-dashed border-gray-200 rounded-lg text-gray-400"><i class="fa-regular fa-folder-open text-4xl mb-3"></i><p class="text-sm font-semibold">مساحة الملفات فارغة</p><p class="text-xs mt-1">ابدأ برفع الملفات لمشاركتها مع فريقك</p></div>';
             }
         }
 
@@ -1219,7 +1260,7 @@
             const filteredChat = globalChat.filter(msg => (msg.groupId || 'global') === currentGroupId);
 
             if(filteredChat.length === 0) {
-                chatBox.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm">لا توجد رسائل هنا. ابدأ المحادثة الآن!</div>';
+                chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
                 return;
             }
 
@@ -1231,15 +1272,14 @@
                 const textClass = isMe ? 'text-blue-100' : 'text-gray-500';
                 const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
 
-                // معالجة المرفقات إذا وجدت
                 let attachmentHtml = '';
                 if(msg.fileData) {
                     if(msg.fileType.startsWith('image/')) {
-                        attachmentHtml = `<img src="${msg.fileData}" class="mt-2 rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10" onclick="window.open('${msg.fileData}')">`;
+                        attachmentHtml = `<img src="${msg.fileData}" class="mt-2 rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10" onclick="window.openMedia('${msg.fileData}', '${msg.fileType}')">`;
                     } else if(msg.fileType.startsWith('video/')) {
-                        attachmentHtml = `<video src="${msg.fileData}" controls class="mt-2 rounded-lg max-w-full h-auto max-h-48 bg-black"></video>`;
+                        attachmentHtml = `<div class="relative cursor-pointer mt-2" onclick="window.openMedia('${msg.fileData}', '${msg.fileType}')"><video src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 bg-black"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
                     } else {
-                        attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="mt-2 inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                        attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="mt-2 inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
                     }
                 }
 
@@ -1354,7 +1394,6 @@
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             
-            // يجب أن يكون هناك إما نص أو ملف مرفق
             if(!text && !pendingChatFileData) return;
 
             try {
@@ -1369,11 +1408,10 @@
                     timestamp: Date.now()
                 };
 
-                // إضافة بيانات الملف إذا وجدت
                 if(pendingChatFileData) {
                     messageObj.fileData = pendingChatFileData;
                     messageObj.fileType = pendingChatFileType;
-                    window.clearChatAttachment(); // تنظيف المرفق من الواجهة
+                    window.clearChatAttachment(); 
                 }
 
                 await addDoc(getColRef('chat'), messageObj);
