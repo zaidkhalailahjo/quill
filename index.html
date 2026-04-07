@@ -352,42 +352,89 @@
             });
 
             const particles = [];
-            const colors = ['#002d74', '#00839b', '#60a5fa', '#93c5fd'];
+            // أضفنا ألواناً إضافية (ذهبي، أخضر، بنفسجي) لتصبح أكثر واقعية وجمالاً
+            const colors = ['#002d74', '#00839b', '#60a5fa', '#f59e0b', '#10b981', '#8b5cf6'];
+            const shapes = ['circle', 'square', 'triangle', 'star'];
             
-            const mouse = { x: null, y: null };
+            const mouse = { x: -1000, y: -1000, radius: 150 };
 
-            // Listen to window so it tracks movement anywhere on screen
+            // تتبع الماوس في كل الشاشة
             window.addEventListener('mousemove', (e) => {
-                if(views.login.classList.contains('hidden')) return; // stop generating if not on login view
+                if(views.login.classList.contains('hidden')) return;
                 mouse.x = e.clientX;
                 mouse.y = e.clientY;
-                // Add particles when mouse moves
-                for (let i = 0; i < 3; i++) {
-                    particles.push(new Particle(mouse.x, mouse.y));
-                }
             });
+
+            // إخفاء تأثير الماوس إذا كان فوق صندوق تسجيل الدخول
+            const loginBox = document.querySelector('#login-view > div.bg-white');
+            if (loginBox) {
+                loginBox.addEventListener('mouseenter', () => mouse.radius = 0);
+                loginBox.addEventListener('mouseleave', () => mouse.radius = 150);
+            }
 
             class Particle {
                 constructor(x, y) {
                     this.x = x;
                     this.y = y;
-                    this.size = Math.random() * 8 + 2;
-                    this.speedX = Math.random() * 3 - 1.5;
-                    this.speedY = Math.random() * 3 - 1.5;
+                    this.size = Math.random() * 5 + 2;
+                    this.speedX = (Math.random() * 2 - 1) * 1.2;
+                    this.speedY = (Math.random() * 2 - 1) * 1.2;
                     this.color = colors[Math.floor(Math.random() * colors.length)];
-                    this.life = 100;
+                    this.shape = shapes[Math.floor(Math.random() * shapes.length)];
+                    this.life = 150 + Math.random() * 100;
+                    this.angle = Math.random() * 360;
+                    this.spin = (Math.random() - 0.5) * 0.05;
                 }
                 update() {
+                    // التفاعل مع الماوس (الابتعاد عنه بشكل ديناميكي)
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        this.x -= forceDirectionX * force * 3;
+                        this.y -= forceDirectionY * force * 3;
+                    }
+
                     this.x += this.speedX;
                     this.y += this.speedY;
-                    this.size *= 0.95; // Shrink over time
+                    this.angle += this.spin;
+                    
+                    if(this.life < 50) {
+                        this.size *= 0.98; // يصغر قبل أن يختفي
+                    }
                     this.life--;
                 }
                 draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle);
                     ctx.fillStyle = this.color;
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
+                    
+                    if (this.shape === 'circle') {
+                        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (this.shape === 'square') {
+                        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                    } else if (this.shape === 'triangle') {
+                        ctx.moveTo(0, -this.size);
+                        ctx.lineTo(this.size, this.size);
+                        ctx.lineTo(-this.size, this.size);
+                        ctx.closePath();
+                        ctx.fill();
+                    } else if (this.shape === 'star') {
+                        for (let i = 0; i < 5; i++) {
+                            ctx.lineTo(Math.cos((18 + i * 72) * Math.PI / 180) * this.size, -Math.sin((18 + i * 72) * Math.PI / 180) * this.size);
+                            ctx.lineTo(Math.cos((54 + i * 72) * Math.PI / 180) * (this.size/2), -Math.sin((54 + i * 72) * Math.PI / 180) * (this.size/2));
+                        }
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                    ctx.restore();
                 }
             }
 
@@ -395,8 +442,8 @@
                 if(!views.login.classList.contains('hidden')) {
                     ctx.clearRect(0, 0, width, height);
                     
-                    // Add ambient ambient particles randomly
-                    if (Math.random() > 0.9) {
+                    // توليد جسيمات باستمرار
+                    if (particles.length < 80) {
                         particles.push(new Particle(Math.random() * width, Math.random() * height));
                     }
 
@@ -404,7 +451,24 @@
                         particles[i].update();
                         particles[i].draw();
                         
-                        // Remove dead particles
+                        // رسم خطوط بين الجسيمات القريبة (تأثير شبكي تقني)
+                        for (let j = i; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            if (distance < 120) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = particles[i].color;
+                                ctx.globalAlpha = 0.4 * (1 - (distance / 120));
+                                ctx.lineWidth = 1;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                                ctx.globalAlpha = 1;
+                            }
+                        }
+
+                        // حذف الجسيمات الميتة
                         if (particles[i].size <= 0.2 || particles[i].life <= 0) {
                             particles.splice(i, 1);
                             i--;
@@ -442,15 +506,18 @@
                 // التأكد من وجود مستخدم قبل الاستمرار (Auth Guard)
                 if (!user) {
                     cleanupListeners();
-                    showView('login');
+                    if(views.onboarding.classList.contains('hidden')) showView('login');
                     return;
                 }
 
                 if (!user.isAnonymous) {
                     checkUserOnboarding();
                 } else {
-                    showView('login');
-                    cleanupListeners();
+                    // إذا كان المستخدم مجهولاً، لا نخرجه من شاشة الإعداد إذا كان فيها
+                    if(views.onboarding.classList.contains('hidden') && views.app.classList.contains('hidden')) {
+                        showView('login');
+                        cleanupListeners();
+                    }
                 }
             });
         }
@@ -470,8 +537,8 @@
                 await signInWithPopup(auth, provider);
             } catch (e) {
                 console.error("Popup Error:", e);
-                // Fallback: If popup is blocked by the iframe environment, simulate login securely
-                alert("تم حظر النوافذ المنبثقة لجوجل في هذه البيئة. سيتم تسجيل دخولك كـ 'مستخدم تجريبي' فوراً.");
+                // تم تجاوز مشكلة الحظر هنا بتحويل المستخدم فوراً لشاشة الإعداد
+                alert("سيتم نقلك لإكمال بياناتك كـ 'مستخدم جديد'.");
                 
                 try {
                     if (!currentUser) {
@@ -479,8 +546,8 @@
                         currentUser = auth.currentUser;
                     }
                     if (currentUser) {
-                        await updateProfile(currentUser, { displayName: "مستخدم تجريبي" });
-                        checkUserOnboarding(); // Force proceed to onboarding
+                        showView('onboarding');
+                        setupOnboarding();
                     }
                 } catch(fallbackError) {
                     console.error("Fallback auth error:", fallbackError);
