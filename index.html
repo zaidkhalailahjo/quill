@@ -344,9 +344,14 @@
         // ==========================================
         // إعدادات EmailJS
         // ==========================================
-        const EMAILJS_SERVICE_ID = 'service_ibewued'; // الآيدي الخاص بك
-        const EMAILJS_TEMPLATE_ID = 'template_iro6gon'; // ⚠️ استبدل هذا بـ Template ID الخاص بك
-        const EMAILJS_PUBLIC_KEY = '1jeick6OIh3v4znyt'; // ⚠️ استبدل هذا بـ Public Key الخاص بك من إعدادات EmailJS
+        const EMAILJS_SERVICE_ID = 'service_ibewued'; 
+        const EMAILJS_TEMPLATE_ID = 'template_iro6gon'; 
+        const EMAILJS_PUBLIC_KEY = '1jeick6OIh3v4znyt'; // ملاحظة: إذا ظهر لك خطأ يخص المفتاح، جرب استبدال الحرف O بعد الرقم 6 بالرقم 0
+
+        // تهيئة EmailJS مرة واحدة عند تحميل الصفحة
+        emailjs.init({
+            publicKey: EMAILJS_PUBLIC_KEY,
+        });
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -440,15 +445,17 @@
                 const response = await emailjs.send(
                     EMAILJS_SERVICE_ID, 
                     EMAILJS_TEMPLATE_ID, 
-                    templateParams, 
-                    EMAILJS_PUBLIC_KEY
+                    templateParams
                 );
 
                 console.log('Email sent successfully!', response.status, response.text);
-                showToast(`تم إرسال بريد إلكتروني حقيقي للموظف (${assigneeName}) بنجاح.`, 'success');
+                showToast(`تم إرسال بريد إلكتروني للموظف (${assigneeName}) بنجاح.`, 'success');
             } catch (error) {
                 console.error('Failed to send email:', error);
-                showToast('تم إسناد المهمة لكن فشل إرسال البريد الإلكتروني للموظف.', 'warning');
+                
+                // هنا أضفنا ميزة إظهار الخطأ الفعلي القادم من EmailJS لمعرفة السبب
+                let actualErrorMsg = error.text || 'خطأ غير معروف، تأكد من الإعدادات';
+                showToast(`فشل الإيميل: ${actualErrorMsg}`, 'warning');
             }
         }
 
