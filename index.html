@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- مكتبة EmailJS للإرسال الحقيقي -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -19,7 +21,8 @@
                         primary: '#002d74',
                         secondary: '#00839b',
                         light: '#f3f4f6',
-                        dark: '#1f2937'
+                        dark: '#1f2937',
+                        incident: '#ff4d6d'
                     },
                     fontFamily: { sans: ['Cairo', 'sans-serif'] }
                 }
@@ -44,7 +47,6 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #00839b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* خلفية المحادثة (النقش الهندسي) */
         .chat-bg {
             background-color: #fdfdfd;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 15L15 22.5v15L30 45l15-7.5v-15z' stroke='%23f0f0f0' stroke-width='1'/%3E%3Cpath d='M30 15v15l15-7.5M30 30l-15-7.5M30 30v15' stroke='%23f0f0f0' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
@@ -53,39 +55,70 @@
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex relative">
 
-    <!-- شاشة التحميل الأولية -->
+    <!-- شاشة التحميل -->
     <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
-        <p class="text-primary font-bold text-lg">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
+        <p class="text-primary font-bold text-lg">جاري تحميل النظام...</p>
     </div>
 
     <!-- شاشة تسجيل الدخول -->
     <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مرحباً بك في نظام شركتي</h2>
-            <p class="text-gray-500 mb-8 text-sm">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-primary">نظام إدارة الشركة</h2>
             <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6">
                 تسجيل الدخول باستخدام Google
             </button>
         </div>
     </div>
 
+    <!-- واجهة المطور - طلب كلمة المرور (Ctrl+Enter) -->
+    <div id="devAuthModal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center z-[100] p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-xs text-center border-t-4 border-red-600 animate-fade-in">
+            <i class="fa-solid fa-code text-4xl text-red-600 mb-4"></i>
+            <h3 class="text-lg font-bold mb-2">مرحباً بك في واجهة المطور</h3>
+            <p class="text-xs text-gray-500 mb-4">يرجى إدخال كلمة المرور للمتابعة</p>
+            <input type="password" id="devPassInput" placeholder="كلمة المرور" class="w-full border p-2 rounded mb-4 text-center focus:outline-none focus:border-red-600">
+            <button onclick="window.checkDevAccess()" class="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700 transition font-bold">دخول</button>
+        </div>
+    </div>
+
+    <!-- لوحة المطور الكاملة (Master Control) -->
+    <div id="devDashboardModal" class="fixed inset-0 bg-gray-900/95 hidden z-[110] flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl p-6 relative h-[90vh] flex flex-col">
+            <button onclick="window.closeModal('devDashboardModal')" class="absolute top-4 left-4 text-gray-400 hover:text-red-600"><i class="fa-solid fa-xmark text-2xl"></i></button>
+            <div class="border-b pb-4 mb-4">
+                <h2 class="text-2xl font-bold text-red-600 flex items-center gap-2">
+                    <i class="fa-solid fa-terminal"></i> لوحة تحكم المطور (Master View)
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">تعديل الصلاحيات، تغيير الأدوار، وحذف أي حساب بشكل فوري.</p>
+            </div>
+            <div class="flex-1 overflow-auto">
+                <table class="w-full text-right text-sm">
+                    <thead class="bg-gray-100 text-gray-600">
+                        <tr>
+                            <th class="p-3 border">المستخدم</th>
+                            <th class="p-3 border">الإيميل</th>
+                            <th class="p-3 border">الوظيفة</th>
+                            <th class="p-3 border">تغيير الوظيفة</th>
+                            <th class="p-3 border">التحكم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devUsersList" class="divide-y border"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- شاشة إعداد الملف الشخصي -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">إكمال بيانات الملف الشخصي</h2>
-            <p class="text-gray-500 mb-6 text-sm text-center">يرجى إدخال اسمك وتحديد وظيفتك في الشركة للمتابعة</p>
-            
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <h2 class="text-xl font-bold text-gray-800 mb-2 text-center text-primary">إعداد الحساب</h2>
             <form id="setupProfileForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
-                    <input type="text" id="setupName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
-                    <select id="setupRole" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
+                <div><label class="block text-sm font-bold text-gray-700">الاسم</label><input type="text" id="setupName" required class="w-full border p-2 rounded-lg focus:outline-none focus:border-secondary"></div>
+                <div><label class="block text-sm font-bold text-gray-700">الوظيفة</label>
+                    <select id="setupRole" required class="w-full border p-2 rounded-lg focus:outline-none focus:border-secondary">
                         <option value="" disabled selected>-- اختر وظيفتك --</option>
                         <option value="CEO">CEO (المدير التنفيذي)</option>
                         <option value="technical team supervisor">Technical Team Supervisor</option>
@@ -93,239 +126,124 @@
                         <option value="accountant">Accountant</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors mt-4">
-                    حفظ الدخول للنظام
-                </button>
+                <button type="submit" class="w-full bg-secondary text-white font-bold py-3 rounded-lg hover:bg-primary transition-colors">دخول</button>
             </form>
         </div>
     </div>
 
-    <!-- الإشعارات (Toasts) -->
     <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3"></div>
+    <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden" onclick="window.toggleSidebar()"></div>
 
-    <!-- تظليل الخلفية للهواتف -->
-    <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
-
-    <!-- القائمة الجانبية (متوافقة مع الجوال) -->
     <aside id="sidebar" class="fixed md:relative inset-y-0 right-0 transform translate-x-full md:translate-x-0 transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30">
-        <div class="p-6 flex items-center justify-between md:justify-center border-b border-white/10">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-10">
-            <button onclick="window.toggleSidebar()" class="md:hidden text-white hover:text-gray-300">
-                <i class="fa-solid fa-xmark text-2xl"></i>
-            </button>
-        </div>
-        
-        <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
-            <button onclick="window.showSection('dashboard')" class="nav-btn active-nav w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="dashboard">
-                <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">لوحة التحكم</span>
-            </button>
-            <button onclick="window.showSection('employees')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
-                <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الموظفين</span>
-            </button>
-            <button onclick="window.showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
-                <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المهام</span>
-            </button>
-            <button onclick="window.showSection('chat')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="chat">
-                <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">محادثة الفريق</span>
-            </button>
-            
-            <button id="nav-logs-btn" onclick="window.showSection('logs')" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors border-t border-white/10 mt-2 pt-4" data-section="logs">
-                <i class="fa-solid fa-clock-rotate-left w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">سجل النظام</span>
-            </button>
+        <div class="p-6 border-b border-white/10"><img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" class="h-10"></div>
+        <nav class="flex-1 mt-6 px-4 space-y-2">
+            <button onclick="window.showSection('dashboard')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white" data-section="dashboard"><i class="fa-solid fa-chart-line ml-3"></i><span>لوحة التحكم</span></button>
+            <button onclick="window.showSection('employees')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300" data-section="employees"><i class="fa-solid fa-users ml-3"></i><span>الموظفين</span></button>
+            <button onclick="window.showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300" data-section="tasks"><i class="fa-solid fa-list-check ml-3"></i><span>المهام</span></button>
+            <button onclick="window.showSection('chat')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300" data-section="chat"><i class="fa-solid fa-comments ml-3"></i><span>المحادثة</span></button>
+            <button id="nav-logs-btn" onclick="window.showSection('logs')" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 border-t border-white/10 mt-2" data-section="logs"><i class="fa-solid fa-clock-rotate-left ml-3"></i><span>سجل النظام</span></button>
         </nav>
     </aside>
 
-    <!-- المحتوى الرئيسي -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full">
-        
-        <!-- الشريط العلوي -->
-        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10">
+        <header class="bg-white shadow-sm border-b p-4 flex justify-between items-center">
             <div class="flex items-center">
-                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-4">
-                    <i class="fa-solid fa-bars text-xl"></i>
-                </button>
-                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary">لوحة التحكم</h2>
+                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 ml-4"><i class="fa-solid fa-bars text-xl"></i></button>
+                <h2 id="page-title" class="text-xl font-bold text-primary">لوحة التحكم</h2>
             </div>
-            
-            <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse">
+            <div class="flex items-center space-x-4 space-x-reverse">
                 <div class="flex items-center">
-                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
-                    <div class="mr-2 md:mr-3 hidden sm:block">
-                        <p id="userName" class="text-xs md:text-sm font-semibold text-gray-800">جاري التحميل...</p>
-                        <p id="userRole" class="text-[10px] md:text-xs text-secondary font-bold"></p>
-                    </div>
+                    <img id="userAvatar" src="" class="w-10 h-10 rounded-full border-2 border-secondary object-cover">
+                    <div class="mr-3 hidden sm:block"><p id="userName" class="text-sm font-semibold"></p><p id="userRole" class="text-xs text-secondary font-bold"></p></div>
                 </div>
-                <button id="logoutBtn" class="text-red-500 hover:bg-red-50 p-2 rounded transition" title="تسجيل الخروج">
-                    <i class="fa-solid fa-sign-out-alt"></i>
-                </button>
+                <button id="logoutBtn" class="text-red-500 p-2"><i class="fa-solid fa-sign-out-alt"></i></button>
             </div>
         </header>
 
-        <!-- الأقسام المتغيرة -->
-        <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 relative">
-            
-            <!-- 1. لوحة التحكم -->
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+            <!-- قسم تحديثات الخدمة (Service Incident Updates) - مطابق للصورة -->
+            <div id="incidentContainer" class="hidden mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-start gap-3 animate-fade-in">
+                <span class="bg-incident text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase shrink-0 mt-0.5">Fix</span>
+                <div class="flex-1">
+                    <h4 class="text-sm font-bold inline-block border-b-2 border-gray-800 mb-1 cursor-pointer">Service Incident Update.</h4>
+                    <span id="incidentText" class="text-sm text-gray-600 block mt-1 leading-relaxed"></span>
+                </div>
+                <button onclick="window.hideIncident()" id="closeIncidentBtn" class="text-gray-300 hover:text-red-500 hidden"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
             <section id="dashboard" class="section-content animate-fade-in">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-primary">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-blue-50 text-primary p-3 md:p-4 rounded-full"><i class="fa-solid fa-users text-xl md:text-2xl"></i></div>
-                    </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-secondary">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">إجمالي المهام</p><h3 id="stat-tasks" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-teal-50 text-secondary p-3 md:p-4 rounded-full"><i class="fa-solid fa-list-check text-xl md:text-2xl"></i></div>
-                    </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-green-500">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">مهام مكتملة</p><h3 id="stat-completed" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-green-50 text-green-500 p-3 md:p-4 rounded-full"><i class="fa-solid fa-check-double text-xl md:text-2xl"></i></div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 2. الموظفين -->
-            <section id="employees" class="section-content hidden animate-fade-in">
-                <div class="flex justify-between items-center mb-4 md:mb-6">
-                    <p class="text-sm md:text-base text-gray-600">فريق العمل المسجل في النظام</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
-                    <table class="w-full text-right min-w-[500px]">
-                        <thead class="bg-gray-50 border-b">
-                            <tr>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الاسم</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الوظيفة</th>
-                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 hidden">الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeesList" class="divide-y divide-gray-100">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- 3. المهام -->
-            <section id="tasks" class="section-content hidden animate-fade-in">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600">إدارة المهام ومتابعة الإنجاز</p>
-                    <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
-                        <i class="fa-solid fa-plus ml-2"></i> إسناد مهمة جديدة
+                <!-- زر إضافة تحديث للمدير -->
+                <div id="ceoControls" class="hidden mb-6 flex gap-2">
+                    <button onclick="window.openModal('incidentModal')" class="bg-incident text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-red-600 transition">
+                        <i class="fa-solid fa-bullhorn ml-2"></i> نشر تحديث للخدمة
+                    </button>
+                    <button id="clearIncidentBtn" onclick="window.clearIncident()" class="hidden bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-300 transition">
+                        مسح التحديث الحالي
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                    <div class="bg-gray-100 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-gray-700 mb-3 md:mb-4 pb-2 border-b border-gray-200 text-sm md:text-base">قيد الانتظار ⏳</h3>
-                        <div id="tasks-pending" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
-                    </div>
-                    <div class="bg-blue-50 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-primary mb-3 md:mb-4 pb-2 border-b border-blue-200 text-sm md:text-base">قيد التنفيذ 🛠️</h3>
-                        <div id="tasks-progress" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
-                    </div>
-                    <div class="bg-green-50 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-green-600 mb-3 md:mb-4 pb-2 border-b border-green-200 text-sm md:text-base">مكتمل ✅</h3>
-                        <div id="tasks-completed" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
-                    </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-primary shadow-sm"><div><p class="text-xs text-gray-500">الموظفين</p><h3 id="stat-employees" class="text-2xl font-bold">0</h3></div></div>
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-secondary shadow-sm"><div><p class="text-xs text-gray-500">المهام</p><h3 id="stat-tasks" class="text-2xl font-bold">0</h3></div></div>
+                    <div class="bg-white p-6 rounded-xl border-b-4 border-green-500 shadow-sm"><div><p class="text-xs text-gray-500">مكتملة</p><h3 id="stat-completed" class="text-2xl font-bold">0</h3></div></div>
+                </div>
+            </section>
+            
+            <section id="employees" class="section-content hidden animate-fade-in">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden"><table class="w-full text-right"><thead class="bg-gray-50 border-b"><tr><th class="p-4 text-sm">الاسم</th><th class="p-4 text-sm">الوظيفة</th><th id="empActionHeader" class="p-4 hidden text-sm text-center">حذف</th></tr></thead><tbody id="employeesList" class="divide-y"></tbody></table></div>
+            </section>
+
+            <section id="tasks" class="section-content hidden animate-fade-in">
+                <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-secondary text-white px-4 py-2 rounded-lg mb-4 text-sm font-bold shadow-md"><i class="fa-solid fa-plus ml-2"></i> إسناد مهمة جديدة</button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gray-100 p-4 rounded-xl h-[65vh] flex flex-col shadow-inner"><h3 class="font-bold mb-3 text-sm">انتظار ⏳</h3><div id="tasks-pending" class="space-y-3 overflow-y-auto flex-1"></div></div>
+                    <div class="bg-blue-50 p-4 rounded-xl h-[65vh] flex flex-col shadow-inner"><h3 class="font-bold mb-3 text-primary text-sm">تنفيذ 🛠️</h3><div id="tasks-progress" class="space-y-3 overflow-y-auto flex-1"></div></div>
+                    <div class="bg-green-50 p-4 rounded-xl h-[65vh] flex flex-col shadow-inner"><h3 class="font-bold mb-3 text-green-600 text-sm">مكتمل ✅</h3><div id="tasks-completed" class="space-y-3 overflow-y-auto flex-1"></div></div>
                 </div>
             </section>
 
-            <!-- 4. محادثة الفريق (التصميم الجديد المطابق للصورة) -->
-            <section id="chat" class="section-content hidden animate-fade-in h-full pb-4">
-                <div class="flex flex-col h-[75vh] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
-                    
-                    <!-- الهيدر الخاص بالمحادثة -->
-                    <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl">
-                                <i class="fa-solid fa-hashtag"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-primary text-sm md:text-base">الدردشة العامة للشركة</h3>
-                                <p class="text-[10px] md:text-xs text-gray-400">يتواجد هنا جميع أعضاء مساحة العمل</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- منطقة الرسائل -->
-                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative">
-                        <!-- الرسائل ستظهر هنا -->
-                    </div>
-                    
-                    <!-- منطقة الإدخال -->
-                    <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10">
-                        
-                        <!-- قائمة المنشن العائمة -->
-                        <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20">
-                            <!-- سيتم حقن الأسماء هنا -->
-                        </div>
-
-                        <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative">
-                            <!-- زر المنشن @ -->
-                            <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg ml-2 transition-colors font-bold" title="ذكر شخص">
-                                @
-                            </button>
-                            <!-- زر المرفقات -->
-                            <button type="button" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="إرفاق ملف">
-                                <i class="fa-solid fa-paperclip"></i>
-                            </button>
-                            
-                            <input type="text" id="chatInput" placeholder="اكتب رسالتك للشركة..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700" required autocomplete="off">
-                            
-                            <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2">
-                                <i class="fa-regular fa-paper-plane transform -scale-x-100"></i>
-                            </button>
+            <section id="chat" class="section-content hidden animate-fade-in h-full">
+                <div class="flex flex-col h-[75vh] bg-white rounded-xl border overflow-hidden shadow-lg">
+                    <div id="chatMessages" class="flex-1 p-4 chat-bg overflow-y-auto"></div>
+                    <div class="p-4 bg-white border-t relative">
+                        <div id="mentionsList" class="hidden absolute bottom-full mb-2 bg-white border shadow-2xl rounded-xl w-56 z-50 overflow-hidden"></div>
+                        <form id="chatForm" class="flex items-center bg-gray-50 rounded-full px-4 py-1 border">
+                            <button type="button" onclick="window.toggleMentions()" class="text-secondary font-bold text-lg px-2">@</button>
+                            <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none p-2 text-sm" required autocomplete="off">
+                            <button type="submit" class="bg-secondary text-white w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-primary"><i class="fa-regular fa-paper-plane text-xs"></i></button>
                         </form>
                     </div>
                 </div>
             </section>
 
-            <!-- 5. سجل النظام -->
-            <section id="logs" class="section-content hidden animate-fade-in">
-                <div class="flex justify-between items-center mb-4 md:mb-6">
-                    <p class="text-sm md:text-base text-gray-600">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
-                </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
-                    <table class="w-full text-right min-w-[600px]">
-                        <thead class="bg-gray-50 border-b">
-                            <tr>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الوقت</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">المستخدم</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الحدث</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logsList" class="divide-y divide-gray-100">
-                            <!-- Injected by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
+            <section id="logs" class="section-content hidden animate-fade-in"><div class="bg-white rounded-xl overflow-hidden shadow-sm"><table class="w-full text-right"><thead class="bg-gray-50"><tr><th class="p-4 text-xs font-bold border-l">الوقت</th><th class="p-4 text-xs font-bold border-l">المستخدم</th><th class="p-4 text-xs font-bold">الحدث</th></tr></thead><tbody id="logsList" class="divide-y"></tbody></table></div></section>
         </div>
     </div>
 
-    <!-- Modal: إضافة مهمة -->
-    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-secondary text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">إسناد مهمة جديدة</h3>
-                <button onclick="window.closeModal('taskModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
-                <div><label class="block text-sm text-gray-600 mb-1">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></div>
-                <div><label class="block text-sm text-gray-600 mb-1">التفاصيل</label><textarea id="taskDesc" rows="2" class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></textarea></div>
-                <div>
-                    <label class="block text-sm text-gray-600 mb-1">إسناد إلى الموظف</label>
-                    <select id="taskAssignee" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
-                        <!-- Populated dynamically -->
-                    </select>
-                </div>
-                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base">إرسال المهمة</button>
-                </div>
+    <!-- Modal إضافة تحديث خدمة (Incident) -->
+    <div id="incidentModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in">
+            <div class="bg-incident text-white p-4 flex justify-between items-center font-bold"><h3>نشر تحديث للخدمة (Fix)</h3><button onclick="window.closeModal('incidentModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="addIncidentForm" class="p-6 space-y-4">
+                <p class="text-xs text-gray-500">سيظهر هذا التحديث في أعلى لوحة التحكم لجميع الموظفين.</p>
+                <textarea id="incidentContent" placeholder="مثال: نود إخباركم بوجود عطل فني في الخوادم جاري العمل على إصلاحه..." required class="w-full border p-3 rounded-lg focus:outline-none focus:border-incident h-32 text-sm" rows="3"></textarea>
+                <button type="submit" class="w-full bg-incident text-white py-3 rounded-lg font-bold hover:bg-red-600 transition shadow-lg">تحديث الحالة الآن</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase و JavaScript Logic -->
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div class="bg-secondary text-white p-4 flex justify-between items-center font-bold"><h3>مهمة جديدة</h3><button onclick="window.closeModal('taskModal')"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="addTaskForm" class="p-6 space-y-4">
+                <input type="text" id="taskTitle" placeholder="عنوان المهمة" required class="w-full border p-3 rounded-lg focus:outline-none focus:border-secondary">
+                <textarea id="taskDesc" placeholder="تفاصيل المهمة..." class="w-full border p-3 rounded-lg focus:outline-none focus:border-secondary" rows="3"></textarea>
+                <select id="taskAssignee" required class="w-full border p-3 rounded-lg focus:outline-none focus:border-secondary"></select>
+                <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-blue-900 transition shadow-lg">إرسال وتنبيه الموظف</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -346,16 +264,123 @@
         const db = getFirestore(app);
         const appId = 'quill-world-system';
 
+        const EMAILJS_PUBLIC_KEY = ""; 
+        const EMAILJS_SERVICE_ID = ""; 
+        const EMAILJS_TEMPLATE_ID = ""; 
+        if (EMAILJS_PUBLIC_KEY) emailjs.init(EMAILJS_PUBLIC_KEY);
+
         let currentUserAuth = null;
         let currentUserData = null; 
         let globalUsers = []; 
         let globalTasks = [];
         let globalLogs = [];
         let globalChat = [];
-        let initialTaskLoad = true; 
-        let knownTaskIds = new Set();
 
-        // إغلاق وفتح القائمة الجانبية للهاتف
+        // ------------------ واجهة المطور ------------------
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('devAuthModal').classList.remove('hidden');
+                document.getElementById('devPassInput').focus();
+            }
+        });
+
+        window.checkDevAccess = () => {
+            const pass = document.getElementById('devPassInput').value;
+            if (pass === '4522') {
+                document.getElementById('devAuthModal').classList.add('hidden');
+                document.getElementById('devPassInput').value = '';
+                document.getElementById('devDashboardModal').classList.remove('hidden');
+                renderDevUsers();
+                showToast("واجهة التحكم العليا مفعلة", "success");
+            } else showToast("كلمة مرور خاطئة!", "error");
+        };
+
+        function renderDevUsers() {
+            const list = document.getElementById('devUsersList');
+            list.innerHTML = globalUsers.map(u => `
+                <tr class="hover:bg-gray-50">
+                    <td class="p-3 border flex items-center gap-2 font-bold"><img src="${u.photoURL}" class="w-6 h-6 rounded-full border">${u.name}</td>
+                    <td class="p-3 border text-gray-500">${u.email}</td>
+                    <td class="p-3 border"><span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold">${u.role}</span></td>
+                    <td class="p-3 border">
+                        <select onchange="window.devChangeRole('${u.uid}', this.value)" class="border rounded text-xs p-1 w-full outline-none">
+                            <option value="">تعديل...</option>
+                            <option value="CEO">CEO</option>
+                            <option value="technical team supervisor">Supervisor</option>
+                            <option value="Technical Engineer">Engineer</option>
+                            <option value="accountant">Accountant</option>
+                        </select>
+                    </td>
+                    <td class="p-3 border text-center">
+                        <button onclick="window.devDeleteUser('${u.uid}', '${u.name}')" class="bg-red-500 text-white px-3 py-1 rounded text-xs">حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.devChangeRole = async (uid, newRole) => {
+            if (!newRole) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { role: newRole });
+                renderDevUsers();
+                showToast("تم تعديل الرتبة", "success");
+            } catch(e) {}
+        };
+
+        window.devDeleteUser = async (uid, name) => {
+            if (confirm(`حذف ${name} نهائياً؟`)) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid));
+                    renderDevUsers();
+                    showToast("تم الحذف", "success");
+                } catch(e) {}
+            }
+        };
+
+        // ------------------ إدارة التحديثات (Incidents) ------------------
+        function startIncidentListener() {
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'system', 'incident'), (d) => {
+                const cont = document.getElementById('incidentContainer');
+                const text = document.getElementById('incidentText');
+                const clearBtn = document.getElementById('clearIncidentBtn');
+
+                if (d.exists() && d.data().content) {
+                    cont.classList.remove('hidden');
+                    text.innerText = d.data().content;
+                    if(currentUserData?.role === 'CEO') clearBtn.classList.remove('hidden');
+                } else {
+                    cont.classList.add('hidden');
+                    clearBtn.classList.add('hidden');
+                }
+            });
+        }
+
+        document.getElementById('addIncidentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = document.getElementById('incidentContent').value;
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'system', 'incident'), {
+                    content: content,
+                    timestamp: Date.now(),
+                    by: currentUserData.name
+                });
+                window.closeModal('incidentModal');
+                document.getElementById('incidentContent').value = '';
+                showToast("تم نشر التحديث لجميع الموظفين", "success");
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'logs'), { action: 'تحديث خدمة', details: 'نشر تحديث Fix جديد', userName: currentUserData.name, timestamp: Date.now() });
+            } catch(e) { showToast("فشل النشر", "error"); }
+        });
+
+        window.clearIncident = async () => {
+            if(confirm('هل تريد إزالة التحديث الحالي من واجهة الجميع؟')) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'system', 'incident'), { content: "" });
+                showToast("تم مسح التحديث", "success");
+            }
+        };
+
+        window.hideIncident = () => document.getElementById('incidentContainer').classList.add('hidden');
+
+        // ------------------ بقية النظام ------------------
         window.toggleSidebar = () => {
             document.getElementById('sidebar').classList.toggle('translate-x-full');
             document.getElementById('mobileOverlay').classList.toggle('hidden');
@@ -364,478 +389,140 @@
         window.showSection = (sectionId) => {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
-            
-            const titles = { 'dashboard': 'لوحة التحكم', 'employees': 'إدارة الموظفين', 'tasks': 'المهام', 'logs': 'سجل النظام', 'chat': 'المحادثة العامة للشركة' };
-            document.getElementById('page-title').innerText = titles[sectionId];
-            
             document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('bg-secondary', 'text-white');
-                b.classList.add('text-gray-300');
+                b.classList.replace('bg-secondary', 'text-gray-300');
+                b.classList.remove('text-white');
             });
-            const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
-            if(activeBtn) {
-                activeBtn.classList.remove('text-gray-300');
-                activeBtn.classList.add('bg-secondary', 'text-white');
-            }
-            
-            if(window.innerWidth < 768 && sectionId !== 'chat') {
-                document.getElementById('sidebar').classList.add('translate-x-full');
-                document.getElementById('mobileOverlay').classList.add('hidden');
-            }
-            if(sectionId === 'chat') {
-                const chatBox = document.getElementById('chatMessages');
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
+            const btn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
+            if(btn) { btn.classList.replace('text-gray-300', 'bg-secondary'); btn.classList.add('text-white'); }
+            if(sectionId === 'chat') { const b = document.getElementById('chatMessages'); b.scrollTop = b.scrollHeight; }
         };
 
-        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
-        window.closeModal = (id) => {
-            document.getElementById(id).classList.add('hidden');
-            if(id === 'taskModal') document.getElementById('addTaskForm').reset();
-        };
-
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+        
         window.openTaskModal = () => {
-            const select = document.getElementById('taskAssignee');
-            select.innerHTML = '<option value="">-- اختر موظف --</option>';
-            globalUsers.forEach(emp => {
-                select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.role})</option>`;
-            });
-            window.openModal('taskModal');
+            const s = document.getElementById('taskAssignee');
+            s.innerHTML = '<option value="">-- اختر موظف --</option>';
+            globalUsers.forEach(u => s.innerHTML += `<option value="${u.uid}">${u.name}</option>`);
+            document.getElementById('taskModal').classList.remove('hidden');
         };
 
         function showToast(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            let colorClass = type === 'success' ? 'bg-green-500' : (type === 'warning' ? 'bg-secondary' : 'bg-primary');
-            let icon = type === 'success' ? 'fa-check' : (type === 'warning' ? 'fa-bell' : 'fa-info-circle');
-
-            toast.className = `toast-enter ${colorClass} text-white px-4 md:px-6 py-3 md:py-4 rounded-xl shadow-xl flex items-center gap-3 text-sm md:text-base w-max max-w-[90vw]`;
-            toast.innerHTML = `<i class="fa-solid ${icon} text-lg md:text-xl"></i><span class="font-bold">${message}</span>`;
-            
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.replace('toast-enter', 'toast-leave');
-                setTimeout(() => toast.remove(), 500);
-            }, 4000);
+            const c = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast-enter ${type === 'success' ? 'bg-green-500' : (type === 'error' ? 'bg-red-500' : 'bg-primary')} text-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3 text-xs border border-white/20`;
+            t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-info-circle'}"></i><b>${message}</b>`;
+            c.appendChild(t);
+            setTimeout(() => { t.classList.replace('toast-enter', 'toast-leave'); setTimeout(() => t.remove(), 500); }, 5000);
         }
 
-        function getColRef(colName) {
-            return collection(db, 'artifacts', appId, 'public', 'data', colName);
+        async function sendMail(to, name, title, desc) {
+            if (!EMAILJS_PUBLIC_KEY) return;
+            try { await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, { to_email: to, to_name: name, from_name: currentUserData.name, task_title: title, task_desc: desc }); showToast(`تم إرسال بريد حقيقي لـ ${name}`, "success"); } catch(e) {}
         }
 
-        // ------------------ إرسال الإيميل (محاكاة) ------------------
-        async function sendEmailNotification(toEmail, assigneeName, taskTitle) {
-            // ملاحظة: إرسال الإيميل الحقيقي يحتاج إلى Backend أو خدمة مثل EmailJS.
-            // هذا الكود يمثل الـ API ويظهر التنبيه للمدير بنجاح الإرسال.
-            console.log(`[Email System] Sending to: ${toEmail} | Subject: مهمة جديدة: ${taskTitle}`);
-            
-            // محاكاة وقت الاتصال بالخادم
-            await new Promise(r => setTimeout(r, 600)); 
-            
-            showToast(`تم إرسال بريد إلكتروني تلقائياً للموظف (${assigneeName}) لإعلامه بالمهمة.`, 'success');
-        }
-
-        // ------------------ المصادقة ------------------
-        const initAuth = async () => {
-            try { await signInAnonymously(auth); } catch (err) { console.error("Auth error:", err); }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, async (u) => {
             document.getElementById('loadingScreen').classList.add('hidden');
-            
-            if (user) {
-                if(user.isAnonymous && !user.displayName) {
-                    document.getElementById('loginScreen').classList.remove('hidden');
-                    document.getElementById('setupProfileScreen').classList.add('hidden');
-                } else {
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    currentUserAuth = user;
-                    
-                    const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
-                    try {
-                        const docSnap = await getDoc(userDocRef);
-                        if (docSnap.exists()) {
-                            currentUserData = docSnap.data();
-                            document.getElementById('setupProfileScreen').classList.add('hidden');
-                            finishLoginSetup();
-                        } else {
-                            document.getElementById('setupProfileScreen').classList.remove('hidden');
-                            if(user.displayName) document.getElementById('setupName').value = user.displayName;
-                            checkCEOAvailability(); 
-                        }
-                    } catch(e) { console.error(e); }
-                }
-            } else {
-                document.getElementById('loginScreen').classList.remove('hidden');
-                document.getElementById('setupProfileScreen').classList.add('hidden');
-            }
+            if(u && !u.isAnonymous) {
+                currentUserAuth = u;
+                const d = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', u.uid));
+                if(d.exists()) { currentUserData = d.data(); finish(); }
+                else document.getElementById('setupProfileScreen').classList.remove('hidden');
+            } else document.getElementById('loginScreen').classList.remove('hidden');
         });
 
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try {
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-            } catch (error) { alert("خطأ في تسجيل الدخول"); }
-        });
-
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if(currentUserData) logAction('تسجيل خروج', `سجل ${currentUserData.name} الخروج`);
-            signOut(auth);
-            window.location.reload();
-        });
-
-        function checkCEOAvailability() {
-            onSnapshot(getColRef('users'), (snapshot) => {
-                let ceoExists = false;
-                snapshot.forEach(doc => { if(doc.data().role === 'CEO') ceoExists = true; });
-                
-                const roleSelect = document.getElementById('setupRole');
-                const ceoOption = roleSelect.querySelector('option[value="CEO"]');
-                
-                // إخفاء الخيار بصمت دون إظهار تحذير للآخرين
-                if(ceoExists && ceoOption) {
-                    ceoOption.remove();
-                }
-            });
-        }
+        document.getElementById('googleLoginBtn').addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
+        document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth); window.location.reload(); });
 
         document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('setupName').value;
-            const role = document.getElementById('setupRole').value;
-
-            try {
-                const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid);
-                const newUserData = {
-                    name: name,
-                    role: role,
-                    uid: currentUserAuth.uid,
-                    email: currentUserAuth.email || 'no-email@company.com', // جلب الإيميل
-                    photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                    timestamp: Date.now()
-                };
-                
-                await setDoc(userDocRef, newUserData);
-                currentUserData = newUserData;
-                
-                document.getElementById('setupProfileScreen').classList.add('hidden');
-                finishLoginSetup();
-            } catch(e) {}
+            const payload = { 
+                name: document.getElementById('setupName').value, 
+                role: document.getElementById('setupRole').value, 
+                uid: currentUserAuth.uid, 
+                email: currentUserAuth.email, 
+                photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${document.getElementById('setupName').value}&background=00839b&color=fff`, 
+                timestamp: Date.now() 
+            };
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), payload);
+            currentUserData = payload;
+            document.getElementById('setupProfileScreen').classList.add('hidden');
+            finish();
         });
 
-        function finishLoginSetup() {
+        function finish() {
             document.getElementById('userName').innerText = currentUserData.name;
             document.getElementById('userRole').innerText = currentUserData.role;
             document.getElementById('userAvatar').src = currentUserData.photoURL;
-
             if(currentUserData.role === 'CEO') {
                 document.getElementById('nav-logs-btn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').style.display = 'flex';
                 document.getElementById('empActionHeader').classList.remove('hidden');
-            } else {
-                document.getElementById('nav-logs-btn').classList.add('hidden');
-                document.getElementById('addTaskBtn').style.display = 'none';
-                document.getElementById('empActionHeader').classList.add('hidden');
+                document.getElementById('ceoControls').classList.remove('hidden');
             }
-
-            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
-            startDatabaseListeners();
+            start();
+            startIncidentListener();
         }
 
-        async function logAction(action, details) {
-            if(!currentUserData) return;
-            try {
-                await addDoc(getColRef('logs'), {
-                    action: action,
-                    details: details,
-                    userName: currentUserData.name,
-                    timestamp: Date.now()
+        function start() {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), s => {
+                globalUsers = []; s.forEach(d => globalUsers.push(d.data()));
+                const l = document.getElementById('employeesList');
+                l.innerHTML = globalUsers.map(e => `<tr class="hover:bg-gray-50"><td class="p-4 text-xs font-bold flex items-center gap-2"><img src="${e.photoURL}" class="w-6 h-6 rounded-full border">${e.name}</td><td class="p-4 text-xs font-bold text-secondary">${e.role}</td>${currentUserData.role === 'CEO' ? `<td class="p-4 text-center"><button onclick="window.delEmp('${e.uid}')" class="text-red-500 hover:text-red-700 transition"><i class="fa-solid fa-trash"></i></button></td>` : ''}</tr>`).join('');
+                document.getElementById('stat-employees').innerText = globalUsers.length;
+                if(!document.getElementById('devDashboardModal').classList.contains('hidden')) renderDevUsers();
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), s => {
+                globalTasks = []; s.forEach(d => globalTasks.push({id: d.id, ...d.data()}));
+                const gs = { pending: document.getElementById('tasks-pending'), 'in-progress': document.getElementById('tasks-progress'), completed: document.getElementById('tasks-completed') };
+                Object.values(gs).forEach(g => g.innerHTML = '');
+                globalTasks.forEach(t => {
+                    const isMy = t.assigneeName === currentUserData.name;
+                    gs[t.status].innerHTML += `<div class="bg-white p-3 rounded-lg shadow-sm border-r-4 ${t.status==='completed'?'border-r-green-500 opacity-60':(t.status==='in-progress'?'border-r-secondary':'border-r-gray-400')} animate-fade-in"><h4 class="font-bold text-xs">${t.title}</h4><p class="text-[9px] text-gray-500">${t.desc}</p><div class="mt-2 text-[9px] font-bold text-primary flex justify-between"><span><i class="fa-solid fa-user-circle"></i> ${t.assigneeName}</span>${isMy?'<span class="text-red-600 animate-pulse"><i class="fa-solid fa-star"></i> مهمتك</span>':''}</div>${(isMy || currentUserData.role==='CEO') && t.status!=='completed' ? `<button onclick="window.upT('${t.id}', '${t.status==='pending'?'in-progress':'completed'}')" class="w-full bg-secondary text-white text-[10px] py-1.5 rounded mt-3 font-bold">تحديث الحالة</button>` : ''}</div>`;
                 });
-            } catch(e) {}
-        }
-
-        // ------------------ مستمعي قاعدة البيانات ------------------
-        function startDatabaseListeners() {
-            onSnapshot(getColRef('users'), (snapshot) => {
-                globalUsers = [];
-                snapshot.forEach(doc => globalUsers.push({ id: doc.id, ...doc.data() }));
-                renderEmployees();
-                updateDashboardStats();
+                document.getElementById('stat-tasks').innerText = globalTasks.length;
+                document.getElementById('stat-completed').innerText = globalTasks.filter(t => t.status === 'completed').length;
             });
-
-            if(currentUserData.role === 'CEO') {
-                onSnapshot(getColRef('logs'), (snapshot) => {
-                    globalLogs = [];
-                    snapshot.forEach(doc => globalLogs.push({ id: doc.id, ...doc.data() }));
-                    globalLogs.sort((a, b) => b.timestamp - a.timestamp);
-                    renderLogs();
-                });
-            }
-
-            onSnapshot(getColRef('tasks'), (snapshot) => {
-                globalTasks = [];
-                let hasNewAssignedTask = false;
-                let latestTaskName = "";
-
-                snapshot.forEach(doc => {
-                    const taskData = { id: doc.id, ...doc.data() };
-                    globalTasks.push(taskData);
-                    
-                    if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
-                        knownTaskIds.add(taskData.id);
-                        if(taskData.assigneeName === currentUserData.name || taskData.status === 'pending') {
-                            hasNewAssignedTask = true;
-                            latestTaskName = taskData.title;
-                        }
-                    } else if (initialTaskLoad) {
-                        knownTaskIds.add(taskData.id);
-                    }
-                });
-
-                if(hasNewAssignedTask) showToast(`مهمة جديدة: ${latestTaskName}`, 'warning');
-                initialTaskLoad = false;
-                renderTasks();
-                updateDashboardStats();
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), s => {
+                const b = document.getElementById('chatMessages');
+                globalChat = []; s.forEach(d => globalChat.push(d.data()));
+                globalChat.sort((a,b) => a.timestamp - b.timestamp);
+                b.innerHTML = globalChat.map(m => `<div class="flex ${m.uid===currentUserData.uid?'justify-start':'justify-end'} mb-4"><div><span class="text-[9px] text-gray-400 block mb-1 px-2 ${m.uid===currentUserData.uid?'text-right':'text-left'}">${m.senderName}</span><div class="p-3 text-sm rounded-2xl shadow-sm ${m.uid===currentUserData.uid?'bg-secondary text-white':'bg-white border'}">${m.text.replace(/@([^\s]+)/g, '<b class="bg-blue-100 text-primary px-1 rounded">@$1</b>')}</div></div></div>`).join('');
+                b.scrollTop = b.scrollHeight;
             });
-
-            onSnapshot(getColRef('chat'), (snapshot) => {
-                globalChat = [];
-                snapshot.forEach(doc => globalChat.push({ id: doc.id, ...doc.data() }));
-                globalChat.sort((a, b) => a.timestamp - b.timestamp);
-                renderChat();
+            if(currentUserData.role === 'CEO') onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'logs'), s => {
+                const l = []; s.forEach(d => l.push(d.data())); l.sort((a,b) => b.timestamp - a.timestamp);
+                document.getElementById('logsList').innerHTML = l.map(m => `<tr class="text-[10px] hover:bg-gray-50"><td class="p-4 text-gray-400 border-l" dir="ltr">${new Date(m.timestamp).toLocaleString('ar-EG')}</td><td class="p-4 font-bold text-primary border-l">${m.userName}</td><td class="p-4">${m.details}</td></tr>`).join('');
             });
         }
 
-        // ------------------ دوال معالجة وواجهة البيانات ------------------
-        function updateDashboardStats() {
-            document.getElementById('stat-employees').innerText = globalUsers.length;
-            document.getElementById('stat-tasks').innerText = globalTasks.length;
-            document.getElementById('stat-completed').innerText = globalTasks.filter(t => t.status === 'completed').length;
-        }
-
-        function renderEmployees() {
-            const list = document.getElementById('employeesList');
-            const isCEO = currentUserData && currentUserData.role === 'CEO';
-            list.innerHTML = '';
-            
-            globalUsers.forEach(emp => {
-                let deleteHtml = '';
-                if(isCEO && emp.id !== currentUserData.uid) { 
-                    deleteHtml = `<td class="p-3 md:p-4"><button onclick="window.deleteEmployee('${emp.id}', '${emp.name}')" class="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button></td>`;
-                } else if(isCEO) {
-                    deleteHtml = `<td class="p-3 md:p-4"><span class="text-xs text-gray-400">المدير</span></td>`;
-                }
-
-                list.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="p-3 md:p-4 flex items-center">
-                            <img src="${emp.photoURL}" class="w-8 h-8 rounded-full ml-3 object-cover">
-                            <span class="font-medium text-gray-800 text-sm">${emp.name}</span>
-                        </td>
-                        <td class="p-3 md:p-4 text-gray-600 font-bold text-xs md:text-sm">${emp.role}</td>
-                        ${deleteHtml}
-                    </tr>
-                `;
-            });
-        }
-
-        function renderTasks() {
-            const pending = document.getElementById('tasks-pending');
-            const progress = document.getElementById('tasks-progress');
-            const completed = document.getElementById('tasks-completed');
-            
-            pending.innerHTML = progress.innerHTML = completed.innerHTML = '';
-
-            globalTasks.forEach(task => {
-                const isMyTask = task.assigneeName === currentUserData.name;
-                const isCEO = currentUserData.role === 'CEO';
-                let actionsHtml = '';
-                
-                if(isMyTask || isCEO) {
-                    if(task.status === 'pending') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">البدء بالتنفيذ</button>`;
-                    } else if(task.status === 'in-progress') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">تأكيد الإنجاز <i class="fa-solid fa-check ml-1"></i></button>`;
-                    }
-                }
-
-                const card = `
-                    <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 ${task.status === 'completed' ? 'border-r-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-r-secondary' : 'border-r-gray-400')}">
-                        <h4 class="font-bold text-gray-800 text-xs md:text-sm mb-1 ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
-                        <p class="text-[10px] md:text-xs text-gray-500 mb-3">${task.desc}</p>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-100">
-                            <div class="flex items-center text-[10px] md:text-xs text-primary font-bold bg-blue-50 px-2 py-1 rounded">
-                                <i class="fa-solid fa-user-tie ml-1"></i> ${task.assigneeName}
-                            </div>
-                            ${isMyTask ? '<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">مهمتك</span>' : ''}
-                        </div>
-                        ${actionsHtml}
-                        ${isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : ''}
-                    </div>
-                `;
-
-                if(task.status === 'pending') pending.innerHTML += card;
-                else if(task.status === 'in-progress') progress.innerHTML += card;
-                else completed.innerHTML += card;
-            });
-        }
-
-        function renderLogs() {
-            const list = document.getElementById('logsList');
-            list.innerHTML = '';
-            globalLogs.forEach(log => {
-                const date = new Date(log.timestamp).toLocaleString('ar-EG');
-                let icon = 'fa-info-circle text-gray-400';
-                if(log.action.includes('دخول')) icon = 'fa-right-to-bracket text-blue-500';
-                if(log.action.includes('مهمة')) icon = 'fa-check text-green-500';
-                if(log.action.includes('حذف')) icon = 'fa-trash text-red-500';
-
-                list.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500" dir="ltr">${date}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary">${log.userName}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600"><i class="fa-solid ${icon} ml-2"></i>${log.details}</td>
-                    </tr>
-                `;
-            });
-        }
-
-        function renderChat() {
-            const chatBox = document.getElementById('chatMessages');
-            chatBox.innerHTML = '';
-            globalChat.forEach(msg => {
-                const isMe = msg.uid === currentUserData.uid;
-                
-                // تمييز الأسماء التي تبدأ بـ @ بلون مميز
-                const formattedText = msg.text.replace(/@([^\s]+)/g, '<span class="text-primary font-bold bg-blue-100 px-1 rounded mx-1">@$1</span>');
-
-                const alignClass = isMe ? 'justify-start' : 'justify-end'; // في العربية: ابدأ المحادثة الخاصة بي من اليمين
-                const bgClass = isMe ? 'bg-secondary text-white' : 'bg-white border border-gray-200 text-gray-800';
-                const textClass = isMe ? 'text-blue-100' : 'text-gray-500';
-                const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
-
-                chatBox.innerHTML += `
-                    <div class="flex ${alignClass} mb-4">
-                        <div class="max-w-[85%] md:max-w-[70%] min-w-[150px]">
-                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
-                            <div class="p-3 shadow-sm ${bgClass} ${radiusClass}">
-                                <p class="text-sm md:text-base break-words">${formattedText}</p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        // ------------------ عمليات المنشن ------------------
-        window.toggleMentions = () => {
-            const list = document.getElementById('mentionsList');
-            list.classList.toggle('hidden');
-            if(!list.classList.contains('hidden')) {
-                list.innerHTML = globalUsers.map(u => 
-                    `<div class="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 font-semibold text-primary" onclick="window.selectMention('${u.name}')">
-                        <i class="fa-solid fa-user-circle ml-1 text-gray-400"></i> ${u.name}
-                    </div>`
-                ).join('');
-            }
-        };
-
-        window.selectMention = (name) => {
-            const input = document.getElementById('chatInput');
-            input.value += `@${name} `;
-            document.getElementById('mentionsList').classList.add('hidden');
-            input.focus();
-        };
-
-        // إغلاق قائمة المنشن عند النقر خارجها
-        document.addEventListener('click', (e) => {
-            const list = document.getElementById('mentionsList');
-            const btn = document.querySelector('button[onclick="window.toggleMentions()"]');
-            if(list && !list.classList.contains('hidden') && e.target !== list && !list.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                list.classList.add('hidden');
-            }
-        });
-
-        // ------------------ العمليات (حذف، إرسال مهمة، شات) ------------------
-        window.deleteEmployee = async (id, name) => {
-            if(currentUserData.role !== 'CEO') return;
-            if(confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
-                logAction('حذف موظف', `تم حذف الموظف: ${name}`);
-            }
-        };
+        window.delEmp = async (uid) => { if(confirm('حذف الموظف؟')) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid)); };
+        window.upT = async (id, s) => await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: s });
+        window.toggleMentions = () => { const l = document.getElementById('mentionsList'); l.classList.toggle('hidden'); l.innerHTML = globalUsers.map(u => `<div onclick="window.selM('${u.name}')" class="p-3 hover:bg-gray-100 text-xs font-bold cursor-pointer border-b flex items-center gap-2"><img src="${u.photoURL}" class="w-5 h-5 rounded-full">${u.name}</div>`).join(''); };
+        window.selM = (n) => { document.getElementById('chatInput').value += `@${n} `; document.getElementById('mentionsList').classList.add('hidden'); document.getElementById('chatInput').focus(); };
 
         document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!currentUserData || currentUserData.role !== 'CEO') return;
-            
-            const assigneeSelect = document.getElementById('taskAssignee');
-            const assigneeId = assigneeSelect.value;
-            const assigneeName = assigneeSelect.options[assigneeSelect.selectedIndex].text.split(' (')[0];
-            const title = document.getElementById('taskTitle').value;
-
-            try {
-                await addDoc(getColRef('tasks'), {
-                    title: title,
-                    desc: document.getElementById('taskDesc').value,
-                    assigneeId: assigneeId,
-                    assigneeName: assigneeName,
-                    status: 'pending',
-                    timestamp: Date.now()
-                });
-                window.closeModal('taskModal');
-                
-                // البحث عن إيميل الموظف وإرسال التنبيه
-                const assignedUser = globalUsers.find(u => u.id === assigneeId);
-                if(assignedUser && assignedUser.email) {
-                    sendEmailNotification(assignedUser.email, assigneeName, title);
-                } else {
-                    showToast('تم إرسال المهمة بنجاح!', 'success');
-                }
-                
-                logAction('إسناد مهمة', `تم إسناد مهمة "${title}" إلى ${assigneeName}`);
-            } catch(e) {}
+            const s = document.getElementById('taskAssignee');
+            const data = { title: document.getElementById('taskTitle').value, desc: document.getElementById('taskDesc').value, assigneeId: s.value, assigneeName: s.options[s.selectedIndex].text, status: 'pending', timestamp: Date.now() };
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), data);
+            window.closeModal('taskModal');
+            const u = globalUsers.find(x => x.uid === data.assigneeId);
+            if(u) sendMail(u.email, u.name, data.title, data.desc);
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'logs'), { action: 'إسناد مهمة', details: `تم إسناد مهمة "${data.title}" لـ ${data.assigneeName}`, userName: currentUserData.name, timestamp: Date.now() });
         });
-
-        window.updateTaskStatus = async (id, newStatus, taskTitle) => {
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
-                    status: newStatus
-                });
-                let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
-                logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
-                if(newStatus === 'completed') showToast('أحسنت! تم إنجاز المهمة.', 'success');
-            } catch(e) {}
-        };
-
-        window.deleteTask = async (id) => {
-            if(currentUserData.role !== 'CEO') return;
-            if(confirm('حذف هذه المهمة؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id));
-            }
-        };
 
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if(!text || !currentUserData) return;
-
-            try {
-                input.value = '';
-                document.getElementById('mentionsList').classList.add('hidden');
-                await addDoc(getColRef('chat'), {
-                    text: text,
-                    uid: currentUserData.uid,
-                    senderName: currentUserData.name,
-                    timestamp: Date.now()
-                });
-            } catch(e) {}
+            const i = document.getElementById('chatInput');
+            if(!i.value.trim()) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'chat'), { text: i.value, uid: currentUserData.uid, senderName: currentUserData.name, timestamp: Date.now() });
+            i.value = '';
+            document.getElementById('mentionsList').classList.add('hidden');
         });
 
-        initAuth();
+        signInAnonymously(auth);
     </script>
 </body>
 </html>
