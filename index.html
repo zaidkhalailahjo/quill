@@ -289,7 +289,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'quill-app';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const ROLES = ['CEO', 'HR', 'technical team supervisor', 'Technical Engineer', 'accountant'];
 
         // === STATE ===
@@ -318,28 +318,40 @@
         };
 
         // === INITIALIZATION (Instant Load) ===
-        function init() {
+        async function init() {
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
 
-            // الاستماع لحالة تسجيل الدخول فوراً بدون أي تأخير (بدون شاشة تحميل)
+            // انتظار المصادقة لتجنب أخطاء الأذونات (Permission-Denied)
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth init error:", error);
+            }
+
+            // الاستماع لحالة تسجيل الدخول فوراً
             onAuthStateChanged(auth, async (user) => {
                 currentUser = user;
-                if (user && !user.isAnonymous) {
+                
+                // التأكد من وجود مستخدم قبل الاستمرار (Auth Guard)
+                if (!user) {
+                    cleanupListeners();
+                    showView('login');
+                    return;
+                }
+
+                if (!user.isAnonymous) {
                     checkUserOnboarding();
                 } else {
                     showView('login');
                     cleanupListeners();
                 }
             });
-
-            // تسجيل الدخول المجهول يعمل في الخلفية حتى لا يسبب أي بطء في الصفحة
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
-            } else {
-                signInAnonymously(auth).catch(console.error);
-            }
         }
 
         // === AUTH LOGIC ===
@@ -363,17 +375,21 @@
             if(loginText) loginText.innerText = 'جاري تحضير مساحة العمل...';
             if(loginBtn) loginBtn.disabled = true;
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            
-            if (docSnap.exists()) {
-                dbUser = { id: docSnap.id, ...docSnap.data() };
-                setupAppListeners();
-                showView('app');
-                switchContentView('dashboard');
-            } else {
-                setupOnboarding();
-                showView('onboarding');
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    dbUser = { id: docSnap.id, ...docSnap.data() };
+                    setupAppListeners();
+                    showView('app');
+                    switchContentView('dashboard');
+                } else {
+                    setupOnboarding();
+                    showView('onboarding');
+                }
+            } catch(error) {
+                console.error("Error checking user:", error);
             }
 
             if(loginText) loginText.innerText = 'تسجيل الدخول باستخدام Google';
@@ -401,7 +417,7 @@
                 });
 
                 if(hasCEO) document.getElementById('ob-ceo-warning').classList.remove('hidden');
-            });
+            }, (error) => console.error("Onboarding users listener error:", error));
         }
 
         document.getElementById('onboarding-form').addEventListener('submit', async (e) => {
@@ -444,19 +460,19 @@
                 const current = employeesData.find(e => e.id === currentUser.uid);
                 if(current) dbUser = current;
                 updateUI();
-            });
+            }, (error) => console.error("Users listener error:", error));
 
             const tSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), (snap) => {
                 tasksData = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 tasksData.sort((a, b) => b.createdAt - a.createdAt);
                 updateUI();
-            });
+            }, (error) => console.error("Tasks listener error:", error));
 
             const mSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), (snap) => {
                 messagesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 messagesData.sort((a, b) => a.timestamp - b.timestamp);
                 renderChat();
-            });
+            }, (error) => console.error("Messages listener error:", error));
 
             const nSub = onSnapshot(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'notifications'), (snap) => {
                 notificationsData = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -468,7 +484,7 @@
                         showBrowserNotification(change.doc.data().title, change.doc.data().body);
                     }
                 });
-            });
+            }, (error) => console.error("Notifications listener error:", error));
 
             unsubs.push(uSub, tSub, mSub, nSub);
         }
