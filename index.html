@@ -453,7 +453,12 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                document.getElementById('login-screen').classList.add('hidden-view');
+                // بدلاً من إخفاء الشاشة فوراً، نغير حالة الزر ليدل على التحميل
+                const btn = document.getElementById('google-login-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-teal"></div> جاري تجهيز مساحة العمل...';
+                }
                 setupFirestoreListeners();
             } else {
                 currentUser = null;
