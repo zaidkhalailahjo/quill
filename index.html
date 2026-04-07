@@ -14,6 +14,9 @@
     <!-- EmailJS Library -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     
+    <!-- Jitsi Meet API (مكالمات الفيديو) -->
+    <script src="https://meet.jit.si/external_api.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -296,10 +299,17 @@
                             </div>
                         </div>
                         
-                        <!-- زر إنهاء / مسح المحادثة للمدير -->
-                        <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden w-full sm:w-auto text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-trash-can"></i> <span id="clearChatBtnText">مسح الدردشة</span>
-                        </button>
+                        <!-- أزرار التحكم بالدردشة -->
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <!-- زر بدء مكالمة فيديو -->
+                            <button id="startCallBtn" onclick="window.startVideoCall()" class="w-full sm:w-auto text-xs md:text-sm bg-green-50 hover:bg-green-100 text-green-600 border border-green-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-video"></i> <span>مكالمة فيديو</span>
+                            </button>
+                            <!-- زر مسح المحادثة (للمدير) -->
+                            <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden w-full sm:w-auto text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-trash-can"></i> <span id="clearChatBtnText">مسح الدردشة</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- منطقة الرسائل -->
@@ -508,7 +518,6 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
                     <select id="editEmpRole" required class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
-                        <!-- لا يوجد خيار CEO لكي لا يغير موظف آخر ليكون مدير، إلا لو أردنا السماح بمدراء متعددين -->
                         <option value="technical team supervisor">Technical Team Supervisor</option>
                         <option value="Technical Engineer">Technical Engineer</option>
                         <option value="accountant">Accountant</option>
@@ -527,6 +536,24 @@
         <button class="absolute top-4 right-4 md:top-6 md:right-6 text-white text-3xl hover:text-gray-300 transition-colors z-10"><i class="fa-solid fa-xmark"></i></button>
         <div id="mediaContainer" class="max-w-5xl w-full max-h-[90vh] flex items-center justify-center pointer-events-none" onclick="event.stopPropagation()">
             <!-- Media injected here -->
+        </div>
+    </div>
+
+    <!-- Modal: مكالمة الفيديو عبر Jitsi -->
+    <div id="videoCallModal" class="fixed inset-0 bg-black z-[60] hidden flex flex-col">
+        <div class="bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0 shadow-md border-b border-gray-800">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <h3 id="videoCallTitle" class="font-bold text-sm md:text-base">مكالمة فيديو قيد التشغيل</h3>
+            </div>
+            <button onclick="window.endVideoCall()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 text-xs md:text-sm shadow">
+                <i class="fa-solid fa-phone-slash"></i> إنهاء / مغادرة
+            </button>
+        </div>
+        <div id="jitsiContainer" class="flex-1 w-full bg-black relative">
+            <div class="absolute inset-0 flex items-center justify-center text-white">
+                <div class="loader mb-4"></div>
+            </div>
         </div>
     </div>
 
@@ -576,11 +603,11 @@
         let pendingChatFileData = null;
         let pendingChatFileType = null;
         
-        // لون رسالة الشات الافتراضي (البترولي)
         let selectedChatColor = 'bg-[#00839b]'; 
 
-        // المساحة الكلية (15 ميجابايت = 15 * 1024 * 1024)
         const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; 
+        
+        let jitsiApi = null; // مرجع لـ API مكالمة الفيديو
 
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -590,6 +617,77 @@
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
+
+        // ------------------ مكالمات الفيديو (Jitsi Meet) ------------------
+        window.startVideoCall = async () => {
+            if(!currentUserData) return;
+
+            // تحديد اسم الغرفة (يجب أن يكون فريد وآمن للشركة والمجموعة الحالية)
+            // إزالة المسافات والرموز لتجنب أخطاء Jitsi
+            const cleanGroupId = currentGroupId.replace(/[^a-zA-Z0-9]/g, "");
+            const roomName = `QuillWorldApp_${appId.substring(0,5)}_${cleanGroupId}`;
+
+            // إظهار واجهة المكالمة
+            document.getElementById('videoCallModal').classList.remove('hidden');
+            document.getElementById('videoCallModal').classList.add('flex');
+
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: roomName,
+                width: '100%',
+                height: '100%',
+                parentNode: document.querySelector('#jitsiContainer'),
+                userInfo: {
+                    displayName: currentUserData.name
+                },
+                configOverwrite: { 
+                    startWithAudioMuted: false, 
+                    startWithVideoMuted: false,
+                    prejoinPageEnabled: false // تخطي شاشة الانتظار للدخول السريع
+                },
+                interfaceConfigOverwrite: { 
+                    SHOW_JITSI_WATERMARK: false,
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                        'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                        'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                        'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                        'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone', 'security'
+                    ]
+                }
+            };
+            
+            // تفريغ الحاوية أولاً في حال كان هناك اتصال سابق
+            document.querySelector('#jitsiContainer').innerHTML = '';
+            
+            // إنشاء المكالمة
+            jitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+            // إرسال تنبيه في الشات بأن هناك مكالمة بدأت
+            try {
+                const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'هذه المجموعة';
+                await addDoc(getColRef('chat'), {
+                    text: `📞 انضممت إلى مكالمة فيديو في ${groupName}. يمكنكم الانضمام بالضغط على زر "مكالمة فيديو" في الأعلى.`,
+                    uid: currentUserData.uid,
+                    senderName: currentUserData.name,
+                    photoURL: currentUserData.photoURL,
+                    groupId: currentGroupId,
+                    color: 'bg-green-600', // لون مميز لرسالة النظام
+                    timestamp: Date.now()
+                });
+                logAction('مكالمة فيديو', `بدأ مكالمة فيديو في ${groupName}`);
+            } catch(e) {}
+        };
+
+        window.endVideoCall = () => {
+            if(jitsiApi) {
+                jitsiApi.dispose(); // تدمير الاتصال
+                jitsiApi = null;
+            }
+            document.getElementById('videoCallModal').classList.add('hidden');
+            document.getElementById('videoCallModal').classList.remove('flex');
+            document.querySelector('#jitsiContainer').innerHTML = '';
+        };
 
         // ------------------ معالجة الروابط (Hash Routing) ------------------
         function handleHashChange() {
@@ -622,10 +720,9 @@
             document.getElementById('mobileOverlay').classList.toggle('hidden');
         };
 
-        // فتح/إغلاق قائمة المحادثات بشكل سلس + الانتقال للمحادثة العامة
         window.openChatAndToggleMenu = () => {
-            window.selectGroup('global'); // الدخول للعامة فوراً
-            window.toggleChatMenu();      // فتح القائمة المنسدلة للتنقل
+            window.selectGroup('global');
+            window.toggleChatMenu();
         };
 
         window.toggleChatMenu = () => {
@@ -633,12 +730,10 @@
             const icon = document.getElementById('chatMenuIcon');
             
             if(menu.classList.contains('max-h-0')) {
-                // فتح بسلاسة
                 menu.classList.remove('max-h-0', 'opacity-0', 'hidden');
                 menu.classList.add('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
                 icon.classList.add('rotate-180');
             } else {
-                // إغلاق بسلاسة
                 menu.classList.add('max-h-0', 'opacity-0');
                 menu.classList.remove('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
                 icon.classList.remove('rotate-180');
@@ -695,7 +790,6 @@
             if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm').reset();
         };
 
-        // فتح وإغلاق عارض الوسائط
         window.openMedia = (dataUrl, type) => {
             const container = document.getElementById('mediaContainer');
             if(type.startsWith('image/')) {
@@ -708,7 +802,7 @@
 
         window.closeMediaModal = () => {
             window.closeModal('mediaModal');
-            document.getElementById('mediaContainer').innerHTML = ''; // لإيقاف الفيديو
+            document.getElementById('mediaContainer').innerHTML = '';
         };
 
         window.openTaskModal = () => {
@@ -758,7 +852,6 @@
             return collection(db, 'artifacts', appId, 'public', 'data', colName);
         }
 
-        // ------------------ إرسال إيميل التذكير ------------------
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -798,7 +891,6 @@
             });
         }
 
-        // ------------------ إرسال الإيميل ------------------
         async function sendEmailNotification(toEmail, assigneeName, taskTitle, taskDesc) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -819,7 +911,6 @@
             }
         }
 
-        // ------------------ تغيير الصورة الشخصية ------------------
         window.handleProfilePicChange = (e) => {
             const file = e.target.files[0];
             if(!file) return;
@@ -844,22 +935,20 @@
             reader.readAsDataURL(file);
         };
 
-        // ------------------ تغيير تفضيل ترتيب الوسائط ------------------
         window.updateChatLayoutPref = async (value) => {
             if(!currentUserData) return;
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
                     chatLayout: value
                 });
-                currentUserData.chatLayout = value; // التحديث محلياً فوراً
+                currentUserData.chatLayout = value; 
                 showToast('تم حفظ تفضيلات الدردشة بنجاح', 'success');
-                renderChat(); // إعادة رسم الدردشة لتطبيق الشكل الجديد
+                renderChat(); 
             } catch(e) {
                 showToast('حدث خطأ أثناء حفظ الإعدادات', 'warning');
             }
         };
 
-        // ------------------ ألوان الدردشة ------------------
         window.toggleChatColorPicker = () => {
             document.getElementById('chatColorPicker').classList.toggle('hidden');
         };
@@ -868,11 +957,9 @@
             selectedChatColor = colorClass;
             document.getElementById('chatColorPicker').classList.add('hidden');
             
-            // تغيير لون أيقونة الإرسال لتعكس اللون المختار
             const sendBtn = document.querySelector('#chatForm button[type="submit"]');
             sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
             
-            // تحديث الدائرة النشطة لتبين اللون الذي تم اختياره
             if (btnElement) {
                 document.querySelectorAll('.color-btn').forEach(b => {
                     b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
@@ -892,8 +979,7 @@
             }
         });
 
-        // ------------------ إدارة رفع الملفات (وتحديث المساحة) ------------------
-        const MAX_FILE_SIZE = 600 * 1024; // 600KB للملف الواحد
+        const MAX_FILE_SIZE = 600 * 1024; 
 
         window.handleChatAttachment = (e) => {
             const file = e.target.files[0];
@@ -933,7 +1019,6 @@
                 return;
             }
 
-            // فحص المساحة الكلية
             const currentStorage = globalFiles.reduce((acc, f) => acc + (f.size || 0), 0);
             if(currentStorage + file.size > MAX_GLOBAL_STORAGE) {
                 showToast('المساحة التخزينية ممتلئة! يرجى حذف بعض الملفات.', 'warning');
@@ -949,7 +1034,7 @@
                     await addDoc(getColRef('files'), {
                         name: file.name,
                         type: file.type,
-                        size: file.size, // إضافة الحجم بالأرقام للحسابات
+                        size: file.size, 
                         sizeStr: sizeStr,
                         data: ev.target.result,
                         uploaderName: currentUserData.name,
@@ -1043,7 +1128,7 @@
                     uid: currentUserAuth.uid,
                     email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                    chatLayout: 'media-top', // التفضيل الافتراضي لترتيب الوسائط
+                    chatLayout: 'media-top', 
                     timestamp: Date.now()
                 };
                 
@@ -1082,18 +1167,20 @@
             setInterval(checkAndSendReminders, 300000);
         }
 
-        // تحديث أجزاء الواجهة التي تعتمد على بيانات المستخدم
         function updateUIWithUserData() {
             if(!currentUserData) return;
             document.getElementById('userName').innerText = currentUserData.name;
             document.getElementById('userRole').innerText = currentUserData.role;
             document.getElementById('userAvatar').src = currentUserData.photoURL;
 
-            // تحديث الإعدادات
             document.getElementById('settingsAvatarPreview').src = currentUserData.photoURL;
             document.getElementById('settingsName').value = currentUserData.name;
             document.getElementById('settingsRole').value = currentUserData.role;
-            // لا يوجد ايميل مسجل إذا كان تسجيل مجهول لكن سنحاول عرضه إن وجد
+            
+            const layoutSelect = document.getElementById('settingsChatLayout');
+            if (layoutSelect) {
+                layoutSelect.value = currentUserData.chatLayout || 'media-top';
+            }
         }
 
         async function logAction(action, details) {
@@ -1114,7 +1201,6 @@
                 snapshot.forEach(docSnap => {
                     const uData = { id: docSnap.id, ...docSnap.data() };
                     globalUsers.push(uData);
-                    // تحديث بيانات المستخدم الحالي إذا تم تعديلها (مثلاً من قبل المدير)
                     if(currentUserData && uData.id === currentUserData.uid) {
                         currentUserData = uData;
                         updateUIWithUserData();
@@ -1159,7 +1245,6 @@
                 updateDashboardStats();
             });
 
-            // الاستماع للملفات (Drive) وتحديث شريط المساحة
             onSnapshot(getColRef('files'), (snapshot) => {
                 globalFiles = [];
                 snapshot.forEach(doc => globalFiles.push({ id: doc.id, ...doc.data() }));
@@ -1168,7 +1253,6 @@
                 updateStorageProgress();
             });
 
-            // الاستماع للمجموعات
             onSnapshot(getColRef('groups'), (snapshot) => {
                 globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
                 snapshot.forEach(doc => {
@@ -1194,7 +1278,6 @@
             });
         }
 
-        // تحديث شريط المساحة للملفات
         function updateStorageProgress() {
             const currentStorage = globalFiles.reduce((acc, file) => acc + (file.size || 0), 0);
             const percentage = Math.min((currentStorage / MAX_GLOBAL_STORAGE) * 100, 100);
@@ -1208,7 +1291,6 @@
             text.innerText = `${formatBytes(currentStorage, 1)} / 15 MB`;
             bar.style.width = `${percentage}%`;
 
-            // تغيير اللون بناءً على النسبة
             bar.classList.remove('bg-green-500', 'bg-orange-500', 'bg-red-600');
             if(percentage < 50) {
                 bar.classList.add('bg-green-500');
@@ -1229,11 +1311,10 @@
                 bar.classList.add('bg-red-600');
                 warning.classList.remove('hidden');
                 uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                inputField.disabled = true; // منع الرفع
+                inputField.disabled = true; 
             }
         }
 
-        // رسم قائمة المجموعات المنسدلة في الـ Sidebar
         function renderChatSubMenu() {
             const subMenu = document.getElementById('chatSubMenu');
             subMenu.innerHTML = '';
@@ -1260,7 +1341,6 @@
             }
         }
 
-        // التنقل بين المجموعات عبر الـ Sidebar
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
             window.showSection('chat');
@@ -1273,7 +1353,6 @@
             }
         };
 
-        // إنشاء مجموعة جديدة
         document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUserData || currentUserData.role !== 'CEO') return;
@@ -1340,13 +1419,11 @@
             document.getElementById('stat-completed').innerText = globalTasks.filter(t => t.status === 'completed').length;
         }
 
-        // فتح مودال تعديل بيانات الموظف
         window.openEditEmployeeModal = (id, name, role) => {
             document.getElementById('editEmpId').value = id;
             document.getElementById('editEmpName').value = name;
             
             const selectRole = document.getElementById('editEmpRole');
-            // إذا كان الموظف CEO (وإن لم يكن من المفترض تغييره)، نضعه مؤقتاً
             if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
                 selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
             }
@@ -1355,7 +1432,6 @@
             window.openModal('editEmployeeModal');
         };
 
-        // حفظ بيانات الموظف المعدلة
         document.getElementById('editEmployeeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(currentUserData.role !== 'CEO') return;
@@ -1420,12 +1496,10 @@
                 const isMyTask = task.assigneeId === currentUserData.uid;
                 const isCEO = currentUserData.role === 'CEO';
                 
-                // الموظف يرى مهامه فقط
                 if (!isCEO && !isMyTask) return;
 
                 let actionsHtml = '';
                 
-                // الموظف يغير حالة المهمة، المدير لا يمكنه التغيير بل الحذف فقط
                 if(isMyTask && !isCEO) {
                     if(task.status === 'pending') {
                         actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">البدء بالتنفيذ</button>`;
@@ -1434,7 +1508,6 @@
                     }
                 }
 
-                // الحذف متاح للمدير فقط
                 const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : '';
 
                 const card = `
@@ -1458,7 +1531,6 @@
             });
         }
 
-        // رسم قسم الملفات
         function renderDriveFiles() {
             const pinnedContainer = document.getElementById('pinnedFilesContainer');
             const allContainer = document.getElementById('allFilesContainer');
@@ -1477,7 +1549,6 @@
                 else if(file.type.includes('pdf')) fileIcon = 'fa-file-pdf text-red-600';
                 else if(file.type.includes('word') || file.type.includes('document')) fileIcon = 'fa-file-word text-blue-700';
 
-                // أزرار التحكم في الأسفل
                 let controlsHtml = `
                     <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-gray-500 hover:text-red-500 w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="حذف">
                         <i class="fa-solid fa-trash"></i>
@@ -1487,7 +1558,6 @@
                     </button>
                 `;
 
-                // عرض معاينة
                 let previewHtml = `<div class="h-24 bg-gray-50 flex items-center justify-center text-4xl"><i class="fa-solid ${fileIcon}"></i></div>`;
                 if(file.type.startsWith('image/')) {
                     previewHtml = `<div class="h-24 bg-gray-200 cursor-pointer" onclick="window.openMedia('${file.data}', '${file.type}')"><img src="${file.data}" class="w-full h-full object-cover hover:opacity-80 transition"></div>`;
@@ -1506,7 +1576,6 @@
                             <p class="text-[10px] text-gray-500 mt-auto">بواسطة: ${file.uploaderName}${fileSizeText}</p>
                         </div>
                         
-                        <!-- شريط الأزرار في الأسفل -->
                         <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm p-2 opacity-0 group-hover:opacity-100 transition-opacity border-t border-gray-100 pointer-events-none flex justify-end">
                             <div class="pointer-events-auto flex items-center gap-2">
                                 <a href="${file.data}" download="${file.name}" class="text-gray-500 hover:text-primary w-8 h-8 flex items-center justify-center bg-gray-100 rounded transition" title="تحميل">
@@ -1527,7 +1596,6 @@
                 }
             });
 
-            // حالات إذا كانت القائمة فارغة
             if(!hasPinned) {
                 pinnedContainer.innerHTML = '<div class="col-span-full text-center py-4 bg-gray-50 border border-dashed border-gray-200 rounded-lg text-gray-400 text-xs"><i class="fa-solid fa-thumbtack mb-1"></i><p>لا توجد ملفات مثبتة حالياً</p></div>';
             }
@@ -1559,7 +1627,6 @@
             });
         }
 
-        // رسم محتوى الدردشة مع احترام تفضيلات المستخدم (وسائط فوق أم نص فوق)
         function renderChat() {
             const chatBox = document.getElementById('chatMessages');
             chatBox.innerHTML = '';
@@ -1578,16 +1645,13 @@
                 const formattedText = msg.text ? msg.text.replace(/@([^\s]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>') : '';
                 const alignClass = isMe ? 'justify-start' : 'justify-end';
                 
-                // تطبيق لون الرسالة للجميع بغض النظر عمن أرسلها
                 const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white border border-gray-200 text-gray-800');
                 
-                // إذا كان للمربع لون غامق، اجعل اسم المرسل بلون فاتح ليظهر بوضوح، والعكس صحيح
                 const isColored = msg.color && msg.color !== 'bg-white';
                 const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 font-bold';
                 
                 const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
                 
-                // جلب صورة صاحب الرسالة
                 const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName)}&background=00839b&color=fff`;
 
                 let attachmentHtml = '';
@@ -1601,7 +1665,6 @@
                     }
                 }
 
-                // بناء محتوى الرسالة بناءً على إعدادات المستخدم المخصصة
                 let messageBody = '';
                 if (layoutPref === 'text-top') {
                     messageBody = `
@@ -1729,9 +1792,9 @@
                     text: text,
                     uid: currentUserData.uid,
                     senderName: currentUserData.name,
-                    photoURL: currentUserData.photoURL, // إضافة الصورة مع الرسالة
+                    photoURL: currentUserData.photoURL, 
                     groupId: currentGroupId,
-                    color: selectedChatColor, // حفظ اللون المختار
+                    color: selectedChatColor, 
                     timestamp: Date.now()
                 };
 
