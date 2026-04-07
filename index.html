@@ -33,31 +33,26 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans overflow-hidden h-screen flex flex-col">
 
-    <!-- 1. LOADING SCREEN -->
-    <div id="loading-view" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-50">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-brand-teal"></div>
-    </div>
-
-    <!-- 2. LOGIN SCREEN -->
-    <div id="login-view" class="hidden fixed inset-0 bg-gray-100 flex items-center justify-center z-40" style="background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
+    <!-- 1. LOGIN SCREEN (Shows Instantly) -->
+    <div id="login-view" class="fixed inset-0 bg-gray-100 flex items-center justify-center z-40" style="background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px); background-size: 20px 20px;">
         <div class="bg-white p-10 rounded-2xl shadow-xl w-full max-w-md text-center border-t-4 border-brand-teal">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Quill Logo" class="h-16 mx-auto mb-6" />
             <h1 class="text-2xl font-bold text-gray-800 mb-2">مساحة عمل نظام الشركة</h1>
             <p class="text-gray-500 mb-8">سجل الدخول للوصول إلى المهام وفريق العمل والمحادثات</p>
             
-            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium">
-                <svg viewBox="0 0 24 24" class="h-5 w-5">
+            <button id="btn-google-login" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 shrink-0">
                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                     <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                تسجيل الدخول باستخدام Google
+                <span id="btn-login-text">تسجيل الدخول باستخدام Google</span>
             </button>
         </div>
     </div>
 
-    <!-- 3. ONBOARDING SCREEN -->
+    <!-- 2. ONBOARDING SCREEN -->
     <div id="onboarding-view" class="hidden fixed inset-0 bg-gray-100 flex items-center justify-center z-40">
         <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border-t-4 border-brand-teal">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إعداد الملف الشخصي</h2>
@@ -82,7 +77,7 @@
         </div>
     </div>
 
-    <!-- 4. MAIN APP LAYOUT -->
+    <!-- 3. MAIN APP LAYOUT -->
     <div id="app-layout" class="hidden flex h-screen w-full relative">
         
         <!-- Sidebar Overlay -->
@@ -289,13 +284,7 @@
         // === CONFIGURATION ===
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
-            : {
-                // To deploy externally, insert your Firebase Config here:
-                // apiKey: "AIza...",
-                // authDomain: "quill-world.firebaseapp.com",
-                // projectId: "quill-world",
-                // ...
-              };
+            : {};
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -316,7 +305,6 @@
 
         // === DOM ELEMENTS ===
         const views = {
-            loading: document.getElementById('loading-view'),
             login: document.getElementById('login-view'),
             onboarding: document.getElementById('onboarding-view'),
             app: document.getElementById('app-layout')
@@ -329,23 +317,13 @@
             chat: document.getElementById('view-chat')
         };
 
-        // === INITIALIZATION ===
-        async function init() {
-            // Request Notification Permission early if supported
+        // === INITIALIZATION (Instant Load) ===
+        function init() {
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
 
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
-
+            // الاستماع لحالة تسجيل الدخول فوراً بدون أي تأخير (بدون شاشة تحميل)
             onAuthStateChanged(auth, async (user) => {
                 currentUser = user;
                 if (user && !user.isAnonymous) {
@@ -355,6 +333,13 @@
                     cleanupListeners();
                 }
             });
+
+            // تسجيل الدخول المجهول يعمل في الخلفية حتى لا يسبب أي بطء في الصفحة
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
+            } else {
+                signInAnonymously(auth).catch(console.error);
+            }
         }
 
         // === AUTH LOGIC ===
@@ -372,7 +357,12 @@
         });
 
         async function checkUserOnboarding() {
-            showView('loading');
+            // تغيير نص الزر بدلاً من إظهار شاشة تحميل مزعجة
+            const loginBtn = document.getElementById('btn-google-login');
+            const loginText = document.getElementById('btn-login-text');
+            if(loginText) loginText.innerText = 'جاري تحضير مساحة العمل...';
+            if(loginBtn) loginBtn.disabled = true;
+
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid);
             const docSnap = await getDoc(docRef);
             
@@ -385,6 +375,9 @@
                 setupOnboarding();
                 showView('onboarding');
             }
+
+            if(loginText) loginText.innerText = 'تسجيل الدخول باستخدام Google';
+            if(loginBtn) loginBtn.disabled = false;
         }
 
         // === ONBOARDING ===
@@ -392,8 +385,6 @@
             const nameInput = document.getElementById('ob-name');
             nameInput.value = currentUser.displayName || '';
             
-            // Check available roles (Hide CEO if exists)
-            // Fetch once without listener for onboarding setup
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (snap) => {
                 const users = snap.docs.map(d => d.data());
                 const hasCEO = users.some(u => u.role === 'CEO');
@@ -402,7 +393,7 @@
                 select.innerHTML = '<option value="" disabled selected>اختر وظيفتك...</option>';
                 
                 ROLES.forEach(r => {
-                    if (r === 'CEO' && hasCEO) return; // skip CEO
+                    if (r === 'CEO' && hasCEO) return;
                     const opt = document.createElement('option');
                     opt.value = r;
                     opt.innerText = r;
@@ -428,7 +419,7 @@
                 email: currentUser.email,
                 role: role,
                 photoURL: currentUser.photoURL,
-                joinedAt: Date.now() // using Date.now for simpler local sorting
+                joinedAt: Date.now()
             };
 
             try {
@@ -448,39 +439,30 @@
         function setupAppListeners() {
             cleanupListeners();
 
-            // 1. Users Listener
             const uSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'users'), (snap) => {
                 employeesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                
-                // Update current user if changed
                 const current = employeesData.find(e => e.id === currentUser.uid);
                 if(current) dbUser = current;
-
                 updateUI();
             });
 
-            // 2. Tasks Listener
             const tSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), (snap) => {
                 tasksData = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                // Rule 2: Sort locally
                 tasksData.sort((a, b) => b.createdAt - a.createdAt);
                 updateUI();
             });
 
-            // 3. Messages Listener
             const mSub = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), (snap) => {
                 messagesData = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 messagesData.sort((a, b) => a.timestamp - b.timestamp);
                 renderChat();
             });
 
-            // 4. Notifications Listener (Private Data) - Rule 1 & Rule 3 combined
             const nSub = onSnapshot(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'notifications'), (snap) => {
                 notificationsData = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 notificationsData.sort((a, b) => b.timestamp - a.timestamp);
                 renderNotifications();
                 
-                // Trigger browser notification for newly added unread items
                 snap.docChanges().forEach((change) => {
                     if (change.type === "added" && !change.doc.data().read) {
                         showBrowserNotification(change.doc.data().title, change.doc.data().body);
@@ -499,7 +481,7 @@
         // === UI UPDATES ===
         function showView(viewId) {
             Object.values(views).forEach(v => v.classList.add('hidden'));
-            views[viewId].classList.remove('hidden');
+            if(views[viewId]) views[viewId].classList.remove('hidden');
         }
 
         let currentActiveTab = 'dashboard';
@@ -508,7 +490,6 @@
             Object.values(contentViews).forEach(v => v.classList.add('hidden'));
             if(contentViews[target]) contentViews[target].classList.remove('hidden');
             
-            // Update Sidebar Active State
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 if(btn.dataset.target === target) {
                     btn.classList.add('bg-white/20', 'font-bold');
@@ -519,12 +500,10 @@
                 }
             });
 
-            // Update Header
             const titles = { dashboard: 'لوحة القيادة', tasks: 'المهام والمشاريع', employees: 'دليل الموظفين', chat: 'المحادثة العامة' };
             document.getElementById('header-title').innerText = titles[target] || '';
             
             if(window.innerWidth < 768) toggleSidebar(false);
-            
             if(target === 'chat') setTimeout(scrollChatToBottom, 100);
             updateUI();
         }
@@ -532,12 +511,10 @@
         function updateUI() {
             if(!dbUser) return;
             
-            // Sidebar User Info
             document.getElementById('sidebar-user-name').innerText = dbUser.name;
             document.getElementById('sidebar-user-role').innerText = dbUser.role;
             document.getElementById('sidebar-user-avatar').innerText = dbUser.name.charAt(0);
 
-            // Dashboard
             if(currentActiveTab === 'dashboard') {
                 document.getElementById('dash-name').innerText = dbUser.name.split(' ')[0];
                 document.getElementById('dash-role').innerText = dbUser.role;
@@ -548,10 +525,8 @@
                 document.getElementById('stat-employees').innerText = employeesData.length;
             }
 
-            // Tasks
             if(currentActiveTab === 'tasks') {
                 renderTasks();
-                // Update assignee dropdown
                 const sel = document.getElementById('task-assignee');
                 const currVal = sel.value;
                 sel.innerHTML = `<option value="${currentUser.uid}">إسناد إلي (أنا)</option>`;
@@ -561,7 +536,6 @@
                 sel.value = currVal || currentUser.uid;
             }
 
-            // Employees
             if(currentActiveTab === 'employees') {
                 document.getElementById('emp-count').innerText = employeesData.length;
                 const grid = document.getElementById('employees-grid');
@@ -580,7 +554,6 @@
                     `;
                 });
 
-                // Empty slots
                 const emptySlots = Math.max(0, 10 - employeesData.length);
                 for(let i=0; i<emptySlots; i++) {
                     grid.innerHTML += `
@@ -630,7 +603,6 @@
                 col.querySelector('.tasks-container').appendChild(taskEl);
             });
 
-            // Update Counts
             Object.keys(cols).forEach(key => {
                 cols[key].querySelector('.count').innerText = tasksData.filter(t => t.status === key).length;
             });
@@ -661,7 +633,6 @@
             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId));
         };
 
-
         // === CHAT & MENTION LOGIC ===
         const chatInput = document.getElementById('chat-input');
         const mentionMenu = document.getElementById('mention-menu');
@@ -675,15 +646,11 @@
                 return;
             }
 
-            let lastDate = null;
-
             messagesData.forEach(msg => {
                 const sender = employeesData.find(e => e.id === msg.senderId) || { name: 'مستخدم محذوف', role: '' };
                 const isMe = msg.senderId === currentUser?.uid;
                 
-                // Format text: Highlight mentions
                 let formattedText = msg.text;
-                // Simple naive highlight for anything starting with @
                 formattedText = formattedText.replace(/@([\u0600-\u06FFa-zA-Z0-9_ ]+)/g, (match) => {
                     return `<span class="bg-teal-100 text-teal-800 px-1 rounded text-xs font-bold mx-1" dir="rtl">${match}</span>`;
                 });
@@ -717,14 +684,10 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // Mention Button Click
         document.getElementById('btn-mention').addEventListener('click', (e) => {
             e.stopPropagation();
-            if(mentionMenu.classList.contains('hidden')) {
-                showMentionMenu();
-            } else {
-                mentionMenu.classList.add('hidden');
-            }
+            if(mentionMenu.classList.contains('hidden')) showMentionMenu();
+            else mentionMenu.classList.add('hidden');
         });
 
         function showMentionMenu() {
@@ -745,14 +708,12 @@
             mentionMenu.classList.remove('hidden');
         }
 
-        // Hide mention menu when clicking outside
         document.addEventListener('click', (e) => {
             if(!mentionMenu.contains(e.target) && e.target.id !== 'btn-mention') {
                 mentionMenu.classList.add('hidden');
             }
         });
 
-        // Chat Input Form Submit
         document.getElementById('form-chat').addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = chatInput.value.trim();
@@ -760,7 +721,6 @@
 
             chatInput.value = '';
             
-            // Detect Mentions
             const mentionedUsers = [];
             employeesData.forEach(emp => {
                 if (text.includes(`@${emp.name}`) && emp.id !== currentUser.uid) {
@@ -768,7 +728,6 @@
                 }
             });
 
-            // Save Message (Public)
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'messages'), {
                 text: text,
                 senderId: currentUser.uid,
@@ -776,7 +735,6 @@
                 mentioned: mentionedUsers.map(u => u.id)
             });
 
-            // Send Notifications (Private subcollections)
             for (const emp of mentionedUsers) {
                 await addDoc(collection(db, 'artifacts', appId, 'users', emp.id, 'notifications'), {
                     title: 'إشارة في المحادثة',
@@ -788,7 +746,6 @@
             }
         });
 
-        // Enter key to submit
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
