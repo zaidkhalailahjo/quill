@@ -109,9 +109,9 @@
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         
         <!-- الشريط العلوي المُعدل -->
-        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0">
-            <!-- اليمين (الحساب، الإشعارات، زر القائمة للموبايل) -->
-            <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse">
+        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0 relative">
+            <!-- اليمين (الحساب، الإعدادات، الإشعارات، زر القائمة للموبايل) -->
+            <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse z-10">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-2">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
@@ -122,21 +122,25 @@
                         <p id="userRole" class="text-[10px] md:text-xs text-secondary font-bold"></p>
                     </div>
                 </div>
-                <button onclick="window.requestNotifications()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="تفعيل الإشعارات">
-                    <i class="fa-solid fa-bell"></i>
+                <button onclick="window.location.hash='settings'" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="الإعدادات">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
-                <button id="logoutBtn" class="hidden text-red-500 hover:bg-red-50 p-2 rounded transition" title="تسجيل الخروج">
-                    <i class="fa-solid fa-sign-out-alt"></i>
+                <button onclick="window.showLatestNotification()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="آخر إشعار">
+                    <i class="fa-solid fa-bell"></i>
                 </button>
             </div>
             
-            <!-- اليسار (اللوجو، زر الرجوع، العنوان) -->
-            <div class="flex items-center flex-row-reverse">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2">
-                <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden text-white bg-secondary hover:bg-primary px-3 py-1.5 rounded-lg mr-4 flex items-center gap-2 font-bold transition-colors text-sm shadow-sm">
+            <!-- المنتصف (زر العودة للرئيسية) -->
+            <div class="absolute inset-x-0 top-0 h-full flex items-center justify-center pointer-events-none w-full z-0">
+                <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden pointer-events-auto text-white bg-secondary hover:bg-primary px-4 py-2 rounded-xl flex items-center gap-2 font-bold transition-colors text-sm shadow-md">
                     <span class="hidden sm:inline">خروج للرئيسية</span> <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary hidden md:block mr-4">الرئيسية - التطبيقات</h2>
+                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary hidden md:block">الرئيسية - التطبيقات</h2>
+            </div>
+
+            <!-- اليسار (اللوجو) -->
+            <div class="flex items-center flex-row-reverse z-10">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2">
             </div>
         </header>
 
@@ -151,7 +155,7 @@
             </div>
             
             <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
-                <button id="nav-home-grid-btn" onclick="window.showSection('home-grid')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
+                <button id="nav-home-grid-btn" onclick="window.location.hash='home-grid'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
                     <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm">الرئيسية</span>
                 </button>
                 <button id="nav-dashboard-btn" onclick="window.location.hash='dashboard'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="dashboard">
@@ -253,14 +257,6 @@
                             <span id="homeChatBadge" class="absolute -top-2 -right-2 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                         </div>
                         <span class="font-bold text-gray-700 text-sm">المناقشة</span>
-                    </div>
-
-                    <!-- ALL -->
-                    <div onclick="window.location.hash='settings'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-gray-300 group">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-600 group-hover:-translate-y-1 transition-transform duration-300">
-                            <i class="fa-solid fa-gear text-3xl"></i>
-                        </div>
-                        <span class="font-bold text-gray-700 text-sm">الإعدادات</span>
                     </div>
 
                     <!-- CEO Only -->
@@ -748,19 +744,25 @@
         }
 
         let hasRequestedNotification = false;
+        let latestNotificationMsg = 'لا توجد إشعارات جديدة حالياً';
+
         window.requestNotifications = () => {
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
                 Notification.requestPermission().then(permission => {
                     if (permission === "granted") showToast('تم تفعيل إشعارات المتصفح بنجاح', 'success');
                 });
-            } else if (Notification.permission === "granted") {
-                showToast('الإشعارات مفعلة مسبقاً', 'success');
-            } else {
-                showToast('الإشعارات محظورة من قبل المتصفح، يرجى تفعيلها من الإعدادات', 'warning');
+            } else if (Notification.permission === "granted" || Notification.permission === "denied") {
+                // If already granted or denied, clicking the bell acts as a history checker for the latest notification
+                showToast(latestNotificationMsg, 'info');
             }
         };
 
+        window.showLatestNotification = () => {
+            showToast(latestNotificationMsg, 'info');
+        };
+
         function sendPushNotification(title, body) {
+            latestNotificationMsg = `${title}: ${body}`;
             if ("Notification" in window && Notification.permission === "granted") {
                 new Notification(title, { 
                     body: body, 
@@ -1083,12 +1085,15 @@
                 'chat': 'المناقشة',
                 'settings': 'الإعدادات'
             };
-            document.getElementById('page-title').innerText = titles[sectionId] || 'النظام';
             
+            // التعامل مع زر الرجوع والعنوان
             if (sectionId === 'home-grid') {
                 document.getElementById('backToHomeBtn').classList.add('hidden');
+                document.getElementById('page-title').innerText = titles[sectionId] || 'النظام';
+                document.getElementById('page-title').classList.remove('hidden');
             } else {
                 document.getElementById('backToHomeBtn').classList.remove('hidden');
+                document.getElementById('page-title').classList.add('hidden');
             }
             
             document.querySelectorAll('.nav-btn').forEach(b => {
@@ -1507,11 +1512,8 @@
             startDatabaseListeners();
             handleHashChange();
             
-            // Heartbeat for online status (every 1 min)
             updateActivity();
             setInterval(updateActivity, 60000);
-            
-            // Timers
             setInterval(checkAndSendReminders, 300000);
         }
 
@@ -1620,21 +1622,22 @@
             });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
+                const oldGroupsCount = globalGroups.length;
                 globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
+                
+                let foundCurrentGroup = false;
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
                         globalGroups.push({ id: doc.id, ...data });
+                        if (doc.id === currentGroupId) foundCurrentGroup = true;
                     }
                 });
                 
-                if(!globalGroups.find(g => g.id === currentGroupId)) {
+                // التأكد من عدم الخروج التلقائي عند التحديث (للجروب الحالي)
+                if(!foundCurrentGroup && currentGroupId !== 'global') {
                     currentGroupId = 'global';
-                    renderChatSidebarList();
-                    // Need to wait slightly for globalGroups to be processed if making immediate selection
-                    setTimeout(() => {
-                        // If it fails to find currentGroupId it reverts to global, so we need to add the newly created group manually
-                    }, 50);
                 }
                 
                 renderChatSidebarList();
@@ -1708,7 +1711,6 @@
                     badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
                 }
 
-                // إضافة للقائمة الجانبية الداخلية للدردشة (Desktop)
                 if (innerList) {
                     innerList.innerHTML += `
                         <button onclick="window.selectGroup('${g.id}')" class="w-full text-right py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white shadow-sm text-primary font-bold border border-gray-100' : 'text-gray-600 hover:bg-gray-100'}">
@@ -1719,7 +1721,6 @@
                     `;
                 }
 
-                // إضافة للقائمة المنسدلة في الهاتف (Mobile)
                 if (mobileList) {
                     mobileList.innerHTML += `
                         <button onclick="window.selectGroup('${g.id}')" class="text-right w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
@@ -1792,24 +1793,17 @@
                     createdBy: currentUserData.uid,
                     timestamp: Date.now()
                 });
-                
-                // Add Locally to prevent 'not found' during instant redirection before Firebase syncs
-                globalGroups.push({
-                    id: newGroupRef.id,
-                    name: groupName,
-                    members: members,
-                    createdBy: currentUserData.uid,
-                    timestamp: Date.now()
-                });
 
                 window.closeModal('createGroupModal');
                 showToast('تم إنشاء المجموعة بنجاح!', 'success');
                 
                 currentGroupId = newGroupRef.id;
-                renderChatSidebarList();
-                window.showSection('chat');
+                // توجيه تلقائي
+                window.location.hash = 'chat';
                 logAction('إنشاء مجموعة', `تم إنشاء مجموعة محادثة جديدة "${groupName}"`);
-            } catch(e) {}
+            } catch(err) {
+                showToast('حدث خطأ أثناء الإنشاء', 'warning');
+            }
         });
 
         window.clearOrDeleteGroup = async () => {
@@ -2001,7 +1995,6 @@
                 
                 let formattedText = msg.text || '';
                 if (formattedText) {
-                    // معالجة @الجميع أولاً
                     if (formattedText.includes('@الجميع')) {
                         formattedText = formattedText.replace(/@الجميع/g, '<span class="text-white font-bold bg-red-500/80 px-1 rounded mx-1">@الجميع</span>');
                     }
@@ -2212,7 +2205,6 @@
 
                 await addDoc(getColRef('chat'), messageObj);
 
-                // إرسال الإيميلات عند المنشن (أو @الجميع)
                 if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
                     const chatLink = window.location.origin + window.location.pathname + '#chat';
                     const activeGroup = globalGroups.find(g => g.id === currentGroupId);
@@ -2222,7 +2214,6 @@
                     globalUsers.forEach(u => {
                         if (u.uid === currentUserData.uid) return; 
                         
-                        // فحص إذا كان المستخدم من ضمن الجروب (إلا إذا كانت الدردشة العامة)
                         if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
 
                         const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -2230,7 +2221,6 @@
                         
                         if ((isMentionAll || regex.test(text)) && u.email && u.email !== 'no-email@company.com') {
                             
-                            // لا نرسل ايميل إذا كان الموظف نشطاً الآن (آخر نشاط أقل من دقيقتين)
                             const isOnline = u.lastActive && (Date.now() - u.lastActive < 2 * 60 * 1000);
                             
                             if (!isOnline) {
