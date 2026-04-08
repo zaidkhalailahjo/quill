@@ -92,7 +92,6 @@
                     <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
                     <select id="setupRole" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
                         <option value="" disabled selected>-- اختر وظيفتك --</option>
-                        <!-- لا يوجد خيار CEO للموظفين الجدد -->
                         <option value="technical team supervisor">Technical Team Supervisor</option>
                         <option value="Technical Engineer">Technical Engineer</option>
                         <option value="accountant">Accountant</option>
@@ -455,6 +454,10 @@
             </div>
             <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
                 <div><label class="block text-sm text-gray-600 mb-1">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></div>
+                <div>
+                    <label class="block text-sm text-gray-600 mb-1">وقت وتاريخ الإنجاز المطلوب</label>
+                    <input type="datetime-local" id="taskDeadline" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                </div>
                 <div><label class="block text-sm text-gray-600 mb-1">التفاصيل</label><textarea id="taskDesc" rows="2" class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></textarea></div>
                 <div>
                     <label class="block text-sm text-gray-600 mb-1">إسناد إلى الموظف</label>
@@ -595,12 +598,23 @@
         const db = getFirestore(app);
         const appId = 'quill-world-system';
 
-        const EMAILJS_SERVICE_ID = 'service_ibewued'; 
-        const EMAILJS_TEMPLATE_ID = 'template_iro6gon'; 
-        const EMAILJS_REMINDER_TEMPLATE_ID = 'template_6pbna5z'; 
-        const EMAILJS_PUBLIC_KEY = '1jeick6OIh3v4znyt';
+        // الحساب الأول (إشعار مهمة جديدة، وتذكير الموظف)
+        const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
+        const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
+        const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
+        const EMAILJS_PUBLIC_KEY_1 = '1jeick6OIh3v4znyt';
 
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+        // الحساب الثاني (المنشن، ودعوة الاجتماع)
+        const EMAILJS_SERVICE_ID_2 = 'service_cf5myn4'; 
+        const EMAILJS_TEMPLATE_MENTION = 'template_93xzb4z'; 
+        const EMAILJS_TEMPLATE_MEETING = 'template_j95rjoh'; 
+        const EMAILJS_PUBLIC_KEY_2 = 'V9oeJRZybd-4PFBdz';
+
+        // الحساب الثالث (إنجاز المهمة، وتأخير المهمة للمدير)
+        const EMAILJS_SERVICE_ID_3 = 'service_kiswf1m';
+        const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
+        const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
+        const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -711,6 +725,26 @@
                 window.closeModal('createMeetingModal');
                 showToast(status === 'scheduled' ? 'تمت جدولة الاجتماع بنجاح' : 'تم بدء الاجتماع', 'success');
                 logAction('اجتماع', `أنشأ اجتماع: ${title}`);
+
+                // إرسال إيميل الدعوة (للحساب الثاني)
+                const meetingLink = window.location.origin + window.location.pathname + '#meetings';
+                const timeStr = scheduledTime ? new Date(scheduledTime).toLocaleString('ar-EG') : 'الآن';
+                
+                invited.forEach(uid => {
+                    if (uid === currentUserData.uid) return; 
+                    const user = globalUsers.find(u => u.id === uid);
+                    if (user && user.email && user.email !== 'no-email@company.com') {
+                        emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MEETING, {
+                            to_email: user.email,
+                            to_name: user.name,
+                            creator_name: currentUserData.name,
+                            meeting_title: title,
+                            meeting_time: timeStr,
+                            meeting_link: meetingLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_2);
+                    }
+                });
             } catch(e) {}
         });
 
@@ -1051,7 +1085,7 @@
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
                 };
-                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_REMINDER_TEMPLATE_ID, templateParams);
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, templateParams, EMAILJS_PUBLIC_KEY_1);
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
                 });
@@ -1062,6 +1096,7 @@
             if(globalTasks.length === 0 || globalUsers.length === 0) return;
             const now = Date.now();
             const THIRTY_SIX_HOURS = 36 * 60 * 60 * 1000; 
+            const ceoUser = globalUsers.find(u => u.role === 'CEO');
 
             globalTasks.forEach(task => {
                 if(task.status !== 'completed') {
@@ -1069,9 +1104,41 @@
                     const timePassed = now - lastTimeChecked;
 
                     if(timePassed >= THIRTY_SIX_HOURS) {
+                        
+                        // تحديث وقت آخر تذكير حتى لا يرسل بشكل متكرر
+                        updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id), {
+                            lastReminder: Date.now()
+                        });
+
+                        // 1. إرسال تذكير للموظف (الحساب الأول)
                         const assignedUser = globalUsers.find(u => u.id === task.assigneeId);
                         if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
-                            sendReminderEmail(assignedUser.email, task.assigneeName, task.title, task.desc, task.id);
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, {
+                                to_email: assignedUser.email,
+                                to_name: task.assigneeName,
+                                task_title: task.title,
+                                task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
+                                task_link: taskLink, 
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_1);
+                        }
+
+                        // 2. إرسال تذكير للمدير (الحساب الثالث)
+                        if (ceoUser && ceoUser.email) {
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
+                            
+                            emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_DELAYED, {
+                                ceo_email: ceoUser.email,
+                                ceo_name: ceoUser.name,
+                                employee_name: task.assigneeName,
+                                task_title: task.title,
+                                task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
+                                task_deadline: deadlineStr,
+                                task_link: taskLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_3);
                         }
                     }
                 }
@@ -1089,7 +1156,7 @@
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
                 };
-                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_NEW_TASK, templateParams, EMAILJS_PUBLIC_KEY_1);
             } catch (error) {}
         }
 
@@ -1703,9 +1770,15 @@
 
                 const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : '';
 
+                const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
+                const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
+
                 const card = `
                     <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 ${task.status === 'completed' ? 'border-r-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-r-secondary' : 'border-r-gray-400')}">
-                        <h4 class="font-bold text-gray-800 text-xs md:text-sm mb-1 ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-gray-800 text-xs md:text-sm ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
+                        </div>
+                        <p class="inline-block px-2 py-1 rounded text-[9px] font-bold mb-2 ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}"><i class="fa-regular fa-clock"></i> مطلوب: ${deadlineStr}</p>
                         <p class="text-[10px] md:text-xs text-gray-500 mb-3">${task.desc}</p>
                         <div class="flex justify-between items-center pt-2 border-t border-gray-100">
                             <div class="flex items-center text-[10px] md:text-xs text-primary font-bold bg-blue-50 px-2 py-1 rounded">
@@ -1879,6 +1952,8 @@
             const assigneeName = assigneeSelect.options[assigneeSelect.selectedIndex].text.split(' (')[0];
             const title = document.getElementById('taskTitle').value;
             const desc = document.getElementById('taskDesc').value;
+            const deadlineVal = document.getElementById('taskDeadline').value;
+            const deadlineTime = new Date(deadlineVal).getTime();
 
             try {
                 await addDoc(getColRef('tasks'), {
@@ -1886,6 +1961,7 @@
                     desc: desc,
                     assigneeId: assigneeId,
                     assigneeName: assigneeName,
+                    deadline: deadlineTime,
                     status: 'pending',
                     timestamp: Date.now()
                 });
@@ -1907,7 +1983,24 @@
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
                 let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
                 logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
-                if(newStatus === 'completed') showToast('أحسنت! تم إنجاز المهمة.', 'success');
+                
+                if(newStatus === 'completed') {
+                    showToast('أحسنت! تم إنجاز المهمة.', 'success');
+                    
+                    // إرسال إيميل للمدير (الحساب الثالث)
+                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
+                    if (ceoUser && ceoUser.email) {
+                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
+                            ceo_email: ceoUser.email,
+                            ceo_name: ceoUser.name,
+                            employee_name: currentUserData.name,
+                            task_title: taskTitle,
+                            task_link: taskLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_3);
+                    }
+                }
             } catch(e) {}
         };
 
@@ -1946,6 +2039,26 @@
                 }
 
                 await addDoc(getColRef('chat'), messageObj);
+
+                // إرسال إيميل لمن تم ذكره (المنشن) باستخدام الحساب الثاني
+                const chatLink = window.location.origin + window.location.pathname + '#chat';
+                const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'الدردشة';
+                
+                globalUsers.forEach(u => {
+                    const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`@${safeName}`, 'g');
+                    if (regex.test(text) && u.email && u.email !== 'no-email@company.com') {
+                        emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
+                            to_email: u.email,
+                            to_name: u.name,
+                            sender_name: currentUserData.name,
+                            group_name: groupName,
+                            chat_text: text,
+                            chat_link: chatLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_2);
+                    }
+                });
             } catch(e) {}
         });
 
