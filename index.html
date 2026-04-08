@@ -66,8 +66,8 @@
     <!-- شاشة تسجيل الدخول الإلزامية عبر Google -->
     <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مرحباً بك في نظام شركتي</h2>
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مرحباً بك في نظام شركة quill</h2>
             <p class="text-gray-500 mb-8 text-sm">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
             <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
@@ -79,7 +79,7 @@
     <!-- شاشة إعداد الملف الشخصي (لأول مرة) -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 bg-primary p-2 rounded-lg">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain">
             <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">إكمال بيانات الملف الشخصي</h2>
             <p class="text-gray-500 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
             
@@ -107,12 +107,12 @@
     <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3"></div>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
-        <!-- الشريط العلوي الجديد -->
+        <!-- الشريط العلوي -->
         <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0">
             <div class="flex items-center">
                 <!-- الشعار -->
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 ml-2">
-                <!-- زر الرجوع (خروج) -->
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 ml-2 object-contain">
+                <!-- زر الرجوع (خروج للرئيسية) -->
                 <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden text-white bg-secondary hover:bg-primary px-3 py-1.5 rounded-lg ml-4 flex items-center gap-2 font-bold transition-colors text-sm shadow-sm">
                     <i class="fa-solid fa-arrow-right"></i> <span class="hidden sm:inline">خروج للرئيسية</span>
                 </button>
@@ -136,10 +136,65 @@
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 relative">
+        <!-- القائمة الجانبية (للهواتف فقط الآن للتنقل السريع أو عند الحاجة) -->
+        <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
+        <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
+            <div class="p-6 flex items-center justify-between border-b border-white/10">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 object-contain filter brightness-0 invert">
+                <button onclick="window.toggleSidebar()" class="text-white hover:text-gray-300">
+                    <i class="fa-solid fa-xmark text-2xl"></i>
+                </button>
+            </div>
+            
+            <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
+                <button id="nav-home-grid-btn" onclick="window.showSection('home-grid')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
+                    <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm">الرئيسية</span>
+                </button>
+                <button id="nav-dashboard-btn" onclick="window.location.hash='dashboard'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="dashboard">
+                    <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm">لوحات البيانات</span>
+                </button>
+                <button id="nav-employees-btn" onclick="window.location.hash='employees'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
+                    <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm">الموظفون</span>
+                </button>
+                <button id="nav-tasks-btn" onclick="window.location.hash='tasks'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
+                    <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm">المهام</span>
+                </button>
+                <button onclick="window.location.hash='drive'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="drive">
+                    <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm">المستندات</span>
+                </button>
+                <button onclick="window.location.hash='meetings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative" data-section="meetings">
+                    <i class="fa-solid fa-video w-6 text-center ml-3"></i><span class="font-semibold text-sm">الاجتماعات</span>
+                </button>
+                
+                <div class="mt-2">
+                    <button onclick="window.toggleMobileChatMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
+                        <div class="flex items-center">
+                            <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm">المناقشة</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="globalChatBadgeMobile" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
+                            <i id="chatMenuIconMobile" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
+                        </div>
+                    </button>
+                    <div id="chatSubMenuMobile" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                        <!-- Groups in Mobile Sidebar -->
+                    </div>
+                </div>
+
+                <button onclick="window.location.hash='settings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="settings">
+                    <i class="fa-solid fa-gear w-6 text-center ml-3"></i><span class="font-semibold text-sm">الإعدادات</span>
+                </button>
+                
+                <button id="nav-logs-btn" onclick="window.location.hash='logs'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors border-t border-white/10 mt-2 pt-4" data-section="logs">
+                    <i class="fa-solid fa-clock-rotate-left w-6 text-center ml-3"></i><span class="font-semibold text-sm">سجل النظام</span>
+                </button>
+            </nav>
+        </aside>
+
+        <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 relative">
             
             <!-- 0. الرئيسية (التطبيقات) -->
-            <section id="home-grid" class="section-content animate-fade-in">
+            <section id="home-grid" class="section-content animate-fade-in p-4 md:p-0">
                 <div class="mb-8">
                     <h2 class="text-2xl font-bold text-gray-800">التطبيقات</h2>
                     <p class="text-gray-500 text-sm mt-1">اختر التطبيق الذي تود العمل عليه</p>
@@ -216,7 +271,7 @@
             </section>
 
             <!-- 1. لوحة التحكم -->
-            <section id="dashboard" class="section-content animate-fade-in hidden">
+            <section id="dashboard" class="section-content animate-fade-in hidden p-4 md:p-0">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
                     <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-primary">
                         <div><p class="text-xs md:text-sm text-gray-500 mb-1">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
@@ -234,7 +289,7 @@
             </section>
 
             <!-- 2. الموظفين -->
-            <section id="employees" class="section-content hidden animate-fade-in">
+            <section id="employees" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600">فريق العمل المسجل في النظام</p>
                 </div>
@@ -253,7 +308,7 @@
             </section>
 
             <!-- 3. المهام -->
-            <section id="tasks" class="section-content hidden animate-fade-in">
+            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600">إدارة المهام ومتابعة الإنجاز</p>
                     <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
@@ -277,7 +332,7 @@
             </section>
 
             <!-- 4. قسم الملفات -->
-            <section id="drive" class="section-content hidden animate-fade-in">
+            <section id="drive" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
                     <div class="flex justify-between text-sm mb-2 font-bold text-gray-700">
                         <span>المساحة المستخدمة</span>
@@ -307,7 +362,7 @@
             </section>
 
             <!-- قسم الاجتماعات (مكالمات الفيديو) -->
-            <section id="meetings" class="section-content hidden animate-fade-in">
+            <section id="meetings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600">إدارة وجدولة مكالمات الفيديو</p>
                     <button id="createMeetingBtn" onclick="window.openCreateMeetingModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
@@ -328,76 +383,91 @@
                 </div>
             </section>
 
-            <!-- 5. المحادثات -->
-            <section id="chat" class="section-content hidden animate-fade-in h-full pb-4">
-                <div class="flex flex-col h-[75vh] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
-                    <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 z-10 shadow-sm flex-shrink-0">
-                        <div class="flex items-center gap-3 w-full sm:w-auto">
-                            <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
-                                <i class="fa-solid fa-comments"></i>
-                            </div>
-                            <div class="flex-1 flex flex-col gap-1 w-full max-w-xs">
-                                <div class="flex items-center gap-2">
-                                    <!-- قائمة التنقل بين الدردشات -->
-                                    <select id="chatGroupSelector" onchange="window.selectGroup(this.value)" class="font-bold text-primary text-sm md:text-base bg-transparent focus:outline-none cursor-pointer pb-1 w-full truncate border-none outline-none appearance-none">
-                                        <option value="global">الدردشة العامة للشركة</option>
-                                    </select>
-                                    <button id="createGroupBtn" onclick="window.openCreateGroupModal()" class="hidden text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded transition shadow-sm border border-gray-200 whitespace-nowrap" title="إنشاء مجموعة جديدة">
-                                        <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">إنشاء</span>
-                                    </button>
+            <!-- 5. المحادثات (المناقشة) - تصميم Odoo-like بشريط جانبي داخلي -->
+            <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
+                <div class="flex h-full bg-white md:rounded-xl shadow-sm border-x border-b border-gray-200 overflow-hidden relative">
+                    
+                    <!-- الشريط الجانبي للمحادثات (مثل Odoo) -->
+                    <div class="w-64 bg-gray-50 border-l border-gray-200 flex-col hidden md:flex flex-shrink-0 z-10">
+                        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white h-[68px]">
+                            <span class="font-bold text-gray-700 text-sm"><i class="fa-solid fa-list-ul ml-2 text-gray-400"></i>القنوات والمجموعات</span>
+                            <button id="innerCreateGroupBtn" onclick="window.openCreateGroupModal()" class="hidden text-gray-400 hover:text-primary transition" title="إنشاء مجموعة جديدة">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="p-2 overflow-y-auto flex-1 space-y-1" id="innerChatSidebarList">
+                            <!-- Groups injected here -->
+                        </div>
+                    </div>
+
+                    <!-- منطقة المحادثة الرئيسية -->
+                    <div class="flex-1 flex flex-col min-w-0 bg-white relative">
+                        <!-- الهيدر الخاص بالمحادثة -->
+                        <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm flex-shrink-0 h-[68px]">
+                            <div class="flex items-center gap-3 min-w-0 overflow-hidden">
+                                <!-- زر إظهار القائمة الجانبية للهاتف فقط -->
+                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary">
+                                    <i class="fa-solid fa-bars text-xl"></i>
+                                </button>
+
+                                <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
+                                    <i class="fa-solid fa-comments"></i>
                                 </div>
-                                <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400">يتواجد هنا جميع أعضاء مساحة العمل</p>
+                                <div class="flex flex-col min-w-0">
+                                    <h3 id="chatHeaderTitle" class="font-bold text-primary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
+                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate">يتواجد هنا جميع أعضاء مساحة العمل</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline" id="clearChatBtnText">مسح الدردشة</span>
+                                </button>
                             </div>
                         </div>
                         
-                        <div class="flex items-center gap-2 w-full sm:w-auto">
-                            <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden w-full sm:w-auto text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-trash-can"></i> <span id="clearChatBtnText">مسح الدردشة</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
 
-                    <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
-                        <div class="flex items-center gap-2 text-sm text-primary font-bold">
-                            <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
+                        <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
+                            <div class="flex items-center gap-2 text-sm text-primary font-bold">
+                                <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
+                            </div>
+                            <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i> إزالة</button>
                         </div>
-                        <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i> إزالة</button>
-                    </div>
-                    
-                    <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10 flex-shrink-0">
-                        <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
+                        
+                        <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10 flex-shrink-0">
+                            <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
 
-                        <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-2 z-20">
-                            <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
-                            <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
-                            <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
-                            <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
+                            <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-2 z-20">
+                                <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
+                                <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
+                                <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
+                            </div>
+
+                            <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
+                                <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg ml-2 transition-colors font-bold" title="ذكر شخص">@</button>
+                                <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
+                                <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="إرفاق ملف (صورة/فيديو/pdf)">
+                                    <i class="fa-solid fa-paperclip"></i>
+                                </button>
+                                <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="تغيير لون الرسالة">
+                                    <i class="fa-solid fa-palette"></i>
+                                </button>
+                                <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700" autocomplete="off">
+                                <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow">
+                                    <i class="fa-regular fa-paper-plane transform -scale-x-100"></i>
+                                </button>
+                            </form>
                         </div>
-
-                        <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
-                            <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg ml-2 transition-colors font-bold" title="ذكر شخص">@</button>
-                            <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
-                            <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="إرفاق ملف (صورة/فيديو/pdf)">
-                                <i class="fa-solid fa-paperclip"></i>
-                            </button>
-                            <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="تغيير لون الرسالة">
-                                <i class="fa-solid fa-palette"></i>
-                            </button>
-                            <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700" autocomplete="off">
-                            <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow">
-                                <i class="fa-regular fa-paper-plane transform -scale-x-100"></i>
-                            </button>
-                        </form>
                     </div>
                 </div>
             </section>
 
             <!-- 6. الإعدادات -->
-            <section id="settings" class="section-content hidden animate-fade-in">
+            <section id="settings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600">إعدادات الحساب والملف الشخصي</p>
                 </div>
@@ -453,7 +523,7 @@
             </section>
 
             <!-- 7. سجل النظام -->
-            <section id="logs" class="section-content hidden animate-fade-in">
+            <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
                 </div>
@@ -627,25 +697,22 @@
         const db = getFirestore(app);
         const appId = 'quill-world-system';
 
-        // الحساب الأول (إشعار مهمة جديدة، وتذكير الموظف)
         const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
         const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
         const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
         const EMAILJS_PUBLIC_KEY_1 = '1jeick6OIh3v4znyt';
 
-        // الحساب الثاني (المنشن، ودعوة الاجتماع)
         const EMAILJS_SERVICE_ID_2 = 'service_cf5myn4'; 
         const EMAILJS_TEMPLATE_MENTION = 'template_93xzb4z'; 
         const EMAILJS_TEMPLATE_MEETING = 'template_j95rjoh'; 
         const EMAILJS_PUBLIC_KEY_2 = 'V9oeJRZybd-4PFBdz';
 
-        // الحساب الثالث (إنجاز المهمة، وتأخير المهمة للمدير)
         const EMAILJS_SERVICE_ID_3 = 'service_kiswf1m';
         const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
         const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
         const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
 
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); // Initialize default
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -696,7 +763,7 @@
             if ("Notification" in window && Notification.permission === "granted") {
                 new Notification(title, { 
                     body: body, 
-                    icon: 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png'
+                    icon: 'https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png'
                 });
             }
         }
@@ -757,25 +824,26 @@
                 showToast(status === 'scheduled' ? 'تمت جدولة الاجتماع بنجاح' : 'تم بدء الاجتماع', 'success');
                 logAction('اجتماع', `أنشأ اجتماع: ${title}`);
 
-                // إرسال إيميل الدعوة (للحساب الثاني)
-                const meetingLink = window.location.origin + window.location.pathname + '#meetings';
-                const timeStr = scheduledTime ? new Date(scheduledTime).toLocaleString('ar-EG') : 'الآن';
-                
-                invited.forEach(uid => {
-                    if (uid === currentUserData.uid) return; 
-                    const user = globalUsers.find(u => u.id === uid);
-                    if (user && user.email && user.email !== 'no-email@company.com') {
-                        emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MEETING, {
-                            to_email: user.email,
-                            to_name: user.name,
-                            creator_name: currentUserData.name,
-                            meeting_title: title,
-                            meeting_time: timeStr,
-                            meeting_link: meetingLink,
-                            company_name: 'نظام شركتي'
-                        }, EMAILJS_PUBLIC_KEY_2);
-                    }
-                });
+                if (EMAILJS_TEMPLATE_MEETING !== 'YOUR_MEETING_TEMPLATE_ID') {
+                    const meetingLink = window.location.origin + window.location.pathname + '#meetings';
+                    const timeStr = scheduledTime ? new Date(scheduledTime).toLocaleString('ar-EG') : 'الآن';
+                    
+                    invited.forEach(uid => {
+                        if (uid === currentUserData.uid) return; 
+                        const user = globalUsers.find(u => u.id === uid);
+                        if (user && user.email && user.email !== 'no-email@company.com') {
+                            emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MEETING, {
+                                to_email: user.email,
+                                to_name: user.name,
+                                creator_name: currentUserData.name,
+                                meeting_title: title,
+                                meeting_time: timeStr,
+                                meeting_link: meetingLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_2);
+                        }
+                    });
+                }
             } catch(e) {}
         });
 
@@ -970,6 +1038,33 @@
         }
         window.addEventListener('hashchange', handleHashChange);
 
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('translate-x-full');
+            document.getElementById('mobileOverlay').classList.toggle('hidden');
+        };
+
+        window.openChatAndToggleMenu = () => {
+            window.selectGroup('global');
+            if (window.innerWidth < 768) {
+                window.toggleMobileChatMenu();
+            }
+        };
+
+        window.toggleMobileChatMenu = () => {
+            const menu = document.getElementById('chatSubMenuMobile');
+            const icon = document.getElementById('chatMenuIconMobile');
+            
+            if(menu.classList.contains('max-h-0')) {
+                menu.classList.remove('max-h-0', 'opacity-0', 'hidden');
+                menu.classList.add('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.add('rotate-180');
+            } else {
+                menu.classList.add('max-h-0', 'opacity-0');
+                menu.classList.remove('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.remove('rotate-180');
+            }
+        };
+
         window.showSection = (sectionId) => {
             if(window.location.hash !== `#${sectionId}`) {
                 window.history.pushState(null, null, `#${sectionId}`);
@@ -997,6 +1092,24 @@
                 document.getElementById('backToHomeBtn').classList.remove('hidden');
             }
             
+            // Update Mobile Sidebar Active States
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-secondary', 'text-white');
+                b.classList.add('text-gray-300');
+            });
+            
+            if(sectionId !== 'chat') {
+                const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
+                if(activeBtn) {
+                    activeBtn.classList.remove('text-gray-300');
+                    activeBtn.classList.add('bg-secondary', 'text-white');
+                }
+            }
+            
+            if(window.innerWidth < 768 && sectionId !== 'chat') {
+                document.getElementById('sidebar').classList.add('translate-x-full');
+                document.getElementById('mobileOverlay').classList.add('hidden');
+            }
             if(sectionId === 'chat') {
                 updateReadReceipt(currentGroupId);
                 const chatBox = document.getElementById('chatMessages');
@@ -1011,7 +1124,7 @@
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
                     readReceipts: groupReadTimestamps
                 });
-                renderChatGroups(); 
+                renderChatSidebarList(); 
             } catch(e) {}
         }
 
@@ -1116,7 +1229,7 @@
                             }, EMAILJS_PUBLIC_KEY_1);
                         }
 
-                        if (ceoUser && ceoUser.email) {
+                        if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_DELAYED !== 'YOUR_DELAYED_TEMPLATE_ID') {
                             const taskLink = window.location.origin + window.location.pathname + '#tasks';
                             const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
                             
@@ -1305,7 +1418,6 @@
                         finishLoginSetup();
                     } else {
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
-                        if(user.displayName) document.getElementById('setupName').value = user.displayName;
                     }
                 } catch(e) { console.error(e); }
             } else {
@@ -1366,18 +1478,19 @@
                 document.getElementById('grid-dashboard').classList.remove('hidden');
                 document.getElementById('grid-employees').classList.remove('hidden');
                 document.getElementById('grid-logs').classList.remove('hidden');
+                document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
 
                 document.getElementById('addTaskBtn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').style.display = 'flex';
                 document.getElementById('empActionHeader').classList.remove('hidden');
                 
-                document.getElementById('createGroupBtn').classList.remove('hidden');
                 document.getElementById('clearChatBtn').classList.remove('hidden');
                 document.getElementById('createMeetingBtn').classList.remove('hidden');
             } else {
                 document.getElementById('grid-dashboard').classList.add('hidden');
                 document.getElementById('grid-employees').classList.add('hidden');
                 document.getElementById('grid-logs').classList.add('hidden');
+                document.getElementById('innerCreateGroupBtn').classList.add('hidden');
 
                 document.getElementById('addTaskBtn').style.display = 'none';
                 document.getElementById('empActionHeader').classList.add('hidden');
@@ -1504,7 +1617,7 @@
                 
                 if(!globalGroups.find(g => g.id === currentGroupId)) currentGroupId = 'global';
                 
-                renderChatGroups();
+                renderChatSidebarList();
                 renderChat();
             });
 
@@ -1536,7 +1649,7 @@
                 }
 
                 initialChatLoad = false;
-                renderChatGroups(); 
+                renderChatSidebarList(); 
                 renderChat();
             });
         }
@@ -1551,51 +1664,82 @@
             return { count: unreadCount, hasMention: hasMention };
         }
 
-        function renderChatGroups() {
-            const selector = document.getElementById('chatGroupSelector');
-            if(selector) {
-                selector.innerHTML = '';
-                
-                let totalUnreadCount = 0;
-                let totalMentions = false;
+        function renderChatSidebarList() {
+            const innerList = document.getElementById('innerChatSidebarList');
+            const mobileList = document.getElementById('chatSubMenuMobile');
+            
+            if(innerList) innerList.innerHTML = '';
+            if(mobileList) mobileList.innerHTML = '';
+            
+            let totalUnreadCount = 0;
+            let totalMentions = false;
 
-                globalGroups.forEach(g => {
-                    const unreadInfo = getGroupUnreadInfo(g.id);
-                    totalUnreadCount += unreadInfo.count;
-                    if(unreadInfo.hasMention) totalMentions = true;
-
-                    let label = g.name;
-                    if(unreadInfo.hasMention) label += ' (@)';
-                    else if(unreadInfo.count > 0) label += ` (${unreadInfo.count})`;
-                    
-                    selector.innerHTML += `<option value="${g.id}">${label}</option>`;
-                });
-                selector.value = currentGroupId;
+            globalGroups.forEach(g => {
+                const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
                 
-                const homeBadge = document.getElementById('homeChatBadge');
-                if(homeBadge) {
+                const unreadInfo = getGroupUnreadInfo(g.id);
+                totalUnreadCount += unreadInfo.count;
+                if(unreadInfo.hasMention) totalMentions = true;
+
+                let badgeHtml = '';
+                if(unreadInfo.hasMention) {
+                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">@</span>`;
+                } else if(unreadInfo.count > 0) {
+                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                }
+
+                // إضافة للقائمة الجانبية الداخلية للدردشة (Desktop)
+                if (innerList) {
+                    innerList.innerHTML += `
+                        <button onclick="window.selectGroup('${g.id}')" class="w-full text-right py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white shadow-sm text-primary font-bold border border-gray-100' : 'text-gray-600 hover:bg-gray-100'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center ml-2 text-gray-400 ${isActive ? 'text-primary' : ''}"></i> 
+                            <span class="truncate">${g.name}</span>
+                            ${badgeHtml}
+                        </button>
+                    `;
+                }
+
+                // إضافة للقائمة المنسدلة في الهاتف (Mobile)
+                if (mobileList) {
+                    mobileList.innerHTML += `
+                        <button onclick="window.selectGroup('${g.id}')" class="text-right w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center ml-2"></i> ${g.name}
+                            ${badgeHtml}
+                        </button>
+                    `;
+                }
+            });
+            
+            const homeBadge = document.getElementById('homeChatBadge');
+            const mobileBadge = document.getElementById('globalChatBadgeMobile');
+            
+            [homeBadge, mobileBadge].forEach(badge => {
+                if(badge) {
                     if(totalMentions) {
-                        homeBadge.innerText = '@';
-                        homeBadge.classList.remove('hidden');
-                        homeBadge.classList.replace('bg-blue-500', 'bg-red-500');
+                        badge.innerText = '@';
+                        badge.classList.remove('hidden');
+                        badge.classList.replace('bg-blue-500', 'bg-red-500');
                     } else if(totalUnreadCount > 0) {
-                        homeBadge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
-                        homeBadge.classList.remove('hidden');
-                        homeBadge.classList.replace('bg-red-500', 'bg-blue-500');
+                        badge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
+                        badge.classList.remove('hidden');
+                        badge.classList.replace('bg-red-500', 'bg-blue-500');
                     } else {
-                        homeBadge.classList.add('hidden');
+                        badge.classList.add('hidden');
                     }
                 }
+            });
+            
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(activeGroup) {
+                const titleEl = document.getElementById('chatHeaderTitle');
+                if (titleEl) titleEl.innerText = activeGroup.name;
                 
-                const activeGroup = globalGroups.find(g => g.id === currentGroupId);
-                if(activeGroup) {
-                    if(activeGroup.id === 'global') {
-                        document.getElementById('chatHeaderDesc').innerText = 'يتواجد هنا جميع أعضاء مساحة العمل';
-                        document.getElementById('clearChatBtnText').innerText = 'مسح الدردشة';
-                    } else {
-                        document.getElementById('chatHeaderDesc').innerText = `مجموعة خاصة - ${activeGroup.members.length} أعضاء`;
-                        document.getElementById('clearChatBtnText').innerText = 'حذف المجموعة';
-                    }
+                if(activeGroup.id === 'global') {
+                    document.getElementById('chatHeaderDesc').innerText = 'يتواجد هنا جميع أعضاء مساحة العمل';
+                    document.getElementById('clearChatBtnText').innerText = 'مسح الدردشة';
+                } else {
+                    document.getElementById('chatHeaderDesc').innerText = `مجموعة خاصة - ${activeGroup.members.length} أعضاء`;
+                    document.getElementById('clearChatBtnText').innerText = 'حذف المجموعة';
                 }
             }
         }
@@ -1603,8 +1747,13 @@
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
             window.showSection('chat'); 
-            renderChatGroups(); 
+            renderChatSidebarList(); 
             renderChat();
+            
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('translate-x-full');
+                document.getElementById('mobileOverlay').classList.add('hidden');
+            }
         };
 
         document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
@@ -1628,7 +1777,7 @@
                 showToast('تم إنشاء المجموعة بنجاح!', 'success');
                 
                 currentGroupId = newGroupRef.id;
-                renderChatGroups();
+                renderChatSidebarList();
                 window.showSection('chat');
                 logAction('إنشاء مجموعة', `تم إنشاء مجموعة محادثة جديدة "${groupName}"`);
             } catch(e) {}
@@ -1660,7 +1809,7 @@
                     logAction('حذف مجموعة', `تم حذف مجموعة المحادثة "${groupName}"`);
                     
                     currentGroupId = 'global';
-                    renderChatGroups();
+                    renderChatSidebarList();
                     renderChat();
                 }
             }
