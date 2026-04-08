@@ -74,7 +74,10 @@
     <!-- شاشة تسجيل الدخول الإلزامية عبر Google -->
     <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain bg-white">
+            <!-- الشعار يتبدل حسب الوضع -->
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain block dark:hidden">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain hidden dark:block">
+            
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4" data-i18n="مرحباً بك">مرحباً بك في نظام شركة quill</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm" data-i18n="يجب تسجيل الدخول">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
             <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm">
@@ -87,7 +90,10 @@
     <!-- شاشة إعداد الملف الشخصي (لأول مرة) -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain bg-white">
+            <!-- الشعار يتبدل حسب الوضع -->
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain block dark:hidden">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain hidden dark:block">
+            
             <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center" data-i18n="إكمال بيانات الملف الشخصي">إكمال بيانات الملف الشخصي</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
             
@@ -156,7 +162,8 @@
 
             <!-- اليسار (اللوجو) -->
             <div class="flex items-center flex-row-reverse z-10">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 dark:bg-white dark:rounded dark:p-1">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 block dark:hidden">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 hidden dark:block">
             </div>
         </header>
 
@@ -164,7 +171,8 @@
         <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
         <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary dark:bg-gray-800 text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
             <div class="p-6 flex items-center justify-between border-b border-white/10 dark:border-gray-700">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 object-contain filter brightness-0 invert">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 object-contain filter brightness-0 invert block dark:hidden">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 object-contain hidden dark:block">
                 <button onclick="window.toggleSidebar()" class="text-white hover:text-gray-300">
                     <i class="fa-solid fa-xmark text-2xl"></i>
                 </button>
@@ -972,7 +980,7 @@
             if ("Notification" in window && Notification.permission === "granted") {
                 new Notification(title, { 
                     body: body, 
-                    icon: 'https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png'
+                    icon: document.documentElement.classList.contains('dark') ? 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png' : 'https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png'
                 });
             }
         }
@@ -1287,8 +1295,7 @@
                         ? `<span class="bg-red-100 text-red-600 text-[10px] px-2 py-1 rounded animate-pulse">🔴 جاري الآن</span>`
                         : `<span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-1 rounded">مجدول</span>`;
                     
-                    let actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video mx-1"></i> ${t('إضافة')}</button>`; // using Add string for Join temporarily or raw Join
-                    actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video mx-1"></i> Join / انضمام</button>`;
+                    let actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video mx-1"></i> Join / انضمام</button>`;
                     
                     if (isCEO) {
                         actionsHtml += `
@@ -1938,7 +1945,7 @@
                     
                     if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
                         knownTaskIds.add(taskData.id);
-                        if(taskData.assigneeName === currentUserData.name || taskData.status === 'pending') {
+                        if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
                             hasNewAssignedTask = true;
                             latestTaskName = taskData.title;
                         }
