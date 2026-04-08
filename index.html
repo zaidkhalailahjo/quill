@@ -117,18 +117,22 @@
         </div>
         
         <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
-            <button id="nav-dashboard-btn" onclick="window.showSection('dashboard')" class="nav-btn active-nav hidden w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="dashboard">
-                <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">لوحة التحكم</span>
+            <button id="nav-home-grid-btn" onclick="window.showSection('home-grid')" class="nav-btn active-nav w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
+                <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الرئيسية</span>
+            </button>
+
+            <button id="nav-dashboard-btn" onclick="window.showSection('dashboard')" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="dashboard">
+                <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">لوحات البيانات</span>
             </button>
             <button id="nav-employees-btn" onclick="window.showSection('employees')" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
-                <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الموظفين</span>
+                <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الموظفون</span>
             </button>
             <button id="nav-tasks-btn" onclick="window.showSection('tasks')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
                 <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المهام</span>
             </button>
             
             <button onclick="window.showSection('drive')" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="drive">
-                <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">الملفات</span>
+                <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المستندات</span>
             </button>
 
             <!-- قسم الاجتماعات -->
@@ -139,7 +143,7 @@
             <div class="mt-2">
                 <button onclick="window.openChatAndToggleMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
                     <div class="flex items-center">
-                        <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المحادثات</span>
+                        <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm md:text-base">المناقشة</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="globalChatBadge" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
@@ -167,7 +171,7 @@
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-4">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
-                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary">لوحة التحكم</h2>
+                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary">الرئيسية - التطبيقات</h2>
             </div>
             
             <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse">
@@ -189,6 +193,82 @@
 
         <div class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 relative">
             
+            <!-- 0. الرئيسية (التطبيقات) -->
+            <section id="home-grid" class="section-content animate-fade-in">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">التطبيقات</h2>
+                    <p class="text-gray-500 text-sm mt-1">اختر التطبيق الذي تود العمل عليه</p>
+                </div>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                    
+                    <!-- CEO Only -->
+                    <div id="grid-dashboard" onclick="window.showSection('dashboard')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-fuchsia-200 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-fuchsia-50 text-fuchsia-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-chart-pie text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">لوحات البيانات</span>
+                    </div>
+                    
+                    <!-- CEO Only -->
+                    <div id="grid-employees" onclick="window.showSection('employees')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-purple-200 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-purple-50 text-purple-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-users text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">الموظفون</span>
+                    </div>
+
+                    <!-- ALL -->
+                    <div onclick="window.showSection('tasks')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-emerald-200 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-emerald-50 text-emerald-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-list-check text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">المهام المراد تنفيذها</span>
+                    </div>
+
+                    <!-- ALL -->
+                    <div onclick="window.showSection('drive')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-cyan-200 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-cyan-50 text-cyan-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-folder-open text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">المستندات</span>
+                    </div>
+
+                    <!-- ALL -->
+                    <div onclick="window.showSection('meetings')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-blue-200 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-video text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">الاجتماعات</span>
+                    </div>
+
+                    <!-- ALL -->
+                    <div onclick="window.openChatAndToggleMenu()" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-orange-200 group relative">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-orange-50 text-orange-500 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-comments text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">المناقشة</span>
+                    </div>
+
+                    <!-- ALL -->
+                    <div onclick="window.showSection('settings')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-gray-300 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-gray-100 text-gray-600 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-gear text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">الإعدادات</span>
+                    </div>
+
+                    <!-- CEO Only -->
+                    <div id="grid-logs" onclick="window.showSection('logs')" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-red-200 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-red-50 text-red-500 group-hover:-translate-y-1 transition-transform duration-300">
+                            <i class="fa-solid fa-clock-rotate-left text-3xl"></i>
+                        </div>
+                        <span class="font-bold text-gray-700 text-sm">سجل النظام</span>
+                    </div>
+
+                </div>
+            </section>
+
             <!-- 1. لوحة التحكم -->
             <section id="dashboard" class="section-content animate-fade-in hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
@@ -312,7 +392,7 @@
                             </div>
                             <div class="flex-1 flex flex-col gap-1">
                                 <div class="flex items-center gap-2">
-                                    <h3 id="chatHeaderTitle" class="font-bold text-primary text-sm md:text-base">الدردشة العامة للشركة</h3>
+                                    <h3 id="chatHeaderTitle" class="font-bold text-primary text-sm md:text-base">المناقشة (العامة)</h3>
                                     <button id="createGroupBtn" onclick="window.openCreateGroupModal()" class="hidden text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded transition shadow-sm border border-gray-200" title="إنشاء مجموعة جديدة">
                                         <i class="fa-solid fa-plus"></i> إنشاء مجموعة
                                     </button>
@@ -615,6 +695,8 @@
         const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
         const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
         const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
+
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); // Initialize default
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -921,22 +1003,20 @@
             if(!currentUserData) return; 
             
             const hash = window.location.hash.replace('#', '');
-            const validSections = ['dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings', 'meetings'];
+            const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings', 'meetings'];
             
-            let targetSection = hash;
+            let targetSection = hash || 'home-grid';
             
             if (currentUserData.role !== 'CEO') {
-                if (['dashboard', 'employees', 'logs'].includes(targetSection) || !targetSection) {
-                    targetSection = 'tasks';
+                if (['dashboard', 'employees', 'logs'].includes(targetSection)) {
+                    targetSection = 'home-grid';
                 }
-            } else {
-                if (!targetSection) targetSection = 'dashboard';
             }
 
             if (validSections.includes(targetSection)) {
                 window.showSection(targetSection);
             } else {
-                window.showSection(currentUserData.role === 'CEO' ? 'dashboard' : 'tasks');
+                window.showSection('home-grid');
             }
         }
         window.addEventListener('hashchange', handleHashChange);
@@ -975,13 +1055,14 @@
             document.getElementById(sectionId).classList.remove('hidden');
             
             const titles = { 
-                'dashboard': 'لوحة التحكم', 
+                'home-grid': 'الرئيسية - التطبيقات',
+                'dashboard': 'لوحات البيانات', 
                 'employees': 'إدارة الموظفين', 
-                'tasks': 'المهام', 
-                'drive': 'الملفات',
+                'tasks': 'المهام المراد تنفيذها', 
+                'drive': 'المستندات',
                 'meetings': 'الاجتماعات',
                 'logs': 'سجل النظام', 
-                'chat': 'المحادثات',
+                'chat': 'المناقشة',
                 'settings': 'الإعدادات'
             };
             document.getElementById('page-title').innerText = titles[sectionId];
@@ -1077,15 +1158,15 @@
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                const templateParams = {
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, {
                     to_email: toEmail,
                     to_name: assigneeName,
                     task_title: taskTitle,
                     task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
-                };
-                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, templateParams, EMAILJS_PUBLIC_KEY_1);
+                }, EMAILJS_PUBLIC_KEY_1);
+                
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
                 });
@@ -1372,9 +1453,15 @@
             }
 
             if(currentUserData.role === 'CEO') {
+                // Sidebar
                 document.getElementById('nav-dashboard-btn').classList.remove('hidden');
                 document.getElementById('nav-employees-btn').classList.remove('hidden');
                 document.getElementById('nav-logs-btn').classList.remove('hidden');
+                // Grid
+                document.getElementById('grid-dashboard').classList.remove('hidden');
+                document.getElementById('grid-employees').classList.remove('hidden');
+                document.getElementById('grid-logs').classList.remove('hidden');
+
                 document.getElementById('addTaskBtn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').style.display = 'flex';
                 document.getElementById('empActionHeader').classList.remove('hidden');
@@ -1383,9 +1470,15 @@
                 document.getElementById('clearChatBtn').classList.remove('hidden');
                 document.getElementById('createMeetingBtn').classList.remove('hidden');
             } else {
+                // Sidebar
                 document.getElementById('nav-dashboard-btn').classList.add('hidden');
                 document.getElementById('nav-employees-btn').classList.add('hidden');
                 document.getElementById('nav-logs-btn').classList.add('hidden');
+                // Grid
+                document.getElementById('grid-dashboard').classList.add('hidden');
+                document.getElementById('grid-employees').classList.add('hidden');
+                document.getElementById('grid-logs').classList.add('hidden');
+
                 document.getElementById('addTaskBtn').style.display = 'none';
                 document.getElementById('empActionHeader').classList.add('hidden');
             }
@@ -1989,7 +2082,7 @@
                     
                     // إرسال إيميل للمدير (الحساب الثالث)
                     const ceoUser = globalUsers.find(u => u.role === 'CEO');
-                    if (ceoUser && ceoUser.email) {
+                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
                         const taskLink = window.location.origin + window.location.pathname + '#tasks';
                         emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
                             ceo_email: ceoUser.email,
@@ -2041,24 +2134,26 @@
                 await addDoc(getColRef('chat'), messageObj);
 
                 // إرسال إيميل لمن تم ذكره (المنشن) باستخدام الحساب الثاني
-                const chatLink = window.location.origin + window.location.pathname + '#chat';
-                const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'الدردشة';
-                
-                globalUsers.forEach(u => {
-                    const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(`@${safeName}`, 'g');
-                    if (regex.test(text) && u.email && u.email !== 'no-email@company.com') {
-                        emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
-                            to_email: u.email,
-                            to_name: u.name,
-                            sender_name: currentUserData.name,
-                            group_name: groupName,
-                            chat_text: text,
-                            chat_link: chatLink,
-                            company_name: 'نظام شركتي'
-                        }, EMAILJS_PUBLIC_KEY_2);
-                    }
-                });
+                if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
+                    const chatLink = window.location.origin + window.location.pathname + '#chat';
+                    const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'الدردشة';
+                    
+                    globalUsers.forEach(u => {
+                        const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`@${safeName}`, 'g');
+                        if (regex.test(text) && u.email && u.email !== 'no-email@company.com') {
+                            emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
+                                to_email: u.email,
+                                to_name: u.name,
+                                sender_name: currentUserData.name,
+                                group_name: groupName,
+                                chat_text: text,
+                                chat_link: chatLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_2);
+                        }
+                    });
+                }
             } catch(e) {}
         });
 
