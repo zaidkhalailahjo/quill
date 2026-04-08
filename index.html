@@ -19,6 +19,7 @@
     
     <script>
         tailwind.config = {
+            darkMode: 'class', // تفعيل الوضع الليلي
             theme: {
                 extend: {
                     colors: {
@@ -50,54 +51,61 @@
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #00839b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* خلفية الدردشة العادية */
         .chat-bg {
             background-color: #fdfdfd;
             background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 15L15 22.5v15L30 45l15-7.5v-15z' stroke='%23f0f0f0' stroke-width='1'/%3E%3Cpath d='M30 15v15l15-7.5M30 30l-15-7.5M30 30v15' stroke='%23f0f0f0' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
         }
+        
+        /* خلفية الدردشة في الوضع الليلي */
+        .dark .chat-bg {
+            background-color: #111827;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cpath d='M30 15L15 22.5v15L30 45l15-7.5v-15z' stroke='%231f2937' stroke-width='1'/%3E%3Cpath d='M30 15v15l15-7.5M30 30l-15-7.5M30 30v15' stroke='%231f2937' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E");
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex relative">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
 
-    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
-        <p class="text-primary font-bold text-lg">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
+        <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
     </div>
 
     <!-- شاشة تسجيل الدخول الإلزامية عبر Google -->
     <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">مرحباً بك في نظام شركة quill</h2>
-            <p class="text-gray-500 mb-8 text-sm">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
-            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain bg-white">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4" data-i18n="مرحباً بك">مرحباً بك في نظام شركة quill</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm" data-i18n="يجب تسجيل الدخول">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
+            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6" alt="Google">
-                تسجيل الدخول باستخدام Google
+                <span data-i18n="تسجيل الدخول باستخدام Google">تسجيل الدخول باستخدام Google</span>
             </button>
         </div>
     </div>
 
     <!-- شاشة إعداد الملف الشخصي (لأول مرة) -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain">
-            <h2 class="text-xl font-bold text-gray-800 mb-2 text-center">إكمال بيانات الملف الشخصي</h2>
-            <p class="text-gray-500 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
+        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain bg-white">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center" data-i18n="إكمال بيانات الملف الشخصي">إكمال بيانات الملف الشخصي</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
             
             <form id="setupProfileForm" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
-                    <input type="text" id="setupName" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الاسم الكامل">الاسم الكامل</label>
+                    <input type="text" id="setupName" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
-                    <select id="setupRole" required class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</label>
+                    <select id="setupRole" required class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
                         <option value="" disabled selected>-- اختر وظيفتك --</option>
                         <option value="technical team supervisor">Technical Team Supervisor</option>
                         <option value="Technical Engineer">Technical Engineer</option>
                         <option value="accountant">Accountant</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors mt-4">
+                <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors mt-4" data-i18n="الدخول للنظام">
                     الدخول للنظام
                 </button>
             </form>
@@ -109,22 +117,30 @@
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         
         <!-- الشريط العلوي المُعدل -->
-        <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0 relative">
+        <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center z-10 flex-shrink-0 relative transition-colors">
             <!-- اليمين (الحساب، الإعدادات، الإشعارات، زر القائمة للموبايل) -->
             <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse z-10">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-2">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
-                <div class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded transition" onclick="window.location.hash='settings'">
+                <div class="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition" onclick="window.location.hash='settings'">
                     <img id="userAvatar" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
                     <div class="mr-2 md:mr-3 hidden sm:block text-right">
-                        <p id="userName" class="text-xs md:text-sm font-semibold text-gray-800">جاري التحميل...</p>
+                        <p id="userName" class="text-xs md:text-sm font-semibold text-gray-800 dark:text-white">جاري التحميل...</p>
                         <p id="userRole" class="text-[10px] md:text-xs text-secondary font-bold"></p>
                     </div>
                 </div>
-                <button onclick="window.location.hash='settings'" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="الإعدادات">
-                    <i class="fa-solid fa-gear"></i>
+                
+                <!-- زر تبديل اللغة -->
+                <button onclick="window.toggleLanguage()" class="text-gray-400 hover:text-secondary p-2 rounded transition font-bold" title="تبديل اللغة">
+                    <span id="langIconTxt">EN</span>
                 </button>
+                
+                <!-- زر تبديل الوضع الليلي -->
+                <button onclick="window.toggleTheme()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="الوضع الليلي/النهاري">
+                    <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+                </button>
+
                 <button onclick="window.showLatestNotification()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="آخر إشعار">
                     <i class="fa-solid fa-bell"></i>
                 </button>
@@ -133,21 +149,21 @@
             <!-- المنتصف (زر العودة للرئيسية) -->
             <div class="absolute inset-x-0 top-0 h-full flex items-center justify-center pointer-events-none w-full z-0">
                 <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden pointer-events-auto text-white bg-secondary hover:bg-primary px-4 py-2 rounded-xl flex items-center gap-2 font-bold transition-colors text-sm shadow-md">
-                    <span class="hidden sm:inline">خروج للرئيسية</span> <i class="fa-solid fa-arrow-left"></i>
+                    <span class="hidden sm:inline" data-i18n="الرئيسية">خروج للرئيسية</span> <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary hidden md:block">الرئيسية - التطبيقات</h2>
+                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary dark:text-secondary hidden md:block" data-i18n="الرئيسية">الرئيسية - التطبيقات</h2>
             </div>
 
             <!-- اليسار (اللوجو) -->
             <div class="flex items-center flex-row-reverse z-10">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 dark:bg-white dark:rounded dark:p-1">
             </div>
         </header>
 
         <!-- القائمة الجانبية للموبايل فقط -->
         <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
-        <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
-            <div class="p-6 flex items-center justify-between border-b border-white/10">
+        <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary dark:bg-gray-800 text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
+            <div class="p-6 flex items-center justify-between border-b border-white/10 dark:border-gray-700">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 object-contain filter brightness-0 invert">
                 <button onclick="window.toggleSidebar()" class="text-white hover:text-gray-300">
                     <i class="fa-solid fa-xmark text-2xl"></i>
@@ -156,28 +172,28 @@
             
             <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
                 <button id="nav-home-grid-btn" onclick="window.location.hash='home-grid'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
-                    <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm">الرئيسية</span>
+                    <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الرئيسية">الرئيسية</span>
                 </button>
                 <button id="nav-dashboard-btn" onclick="window.location.hash='dashboard'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="dashboard">
-                    <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm">لوحات البيانات</span>
+                    <i class="fa-solid fa-chart-line w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="لوحات البيانات">لوحات البيانات</span>
                 </button>
                 <button id="nav-employees-btn" onclick="window.location.hash='employees'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
-                    <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm">الموظفون</span>
+                    <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الموظفون">الموظفون</span>
                 </button>
                 <button id="nav-tasks-btn" onclick="window.location.hash='tasks'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
-                    <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm">المهام</span>
+                    <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="المهام">المهام</span>
                 </button>
                 <button onclick="window.location.hash='drive'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="drive">
-                    <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm">المستندات</span>
+                    <i class="fa-solid fa-folder-open w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="المستندات">المستندات</span>
                 </button>
                 <button onclick="window.location.hash='meetings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative" data-section="meetings">
-                    <i class="fa-solid fa-video w-6 text-center ml-3"></i><span class="font-semibold text-sm">الاجتماعات</span>
+                    <i class="fa-solid fa-video w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الاجتماعات">الاجتماعات</span>
                 </button>
                 
                 <div class="mt-2">
                     <button onclick="window.toggleMobileChatMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
                         <div class="flex items-center">
-                            <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm">المناقشة</span>
+                            <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="المناقشة">المناقشة</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <span id="globalChatBadgeMobile" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
@@ -190,81 +206,74 @@
                 </div>
 
                 <button onclick="window.location.hash='settings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="settings">
-                    <i class="fa-solid fa-gear w-6 text-center ml-3"></i><span class="font-semibold text-sm">الإعدادات</span>
+                    <i class="fa-solid fa-gear w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الإعدادات">الإعدادات</span>
                 </button>
                 
-                <button id="nav-logs-btn" onclick="window.location.hash='logs'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors border-t border-white/10 mt-2 pt-4" data-section="logs">
-                    <i class="fa-solid fa-clock-rotate-left w-6 text-center ml-3"></i><span class="font-semibold text-sm">سجل النظام</span>
+                <button id="nav-logs-btn" onclick="window.location.hash='logs'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors border-t border-white/10 dark:border-gray-700 mt-2 pt-4" data-section="logs">
+                    <i class="fa-solid fa-clock-rotate-left w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="سجل النظام">سجل النظام</span>
                 </button>
             </nav>
         </aside>
 
-        <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 relative">
+        <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 dark:bg-gray-900 relative">
             
             <!-- 0. الرئيسية (التطبيقات) -->
             <section id="home-grid" class="section-content animate-fade-in p-4 md:p-0">
                 <div class="mb-8">
-                    <h2 class="text-2xl font-bold text-gray-800">التطبيقات</h2>
-                    <p class="text-gray-500 text-sm mt-1">اختر التطبيق الذي تود العمل عليه</p>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white" data-i18n="التطبيقات">التطبيقات</h2>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1" data-i18n="اختر التطبيق الذي تود العمل عليه">اختر التطبيق الذي تود العمل عليه</p>
                 </div>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                     
-                    <!-- CEO Only -->
-                    <div id="grid-dashboard" onclick="window.location.hash='dashboard'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-fuchsia-200 group hidden">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-fuchsia-50 text-fuchsia-600 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div id="grid-dashboard" onclick="window.location.hash='dashboard'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-fuchsia-200 dark:hover:border-fuchsia-500 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-fuchsia-50 dark:bg-gray-700 text-fuchsia-600 dark:text-fuchsia-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-chart-pie text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">لوحات البيانات</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="لوحات البيانات">لوحات البيانات</span>
                     </div>
                     
-                    <!-- CEO Only -->
-                    <div id="grid-employees" onclick="window.location.hash='employees'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-purple-200 group hidden">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-purple-50 text-purple-600 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div id="grid-employees" onclick="window.location.hash='employees'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-500 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-purple-50 dark:bg-gray-700 text-purple-600 dark:text-purple-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-users text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">الموظفون</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="الموظفون">الموظفون</span>
                     </div>
 
-                    <!-- ALL -->
-                    <div onclick="window.location.hash='tasks'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-emerald-200 group">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-emerald-50 text-emerald-600 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div onclick="window.location.hash='tasks'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-500 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-emerald-50 dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-list-check text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">المهام المراد تنفيذها</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="المهام">المهام المراد تنفيذها</span>
                     </div>
 
-                    <!-- ALL -->
-                    <div onclick="window.location.hash='drive'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-cyan-200 group">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-cyan-50 text-cyan-600 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div onclick="window.location.hash='drive'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-cyan-200 dark:hover:border-cyan-500 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-cyan-50 dark:bg-gray-700 text-cyan-600 dark:text-cyan-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-folder-open text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">المستندات</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="المستندات">المستندات</span>
                     </div>
 
-                    <!-- ALL -->
-                    <div onclick="window.location.hash='meetings'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-blue-200 group">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-600 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div onclick="window.location.hash='meetings'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-500 group">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-video text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">الاجتماعات</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="الاجتماعات">الاجتماعات</span>
                     </div>
 
-                    <!-- ALL -->
-                    <div onclick="window.location.hash='chat'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-orange-200 group relative">
-                        <div class="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-orange-50 text-orange-500 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div onclick="window.location.hash='chat'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-orange-200 dark:hover:border-orange-500 group relative">
+                        <div class="relative w-16 h-16 rounded-2xl flex items-center justify-center bg-orange-50 dark:bg-gray-700 text-orange-500 dark:text-orange-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-comments text-3xl"></i>
                             <span id="homeChatBadge" class="absolute -top-2 -right-2 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">المناقشة</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="المناقشة">المناقشة</span>
                     </div>
 
-                    <!-- CEO Only -->
-                    <div id="grid-logs" onclick="window.location.hash='logs'" class="cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 hover:border-red-200 group hidden">
-                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-red-50 text-red-500 group-hover:-translate-y-1 transition-transform duration-300">
+                    <div id="grid-logs" onclick="window.location.hash='logs'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-red-200 dark:hover:border-red-500 group hidden">
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-red-50 dark:bg-gray-700 text-red-500 dark:text-red-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-clock-rotate-left text-3xl"></i>
                         </div>
-                        <span class="font-bold text-gray-700 text-sm">سجل النظام</span>
+                        <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="سجل النظام">سجل النظام</span>
                     </div>
 
                 </div>
@@ -273,17 +282,17 @@
             <!-- 1. لوحة التحكم -->
             <section id="dashboard" class="section-content animate-fade-in hidden p-4 md:p-0">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-primary">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-blue-50 text-primary p-3 md:p-4 rounded-full"><i class="fa-solid fa-users text-xl md:text-2xl"></i></div>
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-primary">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="الموظفين المسجلين">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-blue-50 dark:bg-gray-700 text-primary dark:text-blue-400 p-3 md:p-4 rounded-full"><i class="fa-solid fa-users text-xl md:text-2xl"></i></div>
                     </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-secondary">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">إجمالي المهام</p><h3 id="stat-tasks" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-teal-50 text-secondary p-3 md:p-4 rounded-full"><i class="fa-solid fa-list-check text-xl md:text-2xl"></i></div>
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-secondary">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="إجمالي المهام">إجمالي المهام</p><h3 id="stat-tasks" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-teal-50 dark:bg-gray-700 text-secondary dark:text-teal-400 p-3 md:p-4 rounded-full"><i class="fa-solid fa-list-check text-xl md:text-2xl"></i></div>
                     </div>
-                    <div class="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex justify-between border-b-4 border-b-green-500">
-                        <div><p class="text-xs md:text-sm text-gray-500 mb-1">مهام مكتملة</p><h3 id="stat-completed" class="text-2xl md:text-3xl font-bold text-gray-800">0</h3></div>
-                        <div class="bg-green-50 text-green-500 p-3 md:p-4 rounded-full"><i class="fa-solid fa-check-double text-xl md:text-2xl"></i></div>
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-green-500">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="مهام مكتملة">مهام مكتملة</p><h3 id="stat-completed" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-green-50 dark:bg-gray-700 text-green-500 p-3 md:p-4 rounded-full"><i class="fa-solid fa-check-double text-xl md:text-2xl"></i></div>
                     </div>
                 </div>
             </section>
@@ -291,18 +300,18 @@
             <!-- 2. الموظفين -->
             <section id="employees" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
-                    <p class="text-sm md:text-base text-gray-600">فريق العمل المسجل في النظام</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="فريق العمل المسجل">فريق العمل المسجل في النظام</p>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                     <table class="w-full text-right min-w-[500px]">
-                        <thead class="bg-gray-50 border-b">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                             <tr>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الاسم</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الوظيفة</th>
-                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 hidden text-left">الإجراءات</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الاسم">الاسم</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الوظيفة">الوظيفة</th>
+                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200 hidden text-left" data-i18n="الإجراءات">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="employeesList" class="divide-y divide-gray-100"></tbody>
+                        <tbody id="employeesList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
                     </table>
                 </div>
             </section>
@@ -310,22 +319,22 @@
             <!-- 3. المهام -->
             <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600">إدارة المهام ومتابعة الإنجاز</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إدارة المهام">إدارة المهام ومتابعة الإنجاز</p>
                     <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
-                        <i class="fa-solid fa-plus ml-2"></i> إسناد مهمة جديدة
+                        <i class="fa-solid fa-plus ml-2"></i> <span data-i18n="إسناد مهمة جديدة">إسناد مهمة جديدة</span>
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                    <div class="bg-gray-100 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-gray-700 mb-3 md:mb-4 pb-2 border-b border-gray-200 text-sm md:text-base">قيد الانتظار ⏳</h3>
+                    <div class="bg-gray-100 dark:bg-gray-800 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden border dark:border-gray-700">
+                        <h3 class="font-bold text-gray-700 dark:text-gray-200 mb-3 md:mb-4 pb-2 border-b border-gray-200 dark:border-gray-600 text-sm md:text-base" data-i18n="قيد الانتظار">قيد الانتظار ⏳</h3>
                         <div id="tasks-pending" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
                     </div>
-                    <div class="bg-blue-50 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-primary mb-3 md:mb-4 pb-2 border-b border-blue-200 text-sm md:text-base">قيد التنفيذ 🛠️</h3>
+                    <div class="bg-blue-50 dark:bg-gray-800 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden border border-blue-100 dark:border-gray-700">
+                        <h3 class="font-bold text-primary dark:text-blue-400 mb-3 md:mb-4 pb-2 border-b border-blue-200 dark:border-gray-600 text-sm md:text-base" data-i18n="قيد التنفيذ">قيد التنفيذ 🛠️</h3>
                         <div id="tasks-progress" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
                     </div>
-                    <div class="bg-green-50 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden">
-                        <h3 class="font-bold text-green-600 mb-3 md:mb-4 pb-2 border-b border-green-200 text-sm md:text-base">مكتمل ✅</h3>
+                    <div class="bg-green-50 dark:bg-gray-800 p-3 md:p-4 rounded-xl flex flex-col h-[50vh] md:h-[70vh] overflow-hidden border border-green-100 dark:border-gray-700">
+                        <h3 class="font-bold text-green-600 dark:text-green-400 mb-3 md:mb-4 pb-2 border-b border-green-200 dark:border-gray-600 text-sm md:text-base" data-i18n="مكتمل">مكتمل ✅</h3>
                         <div id="tasks-completed" class="space-y-3 overflow-y-auto flex-1 pr-1"></div>
                     </div>
                 </div>
@@ -333,51 +342,51 @@
 
             <!-- 4. قسم الملفات -->
             <section id="drive" class="section-content hidden animate-fade-in p-4 md:p-0">
-                <div class="mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between text-sm mb-2 font-bold text-gray-700">
-                        <span>المساحة المستخدمة</span>
+                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between text-sm mb-2 font-bold text-gray-700 dark:text-gray-300">
+                        <span data-i18n="المساحة المستخدمة">المساحة المستخدمة</span>
                         <span id="storageText">0 MB / 15 MB</span>
                     </div>
-                    <div class="w-full bg-gray-100 rounded-full h-3 border border-gray-200 overflow-hidden">
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 border border-gray-200 dark:border-gray-600 overflow-hidden">
                         <div id="storageBar" class="bg-green-500 h-full transition-all duration-500 w-0"></div>
                     </div>
                     <p id="storageWarning" class="text-xs text-red-500 mt-2 font-bold hidden"><i class="fa-solid fa-triangle-exclamation"></i> لا يمكن رفع ملفات جديدة، المساحة ممتلئة!</p>
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 600KB للملف الواحد)</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 600KB للملف الواحد)</p>
                     <div>
                         <input type="file" id="driveFileInput" class="hidden" onchange="window.handleDriveFileSelect(event)">
                         <button id="uploadFileBtn" onclick="document.getElementById('driveFileInput').click()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto flex justify-center shadow">
-                            <i class="fa-solid fa-cloud-arrow-up ml-2"></i> رفع ملف جديد
+                            <i class="fa-solid fa-cloud-arrow-up ml-2"></i> <span data-i18n="رفع ملف جديد">رفع ملف جديد</span>
                         </button>
                     </div>
                 </div>
                 
-                <h3 class="font-bold text-gray-800 mb-3 border-b pb-2"><i class="fa-solid fa-thumbtack text-primary ml-2"></i>الملفات المثبتة</h3>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 border-b dark:border-gray-700 pb-2"><i class="fa-solid fa-thumbtack text-primary dark:text-secondary ml-2"></i><span data-i18n="الملفات المثبتة">الملفات المثبتة</span></h3>
                 <div id="pinnedFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"></div>
 
-                <h3 class="font-bold text-gray-800 mb-3 border-b pb-2"><i class="fa-regular fa-folder-open text-secondary ml-2"></i>كل الملفات</h3>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 border-b dark:border-gray-700 pb-2"><i class="fa-regular fa-folder-open text-secondary ml-2"></i><span data-i18n="كل الملفات">كل الملفات</span></h3>
                 <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
             </section>
 
             <!-- قسم الاجتماعات -->
             <section id="meetings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600">إدارة وجدولة مكالمات الفيديو</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إدارة الاجتماعات">إدارة وجدولة مكالمات الفيديو</p>
                     <button id="createMeetingBtn" onclick="window.openCreateMeetingModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center">
-                        <i class="fa-solid fa-video ml-2"></i> بدء / جدولة اجتماع
+                        <i class="fa-solid fa-video ml-2"></i> <span data-i18n="بدء / جدولة اجتماع">بدء / جدولة اجتماع</span>
                     </button>
                 </div>
 
                 <div class="space-y-6">
                     <div>
-                        <h3 class="font-bold text-primary mb-3 border-b border-gray-200 pb-2"><i class="fa-solid fa-calendar-check ml-2"></i>الاجتماعات الحالية والمجدولة</h3>
+                        <h3 class="font-bold text-primary dark:text-blue-400 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fa-solid fa-calendar-check ml-2"></i><span data-i18n="الاجتماعات الحالية">الاجتماعات الحالية والمجدولة</span></h3>
                         <div id="activeMeetingsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
 
                     <div>
-                        <h3 class="font-bold text-gray-600 mb-3 border-b border-gray-200 pb-2 mt-8"><i class="fa-solid fa-clock-rotate-left ml-2"></i>سجل الاجتماعات السابقة</h3>
+                        <h3 class="font-bold text-gray-600 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2 mt-8"><i class="fa-solid fa-clock-rotate-left ml-2"></i><span data-i18n="سجل الاجتماعات">سجل الاجتماعات السابقة</span></h3>
                         <div id="pastMeetingsList" class="space-y-3"></div>
                     </div>
                 </div>
@@ -385,12 +394,12 @@
 
             <!-- 5. المحادثات (المناقشة) -->
             <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
-                <div class="flex h-full bg-white md:rounded-xl shadow-sm border-x border-b border-gray-200 overflow-hidden relative">
+                <div class="flex h-full bg-white dark:bg-gray-800 md:rounded-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden relative">
                     
                     <!-- الشريط الجانبي للمحادثات -->
-                    <div class="w-64 bg-gray-50 border-l border-gray-200 flex-col hidden md:flex flex-shrink-0 z-10">
-                        <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white h-[68px]">
-                            <span class="font-bold text-gray-700 text-sm"><i class="fa-solid fa-list-ul ml-2 text-gray-400"></i>القنوات والمجموعات</span>
+                    <div class="w-64 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex-col hidden md:flex flex-shrink-0 z-10">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 h-[68px]">
+                            <span class="font-bold text-gray-700 dark:text-gray-200 text-sm"><i class="fa-solid fa-list-ul ml-2 text-gray-400"></i><span data-i18n="القنوات والمجموعات">القنوات والمجموعات</span></span>
                             <button id="innerCreateGroupBtn" onclick="window.openCreateGroupModal()" class="text-gray-400 hover:text-primary transition" title="إنشاء مجموعة جديدة">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
@@ -400,8 +409,8 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 flex flex-col min-w-0 bg-white relative">
-                        <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm flex-shrink-0 h-[68px]">
+                    <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 relative">
+                        <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm flex-shrink-0 h-[68px]">
                             <div class="flex items-center gap-3 min-w-0 overflow-hidden">
                                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary">
                                     <i class="fa-solid fa-bars text-xl"></i>
@@ -410,8 +419,8 @@
                                 <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
                                     <i class="fa-solid fa-comments"></i>
                                 </div>
-                                <div class="flex flex-col min-w-0 cursor-pointer hover:bg-gray-50 p-1 rounded transition" onclick="window.openGroupInfoModal()" title="عرض معلومات وأعضاء المجموعة">
-                                    <h3 id="chatHeaderTitle" class="font-bold text-primary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
+                                <div class="flex flex-col min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition" onclick="window.openGroupInfoModal()" title="عرض معلومات وأعضاء المجموعة">
+                                    <h3 id="chatHeaderTitle" class="font-bold text-primary dark:text-secondary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
                                     <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate flex items-center gap-1">
                                         <i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span>
                                     </p>
@@ -420,28 +429,28 @@
                             
                             <!-- أزرار الحذف والمسح -->
                             <div class="flex items-center gap-2 flex-shrink-0" id="chatHeaderActions">
-                                <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1" title="مسح رسائل الدردشة فقط">
-                                    <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">مسح الرسائل</span>
+                                <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-gray-600 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-gray-600 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline" data-i18n="مسح الرسائل">مسح الرسائل</span>
                                 </button>
-                                <button id="deleteGroupBtn" onclick="window.clearOrDeleteGroup('delete')" class="hidden text-xs bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1" title="حذف المجموعة بالكامل">
-                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">حذف المجموعة</span>
+                                <button id="deleteGroupBtn" onclick="window.clearOrDeleteGroup('delete')" class="hidden text-xs bg-red-50 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-gray-600 text-red-600 dark:text-red-400 border border-red-200 dark:border-gray-600 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline" data-i18n="حذف المجموعة">حذف المجموعة</span>
                                 </button>
                             </div>
                         </div>
                         
                         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
 
-                        <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 border-t border-gray-100 flex items-center justify-between flex-shrink-0">
-                            <div class="flex items-center gap-2 text-sm text-primary font-bold">
+                        <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between flex-shrink-0">
+                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold">
                                 <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
                             </div>
                             <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i> إزالة</button>
                         </div>
                         
-                        <div class="p-3 md:p-4 bg-white border-t border-gray-100 relative z-10 flex-shrink-0">
-                            <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white border border-gray-200 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
+                        <div class="p-3 md:p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 relative z-10 flex-shrink-0">
+                            <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
 
-                            <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white border border-gray-200 shadow-xl rounded-lg p-3 flex gap-2 z-20">
+                            <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg p-3 flex gap-2 z-20">
                                 <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
                                 <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
                                 <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
@@ -450,11 +459,11 @@
                                 <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
                             </div>
 
-                            <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 p-2 bg-gray-50 border border-gray-200 rounded-lg">
-                                <i class="fa-solid fa-eye mr-1"></i> أنت تشاهد هذه المجموعة بصفة مراقب (مدير) ولا يمكنك الكتابة فيها.
+                            <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                <i class="fa-solid fa-eye mr-1"></i> <span data-i18n="أنت تشاهد كمراقب">أنت تشاهد هذه المجموعة بصفة مراقب (مدير) ولا يمكنك الكتابة فيها.</span>
                             </div>
 
-                            <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
+                            <form id="chatForm" class="flex items-center bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
                                 <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg ml-2 transition-colors font-bold" title="ذكر شخص">@</button>
                                 <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
                                 <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="إرفاق ملف (صورة/فيديو/pdf)">
@@ -463,9 +472,9 @@
                                 <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg ml-3 transition-colors" title="تغيير لون الرسالة">
                                     <i class="fa-solid fa-palette"></i>
                                 </button>
-                                <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700" autocomplete="off">
+                                <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700 dark:text-gray-200" autocomplete="off">
                                 <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow">
-                                    <i class="fa-regular fa-paper-plane transform -scale-x-100"></i>
+                                    <i class="fa-regular fa-paper-plane transform -scale-x-100" id="sendIconDir"></i>
                                 </button>
                             </form>
                         </div>
@@ -476,52 +485,51 @@
             <!-- 6. الإعدادات -->
             <section id="settings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
-                    <p class="text-sm md:text-base text-gray-600">إعدادات الحساب والملف الشخصي</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إعدادات الحساب">إعدادات الحساب والملف الشخصي</p>
                 </div>
                 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-xl mx-auto md:mx-0">
-                    <h3 class="font-bold text-primary mb-6 border-b border-gray-100 pb-3 text-lg"><i class="fa-solid fa-user-gear ml-2"></i>معلومات الحساب الأساسية</h3>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 max-w-xl mx-auto md:mx-0">
+                    <h3 class="font-bold text-primary dark:text-secondary mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 text-lg"><i class="fa-solid fa-user-gear ml-2"></i><span data-i18n="معلومات الحساب">معلومات الحساب الأساسية</span></h3>
                     
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-right">
                         <div class="relative group">
-                            <img id="settingsAvatarPreview" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-24 h-24 rounded-full border-4 border-gray-50 object-cover shadow-md">
+                            <img id="settingsAvatarPreview" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-24 h-24 rounded-full border-4 border-gray-50 dark:border-gray-700 object-cover shadow-md">
                             <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onclick="document.getElementById('profilePicInput').click()">
                                 <i class="fa-solid fa-camera text-white text-xl"></i>
                             </div>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-bold text-gray-800 text-base mb-1">تغيير الصورة الشخصية</h4>
-                            <p class="text-xs text-gray-500 mb-3">اختر صورة تعبر عنك ليراها زملاؤك في العمل (الحد الأقصى 500KB).</p>
+                            <h4 class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1" data-i18n="تغيير الصورة">تغيير الصورة الشخصية</h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3" data-i18n="اختر صورة تعبر عنك">اختر صورة تعبر عنك ليراها زملاؤك في العمل (الحد الأقصى 500KB).</p>
                             <input type="file" id="profilePicInput" class="hidden" accept="image/*" onchange="window.handleProfilePicChange(event)">
-                            <button onclick="document.getElementById('profilePicInput').click()" class="bg-gray-100 border border-gray-200 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm">
-                                <i class="fa-solid fa-upload ml-2"></i> اختيار صورة
+                            <button onclick="document.getElementById('profilePicInput').click()" class="bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm">
+                                <i class="fa-solid fa-upload ml-2"></i> <span data-i18n="اختيار صورة">اختيار صورة</span>
                             </button>
                         </div>
                     </div>
 
                     <div class="space-y-5">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل <span class="text-[10px] text-red-400 font-normal mr-1">(لا يمكن تعديله إلا من قبل المدير)</span></label>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الاسم الكامل">الاسم الكامل</span> <span class="text-[10px] text-red-400 font-normal mr-1" data-i18n="(لا يمكن تعديله)">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
                                 <i class="fa-solid fa-user absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="settingsName" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none">
+                                <input type="text" id="settingsName" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg pr-10 pl-3 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور) <span class="text-[10px] text-red-400 font-normal mr-1">(لا يمكن تعديله إلا من قبل المدير)</span></label>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</span> <span class="text-[10px] text-red-400 font-normal mr-1" data-i18n="(لا يمكن تعديله)">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
                                 <i class="fa-solid fa-briefcase absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 bg-gray-50 rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium cursor-not-allowed outline-none">
+                                <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg pr-10 pl-3 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
-                        <div class="pt-4 border-t border-gray-100">
-                            <label class="block text-sm font-bold text-gray-700 mb-1">ترتيب عرض وسائط المحادثة</label>
-                            <p class="text-xs text-gray-500 mb-2">اختر طريقة عرض النص مع الصور أو الفيديوهات في رسائلك.</p>
-                            <div class="relative">
+                        <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="ترتيب عرض الوسائط">ترتيب عرض وسائط المحادثة</label>
+                            <div class="relative mt-2">
                                 <i class="fa-solid fa-layer-group absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                <select id="settingsChatLayout" onchange="window.updateChatLayoutPref(this.value)" class="w-full border border-gray-200 bg-white rounded-lg pr-10 pl-3 py-3 text-gray-600 font-medium focus:border-secondary focus:outline-none transition shadow-sm cursor-pointer hover:border-gray-300">
-                                    <option value="media-top">الوسائط في الأعلى والنص في الأسفل (الافتراضي)</option>
-                                    <option value="text-top">النص في الأعلى والوسائط في الأسفل</option>
+                                <select id="settingsChatLayout" onchange="window.updateChatLayoutPref(this.value)" class="w-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg pr-10 pl-3 py-3 text-gray-600 dark:text-gray-200 font-medium focus:border-secondary focus:outline-none transition shadow-sm cursor-pointer hover:border-gray-300 dark:hover:border-gray-500">
+                                    <option value="media-top" data-i18n="الوسائط في الأعلى">الوسائط في الأعلى والنص في الأسفل (الافتراضي)</option>
+                                    <option value="text-top" data-i18n="النص في الأعلى">النص في الأعلى والوسائط في الأسفل</option>
                                 </select>
                             </div>
                         </div>
@@ -532,21 +540,21 @@
             <!-- 7. سجل النظام -->
             <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
-                    <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm">
-                        <i class="fa-solid fa-trash-can"></i> تفريغ السجل
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
+                    <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-gray-600 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm">
+                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="تفريغ السجل">تفريغ السجل</span>
                     </button>
                 </div>
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                     <table class="w-full text-right min-w-[600px]">
-                        <thead class="bg-gray-50 border-b">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                             <tr>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الوقت</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">المستخدم</th>
-                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600">الحدث</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الوقت">الوقت</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="المستخدم">المستخدم</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الحدث">الحدث</th>
                             </tr>
                         </thead>
-                        <tbody id="logsList" class="divide-y divide-gray-100"></tbody>
+                        <tbody id="logsList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
                     </table>
                 </div>
             </section>
@@ -556,26 +564,26 @@
 
     <!-- Modal: معلومات المجموعة -->
     <div id="groupInfoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg" id="infoModalTitle">معلومات المجموعة</h3>
                 <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-4 md:p-6 overflow-y-auto flex-1">
                 
-                <div id="addMemberSection" class="hidden mb-4 border-b border-gray-100 pb-4">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">إضافة عضو جديد للمجموعة (خاص بالمدير)</label>
+                <div id="addMemberSection" class="hidden mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة عضو جديد">إضافة عضو جديد للمجموعة (خاص بالمدير)</label>
                     <div class="flex gap-2">
-                        <select id="newMemberSelect" class="flex-1 border rounded-lg px-2 py-2 focus:border-secondary focus:outline-none text-sm">
+                        <select id="newMemberSelect" class="flex-1 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-2 py-2 focus:border-secondary focus:outline-none text-sm">
                             <option value="">-- اختر موظف --</option>
                         </select>
                         <button onclick="window.addGroupMember()" class="bg-secondary text-white px-3 py-2 rounded-lg text-sm hover:bg-primary transition shadow-sm font-bold whitespace-nowrap">
-                            <i class="fa-solid fa-user-plus ml-1"></i> إضافة
+                            <i class="fa-solid fa-user-plus ml-1"></i> <span data-i18n="إضافة">إضافة</span>
                         </button>
                     </div>
                 </div>
 
-                <label class="block text-sm font-bold text-gray-700 mb-2">أعضاء المجموعة المتواجدين</label>
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="أعضاء المجموعة">أعضاء المجموعة المتواجدين</label>
                 <div id="groupInfoMembersList" class="space-y-2">
                     <!-- Populated dynamically -->
                 </div>
@@ -585,27 +593,27 @@
 
     <!-- Modal: إضافة مهمة -->
     <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-secondary text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">إسناد مهمة جديدة</h3>
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إسناد مهمة جديدة">إسناد مهمة جديدة</h3>
                 <button onclick="window.closeModal('taskModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
-                <div><label class="block text-sm text-gray-600 mb-1">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></div>
+                <div><label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="عنوان المهمة">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></div>
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">وقت وتاريخ الإنجاز المطلوب</label>
-                    <input type="datetime-local" id="taskDeadline" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                    <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="وقت وتاريخ">وقت وتاريخ الإنجاز المطلوب</label>
+                    <input type="datetime-local" id="taskDeadline" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
                 </div>
-                <div><label class="block text-sm text-gray-600 mb-1">التفاصيل</label><textarea id="taskDesc" rows="2" class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></textarea></div>
+                <div><label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="التفاصيل">التفاصيل</label><textarea id="taskDesc" rows="2" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></textarea></div>
                 <div>
-                    <label class="block text-sm text-gray-600 mb-1">إسناد إلى الموظف</label>
-                    <select id="taskAssignee" required class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                    <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="إسناد إلى">إسناد إلى الموظف</label>
+                    <select id="taskAssignee" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
                         <!-- Populated dynamically -->
                     </select>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base">إرسال المهمة</button>
+                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base" data-i18n="إرسال المهمة">إرسال المهمة</button>
                 </div>
             </form>
         </div>
@@ -613,23 +621,23 @@
 
     <!-- Modal: إنشاء مجموعة محادثة -->
     <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-primary text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">إنشاء مجموعة دردشة</h3>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إنشاء مجموعة">إنشاء مجموعة دردشة</h3>
                 <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="createGroupForm" class="p-4 md:p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">اسم المجموعة</label>
-                    <input type="text" id="newGroupName" required placeholder="مثال: فريق التسويق" class="w-full border rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="اسم المجموعة">اسم المجموعة</label>
+                    <input type="text" id="newGroupName" required placeholder="مثال: فريق التسويق" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">إضافة الأعضاء</label>
-                    <div id="groupMembersSelection" class="border border-gray-200 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50"></div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة الأعضاء">إضافة الأعضاء</label>
+                    <div id="groupMembersSelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700"></div>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base">تأكيد الإنشاء</button>
+                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base" data-i18n="تأكيد">تأكيد الإنشاء</button>
                 </div>
             </form>
         </div>
@@ -637,27 +645,27 @@
 
     <!-- Modal: إنشاء/جدولة اجتماع (مكالمة فيديو) -->
     <div id="createMeetingModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-green-600 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">بدء أو جدولة اجتماع فيديو</h3>
+                <h3 class="font-bold text-base md:text-lg" data-i18n="جدولة اجتماع">بدء أو جدولة اجتماع فيديو</h3>
                 <button onclick="window.closeModal('createMeetingModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="createMeetingForm" class="p-4 md:p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">عنوان الاجتماع</label>
-                    <input type="text" id="newMeetingTitle" required placeholder="مثال: مناقشة المشروع الجديد" class="w-full border rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="عنوان الاجتماع">عنوان الاجتماع</label>
+                    <input type="text" id="newMeetingTitle" required placeholder="مثال: مناقشة المشروع الجديد" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">وقت الاجتماع (اتركه فارغاً للبدء فوراً)</label>
-                    <input type="datetime-local" id="newMeetingTime" class="w-full border rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="وقت الاجتماع">وقت الاجتماع (اتركه فارغاً للبدء فوراً)</label>
+                    <input type="datetime-local" id="newMeetingTime" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">المدعوين للاجتماع</label>
-                    <div id="meetingMembersSelection" class="border border-gray-200 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50"></div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="المدعوين">المدعوين للاجتماع</label>
+                    <div id="meetingMembersSelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700"></div>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('createMeetingModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base">إنشاء الاجتماع</button>
+                    <button type="button" onclick="window.closeModal('createMeetingModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base" data-i18n="إنشاء الاجتماع">إنشاء الاجتماع</button>
                 </div>
             </form>
         </div>
@@ -665,28 +673,28 @@
 
     <!-- Modal: تعديل بيانات موظف (للمدير) -->
     <div id="editEmployeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">تعديل بيانات الموظف</h3>
+                <h3 class="font-bold text-base md:text-lg" data-i18n="تعديل بيانات">تعديل بيانات الموظف</h3>
                 <button onclick="window.closeModal('editEmployeeModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="editEmployeeForm" class="p-4 md:p-6 space-y-4">
                 <input type="hidden" id="editEmpId">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
-                    <input type="text" id="editEmpName" required class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الاسم الكامل">الاسم الكامل</label>
+                    <input type="text" id="editEmpName" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">الوظيفة (الدور)</label>
-                    <select id="editEmpRole" required class="w-full border rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</label>
+                    <select id="editEmpRole" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
                         <option value="technical team supervisor">Technical Team Supervisor</option>
                         <option value="Technical Engineer">Technical Engineer</option>
                         <option value="accountant">Accountant</option>
                     </select>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-50 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow">حفظ التغييرات</button>
+                    <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow" data-i18n="حفظ">حفظ التغييرات</button>
                 </div>
             </form>
         </div>
@@ -703,10 +711,10 @@
         <div class="bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0 shadow-md border-b border-gray-800">
             <div class="flex items-center gap-3">
                 <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <h3 id="videoCallTitle" class="font-bold text-sm md:text-base">مكالمة فيديو قيد التشغيل</h3>
+                <h3 id="videoCallTitle" class="font-bold text-sm md:text-base" data-i18n="مكالمة جارية">مكالمة فيديو قيد التشغيل</h3>
             </div>
             <button onclick="window.endVideoCall()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 text-xs md:text-sm shadow">
-                <i class="fa-solid fa-phone-slash"></i> إنهاء / مغادرة
+                <i class="fa-solid fa-phone-slash"></i> <span data-i18n="إنهاء/مغادرة">إنهاء / مغادرة</span>
             </button>
         </div>
         <div id="jitsiContainer" class="flex-1 w-full bg-black relative">
@@ -753,6 +761,163 @@
 
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
 
+        // ==========================================
+        // 🌐 نظام الترجمة البسيط
+        // ==========================================
+        const i18nDict = {
+            "التطبيقات": "Applications",
+            "اختر التطبيق الذي تود العمل عليه": "Choose an application to work on",
+            "لوحات البيانات": "Dashboards",
+            "الموظفون": "Employees",
+            "المهام": "Tasks",
+            "المهام المراد تنفيذها": "Tasks to do",
+            "المستندات": "Documents",
+            "الاجتماعات": "Meetings",
+            "المناقشة": "Chat",
+            "سجل النظام": "System Logs",
+            "الإعدادات": "Settings",
+            "الرئيسية": "Home",
+            "جاري التحميل...": "Loading...",
+            "مرحباً بك": "Welcome",
+            "يجب تسجيل الدخول": "Please login to access the system",
+            "تسجيل الدخول باستخدام Google": "Login with Google",
+            "إكمال بيانات الملف الشخصي": "Complete Profile Setup",
+            "الاسم الكامل": "Full Name",
+            "الوظيفة (الدور)": "Role",
+            "الدخول للنظام": "Enter System",
+            "الموظفين المسجلين": "Registered Employees",
+            "إجمالي المهام": "Total Tasks",
+            "مهام مكتملة": "Completed Tasks",
+            "فريق العمل المسجل": "Registered Team Members",
+            "الاسم": "Name",
+            "الوظيفة": "Job Role",
+            "الإجراءات": "Actions",
+            "إدارة المهام": "Task Management",
+            "إسناد مهمة جديدة": "Assign New Task",
+            "قيد الانتظار": "Pending ⏳",
+            "قيد التنفيذ": "In Progress 🛠️",
+            "مكتمل": "Completed ✅",
+            "المساحة المستخدمة": "Used Storage",
+            "مشاركة الملفات": "Share Important Files (Max 600KB)",
+            "رفع ملف جديد": "Upload New File",
+            "الملفات المثبتة": "Pinned Files",
+            "كل الملفات": "All Files",
+            "إدارة الاجتماعات": "Manage Video Calls",
+            "بدء / جدولة اجتماع": "Start/Schedule Meeting",
+            "الاجتماعات الحالية": "Active & Scheduled Meetings",
+            "سجل الاجتماعات": "Past Meetings Log",
+            "القنوات والمجموعات": "Channels & Groups",
+            "مسح الرسائل": "Clear Messages",
+            "حذف المجموعة": "Delete Group",
+            "أنت تشاهد كمراقب": "You are viewing this as an observer (CEO).",
+            "إعدادات الحساب": "Account Settings",
+            "معلومات الحساب": "Basic Info",
+            "تغيير الصورة": "Change Avatar",
+            "اختر صورة تعبر عنك": "Choose an image (Max 500KB)",
+            "اختيار صورة": "Choose Image",
+            "(لا يمكن تعديله)": "(Cannot be changed except by CEO)",
+            "ترتيب عرض الوسائط": "Chat Media Layout",
+            "الوسائط في الأعلى": "Media top, Text bottom (Default)",
+            "النص في الأعلى": "Text top, Media bottom",
+            "تسجيل حي ومباشر": "Live System Log (CEO)",
+            "تفريغ السجل": "Clear Log",
+            "الوقت": "Time",
+            "المستخدم": "User",
+            "الحدث": "Event",
+            "إضافة عضو جديد": "Add New Member",
+            "إضافة": "Add",
+            "أعضاء المجموعة": "Current Group Members",
+            "عنوان المهمة": "Task Title",
+            "وقت وتاريخ": "Deadline",
+            "التفاصيل": "Details",
+            "إسناد إلى": "Assign to",
+            "إلغاء": "Cancel",
+            "إرسال المهمة": "Send Task",
+            "إنشاء مجموعة": "Create Group",
+            "اسم المجموعة": "Group Name",
+            "إضافة الأعضاء": "Add Members",
+            "تأكيد": "Confirm",
+            "جدولة اجتماع": "Schedule Video Meeting",
+            "عنوان الاجتماع": "Meeting Title",
+            "وقت الاجتماع": "Meeting Time",
+            "المدعوين": "Invitees",
+            "إنشاء الاجتماع": "Create Meeting",
+            "تعديل بيانات": "Edit Employee Data",
+            "حفظ": "Save",
+            "مكالمة جارية": "Active Call",
+            "إنهاء/مغادرة": "End / Leave",
+            "بواسطة:": "By:",
+            "مجهول": "Unknown",
+            "أنت (المدير)": "You (CEO)",
+            "مطلوب:": "Due:",
+            "مدير": "Admin",
+            "مراقب": "Viewer",
+            "حذف": "Delete",
+            "مهمتك": "Your Task",
+            "البدء بالتنفيذ": "Start Progress",
+            "تأكيد الإنجاز": "Confirm Done"
+        };
+
+        window.currentLang = localStorage.getItem('appLang') || 'ar';
+        
+        window.t = function(arString) {
+            if (window.currentLang === 'en' && i18nDict[arString]) {
+                return i18nDict[arString];
+            }
+            return arString;
+        };
+
+        function applyLanguageToDOM() {
+            document.documentElement.lang = window.currentLang;
+            document.documentElement.dir = window.currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.getElementById('langIconTxt').innerText = window.currentLang === 'ar' ? 'EN' : 'AR';
+            
+            const sendIconDir = document.getElementById('sendIconDir');
+            if(sendIconDir) {
+                sendIconDir.className = window.currentLang === 'ar' ? 'fa-regular fa-paper-plane transform -scale-x-100' : 'fa-regular fa-paper-plane';
+            }
+
+            if (window.currentLang === 'en') {
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (i18nDict[key]) {
+                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = i18nDict[key];
+                        else {
+                            // الحفاظ على الأيقونات داخل الزر/العنصر
+                            const icon = el.querySelector('i');
+                            el.innerHTML = (icon ? icon.outerHTML + ' ' : '') + i18nDict[key];
+                        }
+                    }
+                });
+            }
+        }
+
+        window.toggleLanguage = () => {
+            window.currentLang = window.currentLang === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('appLang', window.currentLang);
+            window.location.reload(); // أسهل طريقة لترجمة كافة المكونات الديناميكية
+        };
+
+        // ==========================================
+        // 🌙 الوضع الليلي
+        // ==========================================
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('appTheme', isDark ? 'dark' : 'light');
+            document.getElementById('themeToggleIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        };
+
+        // تهيئة السمة واللغة عند التحميل
+        if (localStorage.getItem('appTheme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.addEventListener("DOMContentLoaded", () => {
+                const icon = document.getElementById('themeToggleIcon');
+                if (icon) icon.className = 'fa-solid fa-sun';
+            });
+        }
+        document.addEventListener("DOMContentLoaded", applyLanguageToDOM);
+
         let currentUserAuth = null;
         let currentUserData = null; 
         let globalUsers = []; 
@@ -786,7 +951,7 @@
         }
 
         let hasRequestedNotification = false;
-        let latestNotificationMsg = 'لا توجد إشعارات جديدة حالياً';
+        let latestNotificationMsg = window.t('لا توجد إشعارات جديدة حالياً');
 
         window.requestNotifications = () => {
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -819,7 +984,7 @@
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(!activeGroup) return;
 
-            document.getElementById('infoModalTitle').innerText = `معلومات: ${activeGroup.name}`;
+            document.getElementById('infoModalTitle').innerText = `${t('معلومات الحساب')}: ${activeGroup.name}`;
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             
             const addMemberSection = document.getElementById('addMemberSection');
@@ -827,7 +992,7 @@
                 addMemberSection.classList.remove('hidden');
                 
                 const select = document.getElementById('newMemberSelect');
-                select.innerHTML = '<option value="">-- اختر موظف --</option>';
+                select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
                 globalUsers.forEach(u => {
                     if (!activeGroup.members.includes(u.id)) {
                         select.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
@@ -843,7 +1008,6 @@
             let membersToShow = activeGroup.id === 'global' ? globalUsers : globalUsers.filter(u => activeGroup.members.includes(u.id));
             
             if(activeGroup.id !== 'global' && isCEO && !activeGroup.members.includes(currentUserData.uid)) {
-                // إضافة المدير كعضو مراقب لتوضيح تواجده
                 const ceoViewer = globalUsers.find(u => u.uid === currentUserData.uid);
                 if(ceoViewer) membersToShow.unshift({...ceoViewer, isViewer: true});
             }
@@ -851,19 +1015,19 @@
             membersToShow.forEach(u => {
                 let removeBtn = '';
                 if (isCEO && activeGroup.id !== 'global' && u.id !== currentUserData.uid && !u.isViewer) {
-                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded transition text-xs font-bold" title="حذف من المجموعة"><i class="fa-solid fa-user-minus"></i> حذف</button>`;
+                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-gray-700 p-1.5 rounded transition text-xs font-bold" title="${t('حذف من المجموعة')}"><i class="fa-solid fa-user-minus"></i> ${t('حذف')}</button>`;
                 }
 
-                let badge = u.role === 'CEO' ? `<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded mr-2">مدير</span>` : '';
-                if(u.isViewer) badge = `<span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded mr-2">مراقب</span>`;
+                let badge = u.role === 'CEO' ? `<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مدير')}</span>` : '';
+                if(u.isViewer) badge = `<span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مراقب')}</span>`;
 
                 list.innerHTML += `
-                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 border border-transparent hover:border-gray-100 rounded-lg transition">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent hover:border-gray-100 dark:hover:border-gray-600 rounded-lg transition">
                         <div class="flex items-center gap-2">
                             <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover">
                             <div>
-                                <p class="text-sm font-bold text-gray-800">${u.name} ${badge}</p>
-                                <p class="text-[10px] text-gray-500">${u.role}</p>
+                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${u.name} ${badge}</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">${u.role}</p>
                             </div>
                         </div>
                         ${removeBtn}
@@ -887,7 +1051,7 @@
                     });
                     showToast(`تمت إزالة ${userName} بنجاح`, 'success');
                     logAction('إدارة مجموعة', `تمت إزالة ${userName} من مجموعة ${activeGroup.name}`);
-                    window.openGroupInfoModal(); // Refresh modal
+                    window.openGroupInfoModal(); 
                 } catch(e) {}
             }
         };
@@ -913,7 +1077,7 @@
                 });
                 showToast(`تم إضافة ${userName} بنجاح`, 'success');
                 logAction('إدارة مجموعة', `تمت إضافة ${userName} إلى مجموعة ${activeGroup.name}`);
-                window.openGroupInfoModal(); // Refresh modal
+                window.openGroupInfoModal(); 
             } catch(e) {}
         };
 
@@ -925,10 +1089,10 @@
             globalUsers.forEach(emp => {
                 if(emp.id !== currentUserData.uid) {
                     container.innerHTML += `
-                        <label class="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer border border-transparent hover:border-gray-200 transition">
+                        <label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-500 transition">
                             <input type="checkbox" value="${emp.id}" class="group-member-checkbox w-4 h-4 text-secondary rounded border-gray-300 focus:ring-secondary">
                             <img src="${emp.photoURL}" class="w-6 h-6 rounded-full object-cover">
-                            <span class="text-sm font-medium text-gray-700">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
                         </label>
                     `;
                 }
@@ -943,10 +1107,10 @@
             globalUsers.forEach(emp => {
                 if(emp.id !== currentUserData.uid) {
                     container.innerHTML += `
-                        <label class="flex items-center gap-2 p-2 hover:bg-white rounded cursor-pointer border border-transparent hover:border-gray-200 transition">
+                        <label class="flex items-center gap-2 p-2 hover:bg-white dark:hover:bg-gray-600 rounded cursor-pointer border border-transparent hover:border-gray-200 transition">
                             <input type="checkbox" value="${emp.id}" class="meeting-member-checkbox w-4 h-4 text-green-600 rounded border-gray-300 focus:ring-green-500">
                             <img src="${emp.photoURL}" class="w-6 h-6 rounded-full">
-                            <span class="text-sm font-medium text-gray-700">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
                         </label>
                     `;
                 }
@@ -1018,7 +1182,7 @@
             const cleanId = meetingId.replace(/[^a-zA-Z0-9]/g, "");
             const roomName = `QuillWorldApp_${appId.substring(0,5)}_${cleanId}`;
 
-            document.getElementById('videoCallTitle').innerText = `اجتماع: ${title}`;
+            document.getElementById('videoCallTitle').innerText = `${t('الاجتماعات')}: ${title}`;
             document.getElementById('videoCallModal').classList.remove('hidden');
             document.getElementById('videoCallModal').classList.add('flex');
 
@@ -1123,7 +1287,8 @@
                         ? `<span class="bg-red-100 text-red-600 text-[10px] px-2 py-1 rounded animate-pulse">🔴 جاري الآن</span>`
                         : `<span class="bg-blue-100 text-blue-600 text-[10px] px-2 py-1 rounded">مجدول</span>`;
                     
-                    let actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video ml-1"></i> انضمام</button>`;
+                    let actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video mx-1"></i> ${t('إضافة')}</button>`; // using Add string for Join temporarily or raw Join
+                    actionsHtml = `<button onclick="window.joinMeeting('${meeting.id}', '${meeting.title}')" class="flex-1 bg-green-500 hover:bg-green-600 text-white text-xs py-2 rounded transition font-bold"><i class="fa-solid fa-video mx-1"></i> Join / انضمام</button>`;
                     
                     if (isCEO) {
                         actionsHtml += `
@@ -1133,12 +1298,12 @@
                     }
 
                     activeList.innerHTML += `
-                        <div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md transition">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition">
                             <div class="flex justify-between items-start mb-2">
-                                <h4 class="font-bold text-gray-800 text-sm">${meeting.title}</h4>
+                                <h4 class="font-bold text-gray-800 dark:text-gray-100 text-sm">${meeting.title}</h4>
                                 ${statusBadge}
                             </div>
-                            <p class="text-xs text-gray-500 mb-4"><i class="fa-regular fa-clock ml-1"></i> ${timeStr}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4"><i class="fa-regular fa-clock ml-1"></i> ${timeStr}</p>
                             <div class="flex items-center gap-2">
                                 ${actionsHtml}
                             </div>
@@ -1154,25 +1319,25 @@
                     let detailsHtml = '';
                     if (isCEO) {
                         const participants = [...new Set((meeting.events || []).map(e => e.name))].join('، ');
-                        detailsHtml = `<p class="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">المشاركون: ${participants || 'لا أحد'}</p>`;
+                        detailsHtml = `<p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2 bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600">المشاركون: ${participants || 'لا أحد'}</p>`;
                     } else {
                         const joinTime = myEvents.find(e => e.action === 'joined')?.timestamp;
                         const joinStr = joinTime ? new Date(joinTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '';
                         const others = [...new Set((meeting.events || []).map(e => e.name))].filter(n => n !== currentUserData.name).join('، ');
-                        detailsHtml = `<p class="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">وقت دخولك: ${joinStr} | الحضور: ${others || 'فقط أنت'}</p>`;
+                        detailsHtml = `<p class="text-[10px] text-gray-500 dark:text-gray-400 mt-2 bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600">وقت دخولك: ${joinStr} | الحضور: ${others || 'فقط أنت'}</p>`;
                     }
 
                     pastList.innerHTML += `
-                        <div class="bg-white border border-gray-200 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div class="flex-1 w-full">
-                                <h4 class="font-bold text-gray-700 text-sm">${meeting.title}</h4>
+                                <h4 class="font-bold text-gray-700 dark:text-gray-100 text-sm">${meeting.title}</h4>
                                 <div class="flex gap-4 text-xs text-gray-400 mt-1">
-                                    <span><i class="fa-regular fa-calendar ml-1"></i> ${new Date(meeting.startedAt || meeting.timestamp).toLocaleDateString('ar-EG')}</span>
-                                    <span><i class="fa-solid fa-stopwatch ml-1"></i> المدة: ${duration} دقيقة</span>
+                                    <span><i class="fa-regular fa-calendar mx-1"></i> ${new Date(meeting.startedAt || meeting.timestamp).toLocaleDateString('ar-EG')}</span>
+                                    <span><i class="fa-solid fa-stopwatch mx-1"></i> المدة: ${duration} دقيقة</span>
                                 </div>
                                 ${detailsHtml}
                             </div>
-                            <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded whitespace-nowrap"><i class="fa-solid fa-check ml-1"></i> منتهي</span>
+                            <span class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 text-[10px] px-2 py-1 rounded whitespace-nowrap"><i class="fa-solid fa-check mx-1"></i> منتهي</span>
                         </div>
                     `;
                 }
@@ -1240,15 +1405,15 @@
             document.getElementById(sectionId).classList.remove('hidden');
             
             const titles = { 
-                'home-grid': 'الرئيسية - التطبيقات',
-                'dashboard': 'لوحات البيانات', 
-                'employees': 'إدارة الموظفين', 
-                'tasks': 'المهام المراد تنفيذها', 
-                'drive': 'المستندات',
-                'meetings': 'الاجتماعات',
-                'logs': 'سجل النظام', 
-                'chat': 'المناقشة',
-                'settings': 'الإعدادات'
+                'home-grid': t('الرئيسية'),
+                'dashboard': t('لوحات البيانات'), 
+                'employees': t('الموظفون'), 
+                'tasks': t('المهام المراد تنفيذها'), 
+                'drive': t('المستندات'),
+                'meetings': t('الاجتماعات'),
+                'logs': t('سجل النظام'), 
+                'chat': t('المناقشة'),
+                'settings': t('الإعدادات')
             };
             
             if (sectionId === 'home-grid') {
@@ -1321,7 +1486,7 @@
 
         window.openTaskModal = () => {
             const select = document.getElementById('taskAssignee');
-            select.innerHTML = '<option value="">-- اختر موظف --</option>';
+            select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
             globalUsers.forEach(emp => {
                 select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.role})</option>`;
             });
@@ -1468,7 +1633,7 @@
             document.getElementById('chatColorPicker').classList.add('hidden');
             
             const sendBtn = document.querySelector('#chatForm button[type="submit"]');
-            if (sendBtn) sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+            if (sendBtn) sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
             
             if (btnElement) {
                 document.querySelectorAll('.color-btn').forEach(b => {
@@ -1653,7 +1818,7 @@
                 document.getElementById('grid-employees').classList.remove('hidden');
                 document.getElementById('grid-logs').classList.remove('hidden');
                 document.getElementById('nav-logs-btn').classList.remove('hidden'); 
-                document.getElementById('clearLogsBtn').classList.remove('hidden'); // إظهار تفريغ السجل للمدير
+                document.getElementById('clearLogsBtn').classList.remove('hidden'); 
                 document.getElementById('clearLogsBtn').style.display = 'flex';
 
                 document.getElementById('addTaskBtn').classList.remove('hidden');
@@ -1672,7 +1837,6 @@
                 document.getElementById('empActionHeader').classList.add('hidden');
             }
             
-            // السماح بإنشاء المجموعات للجميع
             document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
 
             logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
@@ -1700,7 +1864,7 @@
             if (currentUserData.chatColor) {
                 selectedChatColor = currentUserData.chatColor;
                 const sendBtn = document.querySelector('#chatForm button[type="submit"]');
-                if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mr-2 shadow hover:opacity-80`;
+                if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
                 
                 document.querySelectorAll('.color-btn').forEach(b => {
                     b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
@@ -1719,7 +1883,6 @@
             try { await addDoc(getColRef('logs'), { action: action, details: details, userName: currentUserData.name, timestamp: Date.now() }); } catch(e) {}
         }
         
-        // تفريغ سجل النظام بالكامل (المدير)
         window.clearSystemLogs = async () => {
             if(currentUserData.role !== 'CEO') return;
             if(confirm('هل أنت متأكد من تفريغ سجل النظام بالكامل؟ (لا يمكن التراجع)')) {
@@ -1748,7 +1911,6 @@
                 renderEmployees();
                 updateDashboardStats();
                 
-                // تحديث المودال إذا كان مفتوحاً
                 if(!document.getElementById('groupInfoModal').classList.contains('hidden')) {
                     window.openGroupInfoModal();
                 }
@@ -1786,8 +1948,8 @@
                 });
 
                 if(hasNewAssignedTask) {
-                    showToast(`مهمة جديدة: ${latestTaskName}`, 'warning');
-                    sendPushNotification('مهمة جديدة', `تم إسناد مهمة جديدة إليك: ${latestTaskName}`);
+                    showToast(`${t('مهمة جديدة')}: ${latestTaskName}`, 'warning');
+                    sendPushNotification(t('مهمة جديدة'), `${t('إسناد مهمة جديدة')}: ${latestTaskName}`);
                 }
                 initialTaskLoad = false;
                 renderTasks();
@@ -1810,12 +1972,11 @@
             });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
-                globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
+                globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
                 let foundCurrentGroup = false;
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // المدير يرى كل المجموعات للمراقبة، الموظف يرى مجموعاته فقط
                     if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
                         globalGroups.push({ id: doc.id, ...data });
                         if (doc.id === currentGroupId) foundCurrentGroup = true;
@@ -1845,8 +2006,6 @@
                     if (latestMsg && latestMsg.uid !== currentUserData.uid) {
                         const group = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'));
                         
-                        // الإشعار والإيميل يصل فقط لمن هم بداخل المجموعة فعلياً 
-                        // (أو الدردشة العامة، أو إذا كان المدير يراقب لا نرسل له إشعار الإيميل المزعج)
                         if (group && (group.id === 'global' || group.members.includes(currentUserData.uid))) {
                             const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
                             const groupName = group.name || 'الشركة';
@@ -1871,7 +2030,6 @@
 
         function getGroupUnreadInfo(groupId) {
             const lastRead = groupReadTimestamps[groupId] || 0;
-            // يتم جلب عدد غير المقروء فقط إذا كان المستخدم من ضمن المجموعة
             const activeGroup = globalGroups.find(g => g.id === groupId);
             if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
                 return { count: 0, hasMention: false }; 
@@ -1894,6 +2052,7 @@
             
             let totalUnreadCount = 0;
             let totalMentions = false;
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
 
             globalGroups.forEach(g => {
                 const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
@@ -1904,16 +2063,27 @@
 
                 let badgeHtml = '';
                 if(unreadInfo.hasMention) {
-                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">@</span>`;
+                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">@</span>`;
                 } else if(unreadInfo.count > 0) {
-                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mr-auto">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                }
+                
+                // جلب اسم منشئ المجموعة لعرضه للمدير فقط
+                let creatorHtml = '';
+                if (isCEO && g.id !== 'global') {
+                    const creatorUser = globalUsers.find(u => u.uid === g.createdBy);
+                    const creatorName = creatorUser ? creatorUser.name : t('مجهول');
+                    creatorHtml = `<span class="block text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">${t('بواسطة:')} ${creatorName}</span>`;
                 }
 
                 if (innerList) {
                     innerList.innerHTML += `
-                        <button onclick="window.selectGroup('${g.id}')" class="w-full text-right py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white shadow-sm text-primary font-bold border border-gray-100' : 'text-gray-600 hover:bg-gray-100'}">
-                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center ml-2 text-gray-400 ${isActive ? 'text-primary' : ''}"></i> 
-                            <span class="truncate">${g.name}</span>
+                        <button onclick="window.selectGroup('${g.id}')" class="w-full text-right rtl:text-right ltr:text-left py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-white font-bold border border-gray-100 dark:border-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center mx-2 text-gray-400 ${isActive ? 'text-primary dark:text-secondary' : ''}"></i> 
+                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                <span class="truncate">${g.name}</span>
+                                ${creatorHtml}
+                            </div>
                             ${badgeHtml}
                         </button>
                     `;
@@ -1921,8 +2091,12 @@
 
                 if (mobileList) {
                     mobileList.innerHTML += `
-                        <button onclick="window.selectGroup('${g.id}')" class="text-right w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
-                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center ml-2"></i> ${g.name}
+                        <button onclick="window.selectGroup('${g.id}')" class="text-right rtl:text-right ltr:text-left w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center mx-2"></i> 
+                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                <span>${g.name}</span>
+                                ${creatorHtml.replace('text-gray-400', 'text-gray-400/70')}
+                            </div>
                             ${badgeHtml}
                         </button>
                     `;
@@ -1953,20 +2127,17 @@
                 const titleEl = document.getElementById('chatHeaderTitle');
                 if (titleEl) titleEl.innerText = activeGroup.name;
                 
-                const isCEO = currentUserData && currentUserData.role === 'CEO';
                 const clearMessagesBtn = document.getElementById('clearMessagesBtn');
                 const deleteGroupBtn = document.getElementById('deleteGroupBtn');
                 const chatForm = document.getElementById('chatForm');
                 const readOnlyMsg = document.getElementById('readOnlyMessage');
 
                 if(activeGroup.id === 'global') {
-                    document.getElementById('chatHeaderDesc').innerHTML = '<i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span>';
+                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
                     
-                    // أزرار الحذف للمدير فقط في العام
                     if(isCEO) {
                         clearMessagesBtn.classList.remove('hidden');
-                        clearMessagesBtn.querySelector('span').innerText = 'مسح الدردشة العامة';
-                        deleteGroupBtn.classList.add('hidden'); // العام لا يحذف
+                        deleteGroupBtn.classList.add('hidden'); 
                     } else {
                         clearMessagesBtn.classList.add('hidden');
                         deleteGroupBtn.classList.add('hidden');
@@ -1975,14 +2146,12 @@
                     chatForm.classList.remove('hidden');
                     readOnlyMsg.classList.add('hidden');
                 } else {
-                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>مجموعة خاصة - ${activeGroup.members.length} أعضاء</span>`;
+                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
                     
                     if(isCEO) {
                         clearMessagesBtn.classList.remove('hidden');
-                        clearMessagesBtn.querySelector('span').innerText = 'مسح الرسائل';
                         deleteGroupBtn.classList.remove('hidden');
                         
-                        // تحقق ما إذا كان المدير يراقب فقط (غير مضاف)
                         if(!activeGroup.members.includes(currentUserData.uid)) {
                             chatForm.classList.add('hidden');
                             readOnlyMsg.classList.remove('hidden');
@@ -2014,13 +2183,12 @@
 
         document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            // أزلنا تقييد المدير هنا ليتمكن الجميع من الإنشاء
             if(!currentUserData) return; 
             
             const groupName = document.getElementById('newGroupName').value;
             const checkboxes = document.querySelectorAll('.group-member-checkbox:checked');
             const members = Array.from(checkboxes).map(cb => cb.value);
-            members.push(currentUserData.uid); // مُنشئ المجموعة يضاف تلقائياً
+            members.push(currentUserData.uid); 
 
             try {
                 const newGroupRef = await addDoc(getColRef('groups'), {
@@ -2041,7 +2209,6 @@
             }
         });
 
-        // دالة مجمعة لمسح الرسائل أو حذف المجموعة كاملة (للمدير)
         window.clearOrDeleteGroup = async (actionType) => {
             if(currentUserData.role !== 'CEO') return;
 
@@ -2127,22 +2294,22 @@
                 let actionsHtml = '';
                 if(isCEO && emp.id !== currentUserData.uid) { 
                     actionsHtml = `
-                        <td class="p-3 md:p-4 whitespace-nowrap text-left">
-                            <button onclick="window.openEditEmployeeModal('${emp.id}', '${emp.name}', '${emp.role}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 p-2 rounded mr-1 transition" title="تعديل"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="window.deleteEmployee('${emp.id}', '${emp.name}')" class="text-red-500 hover:text-red-700 bg-red-50 p-2 rounded transition" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        <td class="p-3 md:p-4 whitespace-nowrap rtl:text-left ltr:text-right">
+                            <button onclick="window.openEditEmployeeModal('${emp.id}', '${emp.name}', '${emp.role}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-gray-700 p-2 rounded mx-1 transition" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="window.deleteEmployee('${emp.id}', '${emp.name}')" class="text-red-500 hover:text-red-700 bg-red-50 dark:bg-gray-700 p-2 rounded transition" title="حذف"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     `;
                 } else if(isCEO) {
-                    actionsHtml = `<td class="p-3 md:p-4 text-left"><span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded">أنت (المدير)</span></td>`;
+                    actionsHtml = `<td class="p-3 md:p-4 rtl:text-left ltr:text-right"><span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2 py-1 rounded">${t('أنت (المدير)')}</span></td>`;
                 }
 
                 list.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                         <td class="p-3 md:p-4 flex items-center">
-                            <img src="${emp.photoURL}" class="w-8 h-8 rounded-full ml-3 object-cover">
-                            <span class="font-medium text-gray-800 text-sm">${emp.name}</span>
+                            <img src="${emp.photoURL}" class="w-8 h-8 rounded-full mx-3 object-cover">
+                            <span class="font-medium text-gray-800 dark:text-gray-200 text-sm">${emp.name}</span>
                         </td>
-                        <td class="p-3 md:p-4 text-gray-600 font-bold text-xs md:text-sm">${emp.role}</td>
+                        <td class="p-3 md:p-4 text-gray-600 dark:text-gray-300 font-bold text-xs md:text-sm">${emp.role}</td>
                         ${actionsHtml}
                     </tr>
                 `;
@@ -2165,29 +2332,29 @@
                 let actionsHtml = '';
                 if(isMyTask && !isCEO) {
                     if(task.status === 'pending') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">البدء بالتنفيذ</button>`;
+                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">${t('البدء بالتنفيذ')}</button>`;
                     } else if(task.status === 'in-progress') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">تأكيد الإنجاز <i class="fa-solid fa-check ml-1"></i></button>`;
+                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">${t('تأكيد الإنجاز')} <i class="fa-solid fa-check mx-1"></i></button>`;
                     }
                 }
 
-                const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full text-left mt-2"><i class="fa-solid fa-trash"></i> حذف</button>` : '';
+                const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full rtl:text-left ltr:text-right mt-2"><i class="fa-solid fa-trash"></i> ${t('حذف')}</button>` : '';
 
                 const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
                 const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
 
                 const card = `
-                    <div class="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 border-r-4 ${task.status === 'completed' ? 'border-r-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-r-secondary' : 'border-r-gray-400')}">
+                    <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 rtl:border-r-4 ltr:border-l-4 ${task.status === 'completed' ? 'border-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-secondary' : 'border-gray-400')}">
                         <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-gray-800 text-xs md:text-sm ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
+                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-xs md:text-sm ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
                         </div>
-                        <p class="inline-block px-2 py-1 rounded text-[9px] font-bold mb-2 ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}"><i class="fa-regular fa-clock"></i> مطلوب: ${deadlineStr}</p>
-                        <p class="text-[10px] md:text-xs text-gray-500 mb-3">${task.desc}</p>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-100">
-                            <div class="flex items-center text-[10px] md:text-xs text-primary font-bold bg-blue-50 px-2 py-1 rounded">
-                                <i class="fa-solid fa-user-tie ml-1"></i> ${task.assigneeName}
+                        <p class="inline-block px-2 py-1 rounded text-[9px] font-bold mb-2 ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}"><i class="fa-regular fa-clock"></i> ${t('مطلوب:')} ${deadlineStr}</p>
+                        <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mb-3">${task.desc}</p>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center text-[10px] md:text-xs text-primary dark:text-secondary font-bold bg-blue-50 dark:bg-gray-700 px-2 py-1 rounded">
+                                <i class="fa-solid fa-user-tie mx-1"></i> ${task.assigneeName}
                             </div>
-                            ${isMyTask ? '<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">مهمتك</span>' : ''}
+                            ${isMyTask ? `<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">${t('مهمتك')}</span>` : ''}
                         </div>
                         ${actionsHtml}
                         ${deleteHtml}
@@ -2205,7 +2372,7 @@
             list.innerHTML = '';
             
             if(globalLogs.length === 0) {
-                list.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500">لا يوجد سجلات حتى الآن.</td></tr>';
+                list.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-500 dark:text-gray-400">لا يوجد سجلات حتى الآن.</td></tr>`;
                 return;
             }
 
@@ -2223,10 +2390,10 @@
                 if(log.action.includes('اجتماع') || log.action.includes('فيديو')) icon = 'fa-video text-green-500';
 
                 list.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition">
-                        <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500" dir="ltr">${date}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary">${log.userName}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600"><i class="fa-solid ${icon} ml-2"></i>${log.details}</td>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500 dark:text-gray-400" dir="ltr">${date}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary dark:text-secondary">${log.userName}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600 dark:text-gray-300"><i class="fa-solid ${icon} mx-2"></i>${log.details}</td>
                     </tr>
                 `;
             });
@@ -2239,7 +2406,7 @@
             const filteredChat = globalChat.filter(msg => (msg.groupId || 'global') === currentGroupId);
 
             if(filteredChat.length === 0) {
-                chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
+                chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300 dark:text-gray-600"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
                 return;
             }
 
@@ -2277,12 +2444,12 @@
                 
                 const alignClass = isMe ? 'justify-start' : 'justify-end';
                 
-                const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white border border-gray-200 text-gray-800');
+                const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200');
                 
-                const isColored = msg.color && msg.color !== 'bg-white';
-                const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 font-bold';
+                const isColored = msg.color && msg.color !== 'bg-white' && msg.color !== 'bg-gray-800';
+                const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 dark:text-gray-300 font-bold';
                 
-                const radiusClass = isMe ? 'rounded-tl-xl rounded-tr-xl rounded-bl-xl' : 'rounded-tl-xl rounded-tr-xl rounded-br-xl';
+                const radiusClass = isMe ? 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-bl-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-br-xl' : 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-br-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-bl-xl';
                 const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName)}&background=00839b&color=fff`;
 
                 let attachmentHtml = '';
@@ -2311,14 +2478,14 @@
 
                 chatBox.innerHTML += `
                     <div class="flex ${alignClass} mb-4 items-end gap-2">
-                        ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" alt="Avatar">` : ''}
+                        ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
                         <div class="max-w-[85%] md:max-w-[70%] min-w-[150px]">
-                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'text-right' : 'text-left'}">${msg.senderName}</span>
+                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'rtl:text-right ltr:text-left' : 'rtl:text-left ltr:text-right'}">${msg.senderName}</span>
                             <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
                                 ${messageBody}
                             </div>
                         </div>
-                        ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0" alt="Avatar">` : ''}
+                        ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
                     </div>
                 `;
             });
@@ -2335,13 +2502,13 @@
                     availableUsers = globalUsers.filter(u => activeGroup.members.includes(u.id));
                 }
 
-                let html = `<div class="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 font-bold text-red-500" onclick="window.selectMention('الجميع')">
-                    <i class="fa-solid fa-users ml-1 text-red-400"></i> الجميع
+                let html = `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-bold text-red-500" onclick="window.selectMention('الجميع')">
+                    <i class="fa-solid fa-users mx-1 text-red-400"></i> الجميع
                 </div>`;
 
                 html += availableUsers.map(u => 
-                    `<div class="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 font-semibold text-primary" onclick="window.selectMention('${u.name}')">
-                        <i class="fa-solid fa-user-circle ml-1 text-gray-400"></i> ${u.name}
+                    `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-semibold text-primary dark:text-gray-200" onclick="window.selectMention('${u.name}')">
+                        <i class="fa-solid fa-user-circle mx-1 text-gray-400"></i> ${u.name}
                     </div>`
                 ).join('');
                 
@@ -2450,19 +2617,19 @@
                 let deleteBtn = '';
                 
                 if (isCEO) {
-                    pinBtn = `<button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-primary' : 'text-gray-300 hover:text-primary'} transition p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}"><i class="fa-solid fa-thumbtack"></i></button>`;
-                    deleteBtn = `<button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 transition p-1 ml-1" title="حذف الملف"><i class="fa-solid fa-trash"></i></button>`;
+                    pinBtn = `<button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-primary dark:text-secondary' : 'text-gray-300 dark:text-gray-500 hover:text-primary'} transition p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}"><i class="fa-solid fa-thumbtack"></i></button>`;
+                    deleteBtn = `<button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 transition p-1 mx-1" title="حذف الملف"><i class="fa-solid fa-trash"></i></button>`;
                 }
 
                 let mediaAction = '';
                 if(file.type.startsWith('image/') || file.type.startsWith('video/')) {
-                    mediaAction = `onclick="window.openMedia('${file.data}', '${file.type}')" class="cursor-pointer hover:bg-gray-50"`;
+                    mediaAction = `onclick="window.openMedia('${file.data}', '${file.type}')" class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"`;
                 }
 
                 const cardHtml = `
-                    <div class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md h-full">
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md h-full">
                         <div class="flex justify-between items-start mb-2">
-                            <div class="bg-gray-50 w-10 h-10 rounded-lg flex items-center justify-center">
+                            <div class="bg-gray-50 dark:bg-gray-700 w-10 h-10 rounded-lg flex items-center justify-center">
                                 <i class="fa-solid ${iconClass} text-xl"></i>
                             </div>
                             <div class="flex">
@@ -2471,12 +2638,12 @@
                             </div>
                         </div>
                         <div ${mediaAction} class="flex-1">
-                            <h4 class="font-bold text-gray-700 text-sm mb-1 truncate" title="${file.name}">${file.name}</h4>
+                            <h4 class="font-bold text-gray-700 dark:text-gray-200 text-sm mb-1 truncate" title="${file.name}">${file.name}</h4>
                             <p class="text-xs text-gray-400 mb-2">${file.sizeStr}</p>
                         </div>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 mt-2">
-                            <span class="text-[10px] text-gray-500"><i class="fa-solid fa-user-circle"></i> ${file.uploaderName}</span>
-                            <a href="${file.data}" download="${file.name}" class="text-secondary hover:text-primary text-xs font-bold transition"><i class="fa-solid fa-download ml-1"></i> تحميل</a>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400"><i class="fa-solid fa-user-circle"></i> ${file.uploaderName}</span>
+                            <a href="${file.data}" download="${file.name}" class="text-secondary hover:text-primary text-xs font-bold transition"><i class="fa-solid fa-download mx-1"></i> تحميل</a>
                         </div>
                     </div>
                 `;
@@ -2555,7 +2722,6 @@
                     globalUsers.forEach(u => {
                         if (u.uid === currentUserData.uid) return; 
                         
-                        // تم إضافة هذا الشرط بحيث لا يرسل الإيميل للأشخاص خارج المجموعة
                         if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
 
                         const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
