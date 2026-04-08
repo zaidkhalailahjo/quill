@@ -1572,7 +1572,7 @@
                 onSnapshot(getColRef('logs'), (snapshot) => {
                     globalLogs = [];
                     snapshot.forEach(doc => globalLogs.push({ id: doc.id, ...doc.data() }));
-                    globalLogs.sort((a, b) => b.timestamp - a.timestamp);
+                    globalLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                     renderLogs();
                 });
             }
@@ -1609,7 +1609,7 @@
             onSnapshot(getColRef('files'), (snapshot) => {
                 globalFiles = [];
                 snapshot.forEach(doc => globalFiles.push({ id: doc.id, ...doc.data() }));
-                globalFiles.sort((a, b) => b.timestamp - a.timestamp); 
+                globalFiles.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); 
                 renderDriveFiles();
                 updateStorageProgress();
             });
@@ -1617,28 +1617,19 @@
             onSnapshot(getColRef('meetings'), (snapshot) => {
                 globalMeetings = [];
                 snapshot.forEach(doc => globalMeetings.push({ id: doc.id, ...doc.data() }));
-                globalMeetings.sort((a, b) => b.timestamp - a.timestamp);
+                globalMeetings.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                 renderMeetings();
             });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
-                const oldGroupsCount = globalGroups.length;
                 globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
-                
-                let foundCurrentGroup = false;
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
                         globalGroups.push({ id: doc.id, ...data });
-                        if (doc.id === currentGroupId) foundCurrentGroup = true;
                     }
                 });
-                
-                // التأكد من عدم الخروج التلقائي عند التحديث (للجروب الحالي)
-                if(!foundCurrentGroup && currentGroupId !== 'global') {
-                    currentGroupId = 'global';
-                }
                 
                 renderChatSidebarList();
                 renderChat();
@@ -1652,7 +1643,7 @@
                     const msg = { id: doc.id, ...doc.data() };
                     globalChat.push(msg);
                 });
-                globalChat.sort((a, b) => a.timestamp - b.timestamp);
+                globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
                 
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
                     const latestMsg = globalChat[globalChat.length - 1];
@@ -1793,13 +1784,24 @@
                     createdBy: currentUserData.uid,
                     timestamp: Date.now()
                 });
+                
+                // إضافة محلية فورية لتفادي مشكلة تأخير الاستجابة من قاعدة البيانات
+                globalGroups.push({
+                    id: newGroupRef.id,
+                    name: groupName,
+                    members: members,
+                    createdBy: currentUserData.uid,
+                    timestamp: Date.now()
+                });
 
                 window.closeModal('createGroupModal');
                 showToast('تم إنشاء المجموعة بنجاح!', 'success');
                 
                 currentGroupId = newGroupRef.id;
-                // توجيه تلقائي
                 window.location.hash = 'chat';
+                window.showSection('chat');
+                renderChatSidebarList();
+                renderChat();
                 logAction('إنشاء مجموعة', `تم إنشاء مجموعة محادثة جديدة "${groupName}"`);
             } catch(err) {
                 showToast('حدث خطأ أثناء الإنشاء', 'warning');
@@ -1957,21 +1959,24 @@
             const list = document.getElementById('logsList');
             list.innerHTML = '';
             globalLogs.forEach(log => {
-                const date = new Date(log.timestamp).toLocaleString('ar-EG');
+                const date = log.timestamp ? new Date(log.timestamp).toLocaleString('ar-EG') : 'غير معروف';
+                const actionStr = log.action || '';
+                const detailsStr = log.details || '';
+                
                 let icon = 'fa-info-circle text-gray-400';
-                if(log.action.includes('دخول')) icon = 'fa-right-to-bracket text-blue-500';
-                if(log.action.includes('مهمة')) icon = 'fa-check text-green-500';
-                if(log.action.includes('حذف') || log.action.includes('مسح')) icon = 'fa-trash text-red-500';
-                if(log.action.includes('مجموعة')) icon = 'fa-users text-purple-500';
-                if(log.action.includes('تعديل')) icon = 'fa-pen text-blue-500';
-                if(log.action.includes('ملف')) icon = 'fa-file text-secondary';
-                if(log.action.includes('اجتماع') || log.action.includes('فيديو')) icon = 'fa-video text-green-500';
+                if(actionStr.includes('دخول')) icon = 'fa-right-to-bracket text-blue-500';
+                if(actionStr.includes('مهمة')) icon = 'fa-check text-green-500';
+                if(actionStr.includes('حذف') || actionStr.includes('مسح')) icon = 'fa-trash text-red-500';
+                if(actionStr.includes('مجموعة')) icon = 'fa-users text-purple-500';
+                if(actionStr.includes('تعديل')) icon = 'fa-pen text-blue-500';
+                if(actionStr.includes('ملف')) icon = 'fa-file text-secondary';
+                if(actionStr.includes('اجتماع') || actionStr.includes('فيديو')) icon = 'fa-video text-green-500';
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 transition">
                         <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500" dir="ltr">${date}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary">${log.userName}</td>
-                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600"><i class="fa-solid ${icon} ml-2"></i>${log.details}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary">${log.userName || 'غير معروف'}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600"><i class="fa-solid ${icon} ml-2"></i>${detailsStr}</td>
                     </tr>
                 `;
             });
