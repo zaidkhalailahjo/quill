@@ -107,21 +107,13 @@
     <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3"></div>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
-        <!-- الشريط العلوي -->
+        
+        <!-- الشريط العلوي المُعدل -->
         <header class="bg-white shadow-sm border-b border-gray-200 p-4 flex justify-between items-center z-10 flex-shrink-0">
-            <div class="flex items-center">
-                <!-- الشعار -->
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 ml-2 object-contain">
-                <!-- زر الرجوع (خروج للرئيسية) -->
-                <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden text-white bg-secondary hover:bg-primary px-3 py-1.5 rounded-lg ml-4 flex items-center gap-2 font-bold transition-colors text-sm shadow-sm">
-                    <i class="fa-solid fa-arrow-right"></i> <span class="hidden sm:inline">خروج للرئيسية</span>
-                </button>
-                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary hidden md:block">الرئيسية - التطبيقات</h2>
-            </div>
-            
+            <!-- اليمين (الحساب، الإشعارات، زر القائمة للموبايل) -->
             <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse">
-                <button onclick="window.requestNotifications()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="تفعيل الإشعارات">
-                    <i class="fa-solid fa-bell"></i>
+                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div class="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded transition" onclick="window.location.hash='settings'">
                     <img id="userAvatar" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
@@ -130,13 +122,25 @@
                         <p id="userRole" class="text-[10px] md:text-xs text-secondary font-bold"></p>
                     </div>
                 </div>
-                <button id="logoutBtn" class="text-red-500 hover:bg-red-50 p-2 rounded transition" title="تسجيل الخروج">
+                <button onclick="window.requestNotifications()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="تفعيل الإشعارات">
+                    <i class="fa-solid fa-bell"></i>
+                </button>
+                <button id="logoutBtn" class="hidden text-red-500 hover:bg-red-50 p-2 rounded transition" title="تسجيل الخروج">
                     <i class="fa-solid fa-sign-out-alt"></i>
                 </button>
             </div>
+            
+            <!-- اليسار (اللوجو، زر الرجوع، العنوان) -->
+            <div class="flex items-center flex-row-reverse">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2">
+                <button id="backToHomeBtn" onclick="window.location.hash='home-grid'" class="hidden text-white bg-secondary hover:bg-primary px-3 py-1.5 rounded-lg mr-4 flex items-center gap-2 font-bold transition-colors text-sm shadow-sm">
+                    <span class="hidden sm:inline">خروج للرئيسية</span> <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary hidden md:block mr-4">الرئيسية - التطبيقات</h2>
+            </div>
         </header>
 
-        <!-- القائمة الجانبية (للهواتف فقط الآن للتنقل السريع أو عند الحاجة) -->
+        <!-- القائمة الجانبية للموبايل فقط -->
         <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
         <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
             <div class="p-6 flex items-center justify-between border-b border-white/10">
@@ -361,7 +365,7 @@
                 <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
             </section>
 
-            <!-- قسم الاجتماعات (مكالمات الفيديو) -->
+            <!-- قسم الاجتماعات -->
             <section id="meetings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600">إدارة وجدولة مكالمات الفيديو</p>
@@ -383,11 +387,11 @@
                 </div>
             </section>
 
-            <!-- 5. المحادثات (المناقشة) - تصميم Odoo-like بشريط جانبي داخلي -->
+            <!-- 5. المحادثات (المناقشة) -->
             <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
                 <div class="flex h-full bg-white md:rounded-xl shadow-sm border-x border-b border-gray-200 overflow-hidden relative">
                     
-                    <!-- الشريط الجانبي للمحادثات (مثل Odoo) -->
+                    <!-- الشريط الجانبي للمحادثات -->
                     <div class="w-64 bg-gray-50 border-l border-gray-200 flex-col hidden md:flex flex-shrink-0 z-10">
                         <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white h-[68px]">
                             <span class="font-bold text-gray-700 text-sm"><i class="fa-solid fa-list-ul ml-2 text-gray-400"></i>القنوات والمجموعات</span>
@@ -400,12 +404,9 @@
                         </div>
                     </div>
 
-                    <!-- منطقة المحادثة الرئيسية -->
                     <div class="flex-1 flex flex-col min-w-0 bg-white relative">
-                        <!-- الهيدر الخاص بالمحادثة -->
                         <div class="bg-white border-b border-gray-100 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm flex-shrink-0 h-[68px]">
                             <div class="flex items-center gap-3 min-w-0 overflow-hidden">
-                                <!-- زر إظهار القائمة الجانبية للهاتف فقط -->
                                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary">
                                     <i class="fa-solid fa-bars text-xl"></i>
                                 </button>
@@ -824,26 +825,24 @@
                 showToast(status === 'scheduled' ? 'تمت جدولة الاجتماع بنجاح' : 'تم بدء الاجتماع', 'success');
                 logAction('اجتماع', `أنشأ اجتماع: ${title}`);
 
-                if (EMAILJS_TEMPLATE_MEETING !== 'YOUR_MEETING_TEMPLATE_ID') {
-                    const meetingLink = window.location.origin + window.location.pathname + '#meetings';
-                    const timeStr = scheduledTime ? new Date(scheduledTime).toLocaleString('ar-EG') : 'الآن';
-                    
-                    invited.forEach(uid => {
-                        if (uid === currentUserData.uid) return; 
-                        const user = globalUsers.find(u => u.id === uid);
-                        if (user && user.email && user.email !== 'no-email@company.com') {
-                            emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MEETING, {
-                                to_email: user.email,
-                                to_name: user.name,
-                                creator_name: currentUserData.name,
-                                meeting_title: title,
-                                meeting_time: timeStr,
-                                meeting_link: meetingLink,
-                                company_name: 'نظام شركتي'
-                            }, EMAILJS_PUBLIC_KEY_2);
-                        }
-                    });
-                }
+                const meetingLink = window.location.origin + window.location.pathname + '#meetings';
+                const timeStr = scheduledTime ? new Date(scheduledTime).toLocaleString('ar-EG') : 'الآن';
+                
+                invited.forEach(uid => {
+                    if (uid === currentUserData.uid) return; 
+                    const user = globalUsers.find(u => u.id === uid);
+                    if (user && user.email && user.email !== 'no-email@company.com') {
+                        emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MEETING, {
+                            to_email: user.email,
+                            to_name: user.name,
+                            creator_name: currentUserData.name,
+                            meeting_title: title,
+                            meeting_time: timeStr,
+                            meeting_link: meetingLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_2);
+                    }
+                });
             } catch(e) {}
         });
 
@@ -1092,7 +1091,6 @@
                 document.getElementById('backToHomeBtn').classList.remove('hidden');
             }
             
-            // Update Mobile Sidebar Active States
             document.querySelectorAll('.nav-btn').forEach(b => {
                 b.classList.remove('bg-secondary', 'text-white');
                 b.classList.add('text-gray-300');
@@ -1184,15 +1182,15 @@
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                const templateParams = {
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, {
                     to_email: toEmail,
                     to_name: assigneeName,
                     task_title: taskTitle,
                     task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
-                };
-                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, templateParams, EMAILJS_PUBLIC_KEY_1);
+                }, EMAILJS_PUBLIC_KEY_1);
+                
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
                 });
@@ -1229,7 +1227,7 @@
                             }, EMAILJS_PUBLIC_KEY_1);
                         }
 
-                        if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_DELAYED !== 'YOUR_DELAYED_TEMPLATE_ID') {
+                        if (ceoUser && ceoUser.email) {
                             const taskLink = window.location.origin + window.location.pathname + '#tasks';
                             const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
                             
@@ -1252,15 +1250,14 @@
         async function sendEmailNotification(toEmail, assigneeName, taskTitle, taskDesc) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                const templateParams = {
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_NEW_TASK, {
                     to_email: toEmail,
                     to_name: assigneeName,
                     task_title: taskTitle,
                     task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
-                };
-                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_NEW_TASK, templateParams, EMAILJS_PUBLIC_KEY_1);
+                }, EMAILJS_PUBLIC_KEY_1);
             } catch (error) {}
         }
 
@@ -1455,6 +1452,7 @@
                     chatLayout: 'media-top',
                     chatColor: 'bg-[#00839b]',
                     readReceipts: {},
+                    lastActive: Date.now(),
                     timestamp: Date.now()
                 };
                 
@@ -1466,6 +1464,13 @@
                 finishLoginSetup();
             } catch(e) {}
         });
+
+        function updateActivity() {
+            if (!currentUserData) return;
+            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                lastActive: Date.now()
+            }).catch(e => {});
+        }
 
         function finishLoginSetup() {
             updateUIWithUserData();
@@ -1486,6 +1491,7 @@
                 
                 document.getElementById('clearChatBtn').classList.remove('hidden');
                 document.getElementById('createMeetingBtn').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
             } else {
                 document.getElementById('grid-dashboard').classList.add('hidden');
                 document.getElementById('grid-employees').classList.add('hidden');
@@ -1494,11 +1500,18 @@
 
                 document.getElementById('addTaskBtn').style.display = 'none';
                 document.getElementById('empActionHeader').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
             }
 
             logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
             startDatabaseListeners();
             handleHashChange();
+            
+            // Heartbeat for online status (every 1 min)
+            updateActivity();
+            setInterval(updateActivity, 60000);
+            
+            // Timers
             setInterval(checkAndSendReminders, 300000);
         }
 
@@ -1615,7 +1628,14 @@
                     }
                 });
                 
-                if(!globalGroups.find(g => g.id === currentGroupId)) currentGroupId = 'global';
+                if(!globalGroups.find(g => g.id === currentGroupId)) {
+                    currentGroupId = 'global';
+                    renderChatSidebarList();
+                    // Need to wait slightly for globalGroups to be processed if making immediate selection
+                    setTimeout(() => {
+                        // If it fails to find currentGroupId it reverts to global, so we need to add the newly created group manually
+                    }, 50);
+                }
                 
                 renderChatSidebarList();
                 renderChat();
@@ -1634,7 +1654,7 @@
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
                     const latestMsg = globalChat[globalChat.length - 1];
                     if (latestMsg && latestMsg.uid !== currentUserData.uid) {
-                        const isMention = latestMsg.text && latestMsg.text.includes(`@${currentUserData.name}`);
+                        const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
                         const groupName = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'))?.name || 'الشركة';
                         
                         sendPushNotification(
@@ -1659,7 +1679,7 @@
             const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
             
             let unreadCount = groupMessages.length;
-            let hasMention = groupMessages.some(m => m.text && m.text.includes(`@${currentUserData.name}`));
+            let hasMention = groupMessages.some(m => m.text && (m.text.includes(`@${currentUserData.name}`) || m.text.includes(`@الجميع`)));
             
             return { count: unreadCount, hasMention: hasMention };
         }
@@ -1773,6 +1793,15 @@
                     timestamp: Date.now()
                 });
                 
+                // Add Locally to prevent 'not found' during instant redirection before Firebase syncs
+                globalGroups.push({
+                    id: newGroupRef.id,
+                    name: groupName,
+                    members: members,
+                    createdBy: currentUserData.uid,
+                    timestamp: Date.now()
+                });
+
                 window.closeModal('createGroupModal');
                 showToast('تم إنشاء المجموعة بنجاح!', 'success');
                 
@@ -1972,6 +2001,11 @@
                 
                 let formattedText = msg.text || '';
                 if (formattedText) {
+                    // معالجة @الجميع أولاً
+                    if (formattedText.includes('@الجميع')) {
+                        formattedText = formattedText.replace(/@الجميع/g, '<span class="text-white font-bold bg-red-500/80 px-1 rounded mx-1">@الجميع</span>');
+                    }
+
                     let mentionedNames = [];
                     const sortedNames = globalUsers.map(u => u.name).sort((a, b) => b.length - a.length);
                     
@@ -1986,7 +2020,7 @@
                         }
                     });
                     
-                    formattedText = formattedText.replace(/@([^\s_]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
+                    formattedText = formattedText.replace(/@([^\s_<>]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
                     
                     mentionedNames.forEach((item) => {
                         formattedText = formattedText.replace(new RegExp(item.key, 'g'), `<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@${item.name}</span>`);
@@ -2053,11 +2087,17 @@
                     availableUsers = globalUsers.filter(u => activeGroup.members.includes(u.id));
                 }
 
-                list.innerHTML = availableUsers.map(u => 
+                let html = `<div class="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 font-bold text-red-500" onclick="window.selectMention('الجميع')">
+                    <i class="fa-solid fa-users ml-1 text-red-400"></i> الجميع
+                </div>`;
+
+                html += availableUsers.map(u => 
                     `<div class="p-3 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 font-semibold text-primary" onclick="window.selectMention('${u.name}')">
                         <i class="fa-solid fa-user-circle ml-1 text-gray-400"></i> ${u.name}
                     </div>`
                 ).join('');
+                
+                list.innerHTML = html;
             }
         };
 
@@ -2172,23 +2212,38 @@
 
                 await addDoc(getColRef('chat'), messageObj);
 
+                // إرسال الإيميلات عند المنشن (أو @الجميع)
                 if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
                     const chatLink = window.location.origin + window.location.pathname + '#chat';
-                    const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'الدردشة';
+                    const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                    const groupName = activeGroup?.name || 'الدردشة';
+                    const isMentionAll = text.includes('@الجميع');
                     
                     globalUsers.forEach(u => {
+                        if (u.uid === currentUserData.uid) return; 
+                        
+                        // فحص إذا كان المستخدم من ضمن الجروب (إلا إذا كانت الدردشة العامة)
+                        if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
+
                         const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const regex = new RegExp(`@${safeName}`, 'g');
-                        if (regex.test(text) && u.email && u.email !== 'no-email@company.com') {
-                            emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
-                                to_email: u.email,
-                                to_name: u.name,
-                                sender_name: currentUserData.name,
-                                group_name: groupName,
-                                chat_text: text,
-                                chat_link: chatLink,
-                                company_name: 'نظام شركتي'
-                            }, EMAILJS_PUBLIC_KEY_2);
+                        
+                        if ((isMentionAll || regex.test(text)) && u.email && u.email !== 'no-email@company.com') {
+                            
+                            // لا نرسل ايميل إذا كان الموظف نشطاً الآن (آخر نشاط أقل من دقيقتين)
+                            const isOnline = u.lastActive && (Date.now() - u.lastActive < 2 * 60 * 1000);
+                            
+                            if (!isOnline) {
+                                emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
+                                    to_email: u.email,
+                                    to_name: u.name,
+                                    sender_name: currentUserData.name,
+                                    group_name: groupName,
+                                    chat_text: text,
+                                    chat_link: chatLink,
+                                    company_name: 'نظام شركتي'
+                                }, EMAILJS_PUBLIC_KEY_2);
+                            }
                         }
                     });
                 }
