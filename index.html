@@ -391,7 +391,7 @@
                     <div class="w-64 bg-gray-50 border-l border-gray-200 flex-col hidden md:flex flex-shrink-0 z-10">
                         <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-white h-[68px]">
                             <span class="font-bold text-gray-700 text-sm"><i class="fa-solid fa-list-ul ml-2 text-gray-400"></i>القنوات والمجموعات</span>
-                            <button id="innerCreateGroupBtn" onclick="window.openCreateGroupModal()" class="hidden text-gray-400 hover:text-primary transition" title="إنشاء مجموعة جديدة">
+                            <button id="innerCreateGroupBtn" onclick="window.openCreateGroupModal()" class="text-gray-400 hover:text-primary transition" title="إنشاء مجموعة جديدة">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -410,15 +410,21 @@
                                 <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
                                     <i class="fa-solid fa-comments"></i>
                                 </div>
-                                <div class="flex flex-col min-w-0">
+                                <div class="flex flex-col min-w-0 cursor-pointer hover:bg-gray-50 p-1 rounded transition" onclick="window.openGroupInfoModal()" title="عرض معلومات وأعضاء المجموعة">
                                     <h3 id="chatHeaderTitle" class="font-bold text-primary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
-                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate">يتواجد هنا جميع أعضاء مساحة العمل</p>
+                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate flex items-center gap-1">
+                                        <i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span>
+                                    </p>
                                 </div>
                             </div>
                             
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <button id="clearChatBtn" onclick="window.clearOrDeleteGroup()" class="hidden text-xs md:text-sm bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-3 py-2 rounded-lg transition-colors flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline" id="clearChatBtnText">مسح الدردشة</span>
+                            <!-- أزرار الحذف والمسح -->
+                            <div class="flex items-center gap-2 flex-shrink-0" id="chatHeaderActions">
+                                <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1" title="مسح رسائل الدردشة فقط">
+                                    <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">مسح الرسائل</span>
+                                </button>
+                                <button id="deleteGroupBtn" onclick="window.clearOrDeleteGroup('delete')" class="hidden text-xs bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1" title="حذف المجموعة بالكامل">
+                                    <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">حذف المجموعة</span>
                                 </button>
                             </div>
                         </div>
@@ -442,6 +448,10 @@
                                 <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
                                 <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
                                 <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
+                            </div>
+
+                            <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                                <i class="fa-solid fa-eye mr-1"></i> أنت تشاهد هذه المجموعة بصفة مراقب (مدير) ولا يمكنك الكتابة فيها.
                             </div>
 
                             <form id="chatForm" class="flex items-center bg-gray-50 border border-gray-200 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
@@ -521,8 +531,11 @@
 
             <!-- 7. سجل النظام -->
             <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
-                <div class="flex justify-between items-center mb-4 md:mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
+                    <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm">
+                        <i class="fa-solid fa-trash-can"></i> تفريغ السجل
+                    </button>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden overflow-x-auto">
                     <table class="w-full text-right min-w-[600px]">
@@ -538,6 +551,35 @@
                 </div>
             </section>
 
+        </div>
+    </div>
+
+    <!-- Modal: معلومات المجموعة -->
+    <div id="groupInfoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-base md:text-lg" id="infoModalTitle">معلومات المجموعة</h3>
+                <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 md:p-6 overflow-y-auto flex-1">
+                
+                <div id="addMemberSection" class="hidden mb-4 border-b border-gray-100 pb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">إضافة عضو جديد للمجموعة (خاص بالمدير)</label>
+                    <div class="flex gap-2">
+                        <select id="newMemberSelect" class="flex-1 border rounded-lg px-2 py-2 focus:border-secondary focus:outline-none text-sm">
+                            <option value="">-- اختر موظف --</option>
+                        </select>
+                        <button onclick="window.addGroupMember()" class="bg-secondary text-white px-3 py-2 rounded-lg text-sm hover:bg-primary transition shadow-sm font-bold whitespace-nowrap">
+                            <i class="fa-solid fa-user-plus ml-1"></i> إضافة
+                        </button>
+                    </div>
+                </div>
+
+                <label class="block text-sm font-bold text-gray-700 mb-2">أعضاء المجموعة المتواجدين</label>
+                <div id="groupInfoMembersList" class="space-y-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -771,8 +813,111 @@
         }
 
         // ============================================
-        // دالة فتح نافذة إنشاء المجموعة التي كانت مفقودة
+        // معلومات وإدارة أعضاء المجموعة
         // ============================================
+        window.openGroupInfoModal = () => {
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(!activeGroup) return;
+
+            document.getElementById('infoModalTitle').innerText = `معلومات: ${activeGroup.name}`;
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
+            
+            const addMemberSection = document.getElementById('addMemberSection');
+            if (isCEO && activeGroup.id !== 'global') {
+                addMemberSection.classList.remove('hidden');
+                
+                const select = document.getElementById('newMemberSelect');
+                select.innerHTML = '<option value="">-- اختر موظف --</option>';
+                globalUsers.forEach(u => {
+                    if (!activeGroup.members.includes(u.id)) {
+                        select.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+                    }
+                });
+            } else {
+                addMemberSection.classList.add('hidden');
+            }
+
+            const list = document.getElementById('groupInfoMembersList');
+            list.innerHTML = '';
+
+            let membersToShow = activeGroup.id === 'global' ? globalUsers : globalUsers.filter(u => activeGroup.members.includes(u.id));
+            
+            if(activeGroup.id !== 'global' && isCEO && !activeGroup.members.includes(currentUserData.uid)) {
+                // إضافة المدير كعضو مراقب لتوضيح تواجده
+                const ceoViewer = globalUsers.find(u => u.uid === currentUserData.uid);
+                if(ceoViewer) membersToShow.unshift({...ceoViewer, isViewer: true});
+            }
+
+            membersToShow.forEach(u => {
+                let removeBtn = '';
+                if (isCEO && activeGroup.id !== 'global' && u.id !== currentUserData.uid && !u.isViewer) {
+                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded transition text-xs font-bold" title="حذف من المجموعة"><i class="fa-solid fa-user-minus"></i> حذف</button>`;
+                }
+
+                let badge = u.role === 'CEO' ? `<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded mr-2">مدير</span>` : '';
+                if(u.isViewer) badge = `<span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded mr-2">مراقب</span>`;
+
+                list.innerHTML += `
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 border border-transparent hover:border-gray-100 rounded-lg transition">
+                        <div class="flex items-center gap-2">
+                            <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">${u.name} ${badge}</p>
+                                <p class="text-[10px] text-gray-500">${u.role}</p>
+                            </div>
+                        </div>
+                        ${removeBtn}
+                    </div>
+                `;
+            });
+
+            window.openModal('groupInfoModal');
+        };
+
+        window.removeGroupMember = async (userId, userName) => {
+            if (currentUserData.role !== 'CEO') return;
+            if(confirm(`هل تريد بالتأكيد إزالة ${userName} من المجموعة؟`)) {
+                const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                if(!activeGroup || activeGroup.id === 'global') return;
+                
+                try {
+                    const newMembers = activeGroup.members.filter(id => id !== userId);
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                        members: newMembers
+                    });
+                    showToast(`تمت إزالة ${userName} بنجاح`, 'success');
+                    logAction('إدارة مجموعة', `تمت إزالة ${userName} من مجموعة ${activeGroup.name}`);
+                    window.openGroupInfoModal(); // Refresh modal
+                } catch(e) {}
+            }
+        };
+
+        window.addGroupMember = async () => {
+            if (currentUserData.role !== 'CEO') return;
+            const select = document.getElementById('newMemberSelect');
+            const userId = select.value;
+            const userName = select.options[select.selectedIndex]?.text.split(' (')[0];
+            
+            if(!userId) {
+                showToast('يرجى اختيار موظف أولاً', 'warning');
+                return;
+            }
+
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(!activeGroup || activeGroup.id === 'global') return;
+
+            try {
+                const newMembers = [...activeGroup.members, userId];
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), {
+                    members: newMembers
+                });
+                showToast(`تم إضافة ${userName} بنجاح`, 'success');
+                logAction('إدارة مجموعة', `تمت إضافة ${userName} إلى مجموعة ${activeGroup.name}`);
+                window.openGroupInfoModal(); // Refresh modal
+            } catch(e) {}
+        };
+
+
         window.openCreateGroupModal = () => {
             const container = document.getElementById('groupMembersSelection');
             container.innerHTML = '';
@@ -1507,25 +1652,28 @@
                 document.getElementById('grid-dashboard').classList.remove('hidden');
                 document.getElementById('grid-employees').classList.remove('hidden');
                 document.getElementById('grid-logs').classList.remove('hidden');
-                document.getElementById('nav-logs-btn').classList.remove('hidden'); // إظهار زر السجل في القائمة الجانبية
-                document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+                document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                document.getElementById('clearLogsBtn').classList.remove('hidden'); // إظهار تفريغ السجل للمدير
+                document.getElementById('clearLogsBtn').style.display = 'flex';
 
                 document.getElementById('addTaskBtn').classList.remove('hidden');
                 document.getElementById('addTaskBtn').style.display = 'flex';
                 document.getElementById('empActionHeader').classList.remove('hidden');
                 
-                document.getElementById('clearChatBtn').classList.remove('hidden');
                 document.getElementById('createMeetingBtn').classList.remove('hidden');
             } else {
                 document.getElementById('grid-dashboard').classList.add('hidden');
                 document.getElementById('grid-employees').classList.add('hidden');
                 document.getElementById('grid-logs').classList.add('hidden');
-                document.getElementById('nav-logs-btn').classList.add('hidden'); // إخفاء زر السجل من القائمة الجانبية
-                document.getElementById('innerCreateGroupBtn').classList.add('hidden');
+                document.getElementById('nav-logs-btn').classList.add('hidden'); 
+                document.getElementById('clearLogsBtn').classList.add('hidden');
 
                 document.getElementById('addTaskBtn').style.display = 'none';
                 document.getElementById('empActionHeader').classList.add('hidden');
             }
+            
+            // السماح بإنشاء المجموعات للجميع
+            document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
 
             logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
             startDatabaseListeners();
@@ -1570,6 +1718,20 @@
             if(!currentUserData) return;
             try { await addDoc(getColRef('logs'), { action: action, details: details, userName: currentUserData.name, timestamp: Date.now() }); } catch(e) {}
         }
+        
+        // تفريغ سجل النظام بالكامل (المدير)
+        window.clearSystemLogs = async () => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من تفريغ سجل النظام بالكامل؟ (لا يمكن التراجع)')) {
+                try {
+                    for(const log of globalLogs) {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', log.id));
+                    }
+                    showToast('تم تفريغ السجل بنجاح', 'success');
+                    logAction('مسح السجل', 'قام المدير بمسح سجل النظام بالكامل');
+                } catch(e) {}
+            }
+        };
 
         function startDatabaseListeners() {
             onSnapshot(getColRef('users'), (snapshot) => {
@@ -1585,16 +1747,19 @@
                 });
                 renderEmployees();
                 updateDashboardStats();
+                
+                // تحديث المودال إذا كان مفتوحاً
+                if(!document.getElementById('groupInfoModal').classList.contains('hidden')) {
+                    window.openGroupInfoModal();
+                }
             });
 
-            // تحسين جلب السجلات وضمان الترتيب بناءً على الوقت القديم والحديث
             if(currentUserData.role === 'CEO') {
                 onSnapshot(getColRef('logs'), (snapshot) => {
                     globalLogs = [];
                     snapshot.forEach(doc => {
                         globalLogs.push({ id: doc.id, ...doc.data() });
                     });
-                    // ترتيب تصاعدي أو تنازلي لضمان ظهور الأحدث في الأعلى
                     globalLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                     renderLogs();
                 });
@@ -1645,13 +1810,12 @@
             });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
-                const oldGroupsCount = globalGroups.length;
                 globalGroups = [{ id: 'global', name: 'الدردشة العامة للشركة', members: [], desc: 'يتواجد هنا جميع أعضاء مساحة العمل' }];
-                
                 let foundCurrentGroup = false;
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    // المدير يرى كل المجموعات للمراقبة، الموظف يرى مجموعاته فقط
                     if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
                         globalGroups.push({ id: doc.id, ...data });
                         if (doc.id === currentGroupId) foundCurrentGroup = true;
@@ -1679,13 +1843,19 @@
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
                     const latestMsg = globalChat[globalChat.length - 1];
                     if (latestMsg && latestMsg.uid !== currentUserData.uid) {
-                        const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
-                        const groupName = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'))?.name || 'الشركة';
+                        const group = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'));
                         
-                        sendPushNotification(
-                            isMention ? `ذكرك ${latestMsg.senderName} في ${groupName}` : `رسالة من ${latestMsg.senderName} في ${groupName}`,
-                            latestMsg.text || 'أرسل مرفقاً'
-                        );
+                        // الإشعار والإيميل يصل فقط لمن هم بداخل المجموعة فعلياً 
+                        // (أو الدردشة العامة، أو إذا كان المدير يراقب لا نرسل له إشعار الإيميل المزعج)
+                        if (group && (group.id === 'global' || group.members.includes(currentUserData.uid))) {
+                            const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
+                            const groupName = group.name || 'الشركة';
+                            
+                            sendPushNotification(
+                                isMention ? `ذكرك ${latestMsg.senderName} في ${groupName}` : `رسالة من ${latestMsg.senderName} في ${groupName}`,
+                                latestMsg.text || 'أرسل مرفقاً'
+                            );
+                        }
                     }
                 }
 
@@ -1701,6 +1871,12 @@
 
         function getGroupUnreadInfo(groupId) {
             const lastRead = groupReadTimestamps[groupId] || 0;
+            // يتم جلب عدد غير المقروء فقط إذا كان المستخدم من ضمن المجموعة
+            const activeGroup = globalGroups.find(g => g.id === groupId);
+            if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
+                return { count: 0, hasMention: false }; 
+            }
+
             const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
             
             let unreadCount = groupMessages.length;
@@ -1777,12 +1953,49 @@
                 const titleEl = document.getElementById('chatHeaderTitle');
                 if (titleEl) titleEl.innerText = activeGroup.name;
                 
+                const isCEO = currentUserData && currentUserData.role === 'CEO';
+                const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+                const deleteGroupBtn = document.getElementById('deleteGroupBtn');
+                const chatForm = document.getElementById('chatForm');
+                const readOnlyMsg = document.getElementById('readOnlyMessage');
+
                 if(activeGroup.id === 'global') {
-                    document.getElementById('chatHeaderDesc').innerText = 'يتواجد هنا جميع أعضاء مساحة العمل';
-                    document.getElementById('clearChatBtnText').innerText = 'مسح الدردشة';
+                    document.getElementById('chatHeaderDesc').innerHTML = '<i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span>';
+                    
+                    // أزرار الحذف للمدير فقط في العام
+                    if(isCEO) {
+                        clearMessagesBtn.classList.remove('hidden');
+                        clearMessagesBtn.querySelector('span').innerText = 'مسح الدردشة العامة';
+                        deleteGroupBtn.classList.add('hidden'); // العام لا يحذف
+                    } else {
+                        clearMessagesBtn.classList.add('hidden');
+                        deleteGroupBtn.classList.add('hidden');
+                    }
+                    
+                    chatForm.classList.remove('hidden');
+                    readOnlyMsg.classList.add('hidden');
                 } else {
-                    document.getElementById('chatHeaderDesc').innerText = `مجموعة خاصة - ${activeGroup.members.length} أعضاء`;
-                    document.getElementById('clearChatBtnText').innerText = 'حذف المجموعة';
+                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>مجموعة خاصة - ${activeGroup.members.length} أعضاء</span>`;
+                    
+                    if(isCEO) {
+                        clearMessagesBtn.classList.remove('hidden');
+                        clearMessagesBtn.querySelector('span').innerText = 'مسح الرسائل';
+                        deleteGroupBtn.classList.remove('hidden');
+                        
+                        // تحقق ما إذا كان المدير يراقب فقط (غير مضاف)
+                        if(!activeGroup.members.includes(currentUserData.uid)) {
+                            chatForm.classList.add('hidden');
+                            readOnlyMsg.classList.remove('hidden');
+                        } else {
+                            chatForm.classList.remove('hidden');
+                            readOnlyMsg.classList.add('hidden');
+                        }
+                    } else {
+                        clearMessagesBtn.classList.add('hidden');
+                        deleteGroupBtn.classList.add('hidden');
+                        chatForm.classList.remove('hidden');
+                        readOnlyMsg.classList.add('hidden');
+                    }
                 }
             }
         }
@@ -1799,17 +2012,15 @@
             }
         };
 
-        // ============================================
-        // دالة تقديم نموذج إنشاء المجموعة
-        // ============================================
         document.getElementById('createGroupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if(!currentUserData || currentUserData.role !== 'CEO') return;
+            // أزلنا تقييد المدير هنا ليتمكن الجميع من الإنشاء
+            if(!currentUserData) return; 
             
             const groupName = document.getElementById('newGroupName').value;
             const checkboxes = document.querySelectorAll('.group-member-checkbox:checked');
             const members = Array.from(checkboxes).map(cb => cb.value);
-            members.push(currentUserData.uid); // المدير يضاف تلقائياً
+            members.push(currentUserData.uid); // مُنشئ المجموعة يضاف تلقائياً
 
             try {
                 const newGroupRef = await addDoc(getColRef('groups'), {
@@ -1830,7 +2041,8 @@
             }
         });
 
-        window.clearOrDeleteGroup = async () => {
+        // دالة مجمعة لمسح الرسائل أو حذف المجموعة كاملة (للمدير)
+        window.clearOrDeleteGroup = async (actionType) => {
             if(currentUserData.role !== 'CEO') return;
 
             if(currentGroupId === 'global') {
@@ -1843,21 +2055,32 @@
                     logAction('مسح الدردشة', 'قام المدير بمسح الدردشة العامة');
                 }
             } else {
-                if(confirm('هل أنت متأكد من حذف هذه المجموعة نهائياً؟')) {
-                    const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'المجموعة';
-                    
-                    const messagesToDelete = globalChat.filter(msg => msg.groupId === currentGroupId);
-                    for(const msg of messagesToDelete) {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', msg.id));
+                const groupName = globalGroups.find(g => g.id === currentGroupId)?.name || 'المجموعة';
+
+                if(actionType === 'clear') {
+                    if(confirm('هل أنت متأكد من مسح جميع الرسائل داخل هذه المجموعة؟ (ستبقى المجموعة موجودة)')) {
+                        const messagesToDelete = globalChat.filter(msg => msg.groupId === currentGroupId);
+                        for(const msg of messagesToDelete) {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', msg.id));
+                        }
+                        showToast('تم مسح رسائل المجموعة', 'success');
+                        logAction('مسح رسائل', `تم مسح رسائل مجموعة "${groupName}"`);
                     }
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', currentGroupId));
-                    
-                    showToast('تم حذف المجموعة', 'success');
-                    logAction('حذف مجموعة', `تم حذف مجموعة المحادثة "${groupName}"`);
-                    
-                    currentGroupId = 'global';
-                    renderChatSidebarList();
-                    renderChat();
+                } else if (actionType === 'delete') {
+                    if(confirm('هل أنت متأكد من حذف هذه المجموعة نهائياً بالرسائل التي بداخلها؟')) {
+                        const messagesToDelete = globalChat.filter(msg => msg.groupId === currentGroupId);
+                        for(const msg of messagesToDelete) {
+                            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', msg.id));
+                        }
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', currentGroupId));
+                        
+                        showToast('تم حذف المجموعة بالكامل', 'success');
+                        logAction('حذف مجموعة', `تم حذف مجموعة المحادثة "${groupName}"`);
+                        
+                        currentGroupId = 'global';
+                        renderChatSidebarList();
+                        renderChat();
+                    }
                 }
             }
         };
@@ -1977,9 +2200,6 @@
             });
         }
 
-        // ============================================
-        // دالة عرض السجلات مع الترتيب الصحيح للتواريخ
-        // ============================================
         function renderLogs() {
             const list = document.getElementById('logsList');
             list.innerHTML = '';
@@ -2335,6 +2555,7 @@
                     globalUsers.forEach(u => {
                         if (u.uid === currentUserData.uid) return; 
                         
+                        // تم إضافة هذا الشرط بحيث لا يرسل الإيميل للأشخاص خارج المجموعة
                         if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
 
                         const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
