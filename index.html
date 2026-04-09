@@ -179,7 +179,6 @@
                 <button id="nav-employees-btn" onclick="window.location.hash='employees'" class="nav-btn hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="employees">
                     <i class="fa-solid fa-users w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الموظفون">الموظفون</span>
                 </button>
-                <!-- الروابط الجديدة -->
                 <button onclick="window.location.hash='attendance'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="attendance">
                     <i class="fa-solid fa-clock w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الحضور والانصراف">الحضور والانصراف</span>
                 </button>
@@ -252,7 +251,6 @@
                         <span class="font-bold text-gray-700 dark:text-gray-200 text-sm" data-i18n="الموظفون">الموظفون</span>
                     </div>
 
-                    <!-- الأقسام الجديدة -->
                     <div onclick="window.location.hash='attendance'" class="cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-lg transition-all p-4 md:p-6 flex flex-col items-center justify-center text-center gap-4 border border-gray-100 dark:border-gray-700 hover:border-indigo-200 dark:hover:border-indigo-500 group">
                         <div class="w-16 h-16 rounded-2xl flex items-center justify-center bg-indigo-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 group-hover:-translate-y-1 transition-transform duration-300">
                             <i class="fa-solid fa-user-clock text-3xl"></i>
@@ -357,8 +355,7 @@
                 </div>
             </section>
 
-            <!-- ****************************************** -->
-            <!-- 3. نظام الحضور والانصراف (جديد) -->
+            <!-- 3. نظام الحضور والانصراف -->
             <section id="attendance" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="سجل الحضور والانصراف">سجل الحضور والانصراف اليومي</p>
@@ -409,8 +406,7 @@
                 </div>
             </section>
 
-            <!-- ****************************************** -->
-            <!-- 4. نظام طلبات الإجازات (جديد) -->
+            <!-- 4. نظام طلبات الإجازات -->
             <section id="leaves" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="طلبات الإجازات">طلبات الإجازات والمغادرات</p>
@@ -437,8 +433,7 @@
                 </div>
             </section>
 
-            <!-- ****************************************** -->
-            <!-- 5. لوحة الإعلانات (جديد) -->
+            <!-- 5. لوحة الإعلانات -->
             <section id="notices" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="التعميمات">لوحة الإعلانات والتعميمات الرسمية</p>
@@ -447,12 +442,10 @@
                     </button>
                 </div>
                 <div id="noticesList" class="space-y-4">
-                    <!-- سيتم ملؤها -->
                 </div>
             </section>
 
-            <!-- ****************************************** -->
-            <!-- 6. نظام العملاء CRM (جديد) -->
+            <!-- 6. نظام العملاء CRM -->
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="قاعدة بيانات العملاء">قاعدة بيانات العملاء (CRM)</p>
@@ -461,7 +454,6 @@
                     </button>
                 </div>
                 <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- سيتم ملؤها -->
                 </div>
             </section>
 
@@ -519,7 +511,7 @@
                 <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
             </section>
 
-            <!-- قسم الاجتماعات -->
+            <!-- 9. قسم الاجتماعات -->
             <section id="meetings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إدارة الاجتماعات">إدارة وجدولة مكالمات الفيديو</p>
@@ -541,7 +533,7 @@
                 </div>
             </section>
 
-            <!-- 5. المحادثات (المناقشة) -->
+            <!-- 10. المحادثات (المناقشة) -->
             <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
                 <div class="flex h-full bg-white dark:bg-gray-800 md:rounded-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden relative">
                     
@@ -627,7 +619,7 @@
                 </div>
             </section>
 
-            <!-- 6. الإعدادات -->
+            <!-- 11. الإعدادات -->
             <section id="settings" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إعدادات الحساب">إعدادات الحساب والملف الشخصي</p>
@@ -682,7 +674,7 @@
                 </div>
             </section>
 
-            <!-- 7. سجل النظام -->
+            <!-- 12. سجل النظام -->
             <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
@@ -707,8 +699,8 @@
         </div>
     </div>
 
-    <!-- Modals الميزات الجديدة -->
-    <!-- Modal طلب إجازة (للموظف) -->
+    <!-- Modals -->
+    <!-- Modal طلب إجازة -->
     <div id="leaveModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-pink-600 text-white p-4 flex justify-between items-center">
@@ -737,7 +729,7 @@
         </div>
     </div>
 
-    <!-- Modal إضافة إعلان (للمدير) -->
+    <!-- Modal إضافة إعلان -->
     <div id="noticeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-yellow-500 text-white p-4 flex justify-between items-center">
@@ -770,7 +762,8 @@
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">حالة العميل مبدئياً</label>
                     <select id="clientStatus" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none">
                         <option value="لم يتم الاتصال به">لم يتم الاتصال به</option>
-                        <option value="تم الاتصال به">تم الاتصال به</option>
+                        <option value="تم الاتصال به - يتم متابعته">تم الاتصال به - يتم متابعته</option>
+                        <option value="تم الاتصال - غير مهتم">تم الاتصال - غير مهتم</option>
                     </select>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
@@ -799,7 +792,7 @@
         </div>
     </div>
 
-    <!-- Modal: معلومات المجموعة القديمة ... -->
+    <!-- Modal: معلومات المجموعة -->
     <div id="groupInfoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
             <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -807,7 +800,6 @@
                 <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-4 md:p-6 overflow-y-auto flex-1">
-                
                 <div id="addMemberSection" class="hidden mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة عضو جديد">إضافة عضو جديد للمجموعة (خاص بالمدير)</label>
                     <div class="flex gap-2">
@@ -822,7 +814,6 @@
 
                 <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="أعضاء المجموعة">أعضاء المجموعة المتواجدين</label>
                 <div id="groupInfoMembersList" class="space-y-2">
-                    <!-- Populated dynamically -->
                 </div>
             </div>
         </div>
@@ -845,12 +836,37 @@
                 <div>
                     <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="إسناد إلى">إسناد إلى الموظف</label>
                     <select id="taskAssignee" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
-                        <!-- Populated dynamically -->
                     </select>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
                     <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
                     <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base" data-i18n="إرسال المهمة">إرسال المهمة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: إنهاء المهمة (جديد) -->
+    <div id="taskCompleteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-green-600 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg">تأكيد إنجاز المهمة وإرسال التقرير</h3>
+                <button onclick="window.closeModal('taskCompleteModal')" class="hover:text-green-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="taskCompleteForm" class="p-4 md:p-6 space-y-4">
+                <input type="hidden" id="completeTaskId">
+                <input type="hidden" id="completeTaskTitle">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تقرير الإنجاز (للمدير فقط)</label>
+                    <textarea id="taskReportText" rows="3" placeholder="اكتب تفاصيل ما تم إنجازه هنا..." required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">المرفقات (صورة أو ملف - اختياري)</label>
+                    <input type="file" id="taskReportFile" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:file:bg-gray-700 dark:file:text-green-400 focus:outline-none">
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('taskCompleteModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base shadow">تأكيد الإنجاز</button>
                 </div>
             </form>
         </div>
@@ -1157,7 +1173,6 @@
         let globalGroups = []; 
         let globalMeetings = [];
         
-        // المتغيرات الجديدة للأنظمة المضافة
         let globalAttendance = [];
         let globalLeaves = [];
         let globalNotices = [];
@@ -1556,15 +1571,18 @@
                     });
                 }
 
-                const statusColor = c.status === 'تم الاتصال به' ? 'text-green-600 bg-green-50' : 'text-gray-600 bg-gray-100';
+                let statusColor = 'text-gray-600 bg-gray-100';
+                if (c.status === 'تم الاتصال به - يتم متابعته') statusColor = 'text-blue-600 bg-blue-50';
+                else if (c.status === 'تم الاتصال - غير مهتم') statusColor = 'text-red-600 bg-red-50';
 
                 list.innerHTML += `
                     <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full">
                         <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
                             <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}"><i class="fa-solid fa-user-tie mx-1"></i> ${c.name}</h3>
-                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor}">
-                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال</option>
-                                <option value="تم الاتصال به" ${c.status === 'تم الاتصال به' ? 'selected' : ''}>تم الاتصال</option>
+                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor} max-w-[130px] truncate">
+                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال به</option>
+                                <option value="تم الاتصال به - يتم متابعته" ${c.status === 'تم الاتصال به - يتم متابعته' ? 'selected' : ''}>تم الاتصال به - يتم متابعته</option>
+                                <option value="تم الاتصال - غير مهتم" ${c.status === 'تم الاتصال - غير مهتم' ? 'selected' : ''}>تم الاتصال - غير مهتم</option>
                             </select>
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1">
@@ -1931,7 +1949,6 @@
             if(!currentUserData) return; 
             
             const hash = window.location.hash.replace('#', '');
-            // أضفنا الأقسام الجديدة للقائمة المسموحة
             const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings', 'meetings', 'attendance', 'leaves', 'notices', 'crm'];
             
             let targetSection = hash || 'home-grid';
@@ -2052,6 +2069,7 @@
         window.closeModal = (id) => {
             document.getElementById(id).classList.add('hidden');
             if(id === 'taskModal') document.getElementById('addTaskForm').reset();
+            if(id === 'taskCompleteModal') document.getElementById('taskCompleteForm').reset();
             if(id === 'createGroupModal') document.getElementById('createGroupForm').reset();
             if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm').reset();
             if(id === 'createMeetingModal') document.getElementById('createMeetingForm').reset();
@@ -2419,7 +2437,6 @@
                 
                 document.getElementById('createMeetingBtn').classList.remove('hidden');
                 
-                // إظهار خاصية اختيار الموظفين في الحضور للمدير
                 document.getElementById('ceoAttendanceView').classList.remove('hidden');
                 
                 const select = document.getElementById('attendanceEmpSelect');
@@ -2527,7 +2544,6 @@
                 });
             }
 
-            // الاستماع للأنظمة الجديدة
             onSnapshot(getColRef('attendance'), (snapshot) => {
                 globalAttendance = [];
                 snapshot.forEach(doc => globalAttendance.push({ id: doc.id, ...doc.data() }));
@@ -2558,7 +2574,6 @@
                 renderCRM();
             });
 
-            // الاستماع للأنظمة القديمة
             onSnapshot(getColRef('tasks'), (snapshot) => {
                 globalTasks = [];
                 let hasNewAssignedTask = false;
@@ -2570,7 +2585,6 @@
                     
                     if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
                         knownTaskIds.add(taskData.id);
-                        // منع إشعار باقي الموظفين - الإشعار فقط لمن أسندت له المهمة
                         if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
                             hasNewAssignedTask = true;
                             latestTaskName = taskData.title;
@@ -2948,6 +2962,76 @@
             });
         }
 
+        window.openTaskCompleteModal = (taskId, taskTitle) => {
+            document.getElementById('completeTaskId').value = taskId;
+            document.getElementById('completeTaskTitle').value = taskTitle;
+            window.openModal('taskCompleteModal');
+        };
+
+        document.getElementById('taskCompleteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const taskId = document.getElementById('completeTaskId').value;
+            const taskTitle = document.getElementById('completeTaskTitle').value;
+            const reportText = document.getElementById('taskReportText').value;
+            const fileInput = document.getElementById('taskReportFile');
+            
+            let reportFileData = null;
+            let reportFileType = null;
+
+            const submitCompletion = async () => {
+                try {
+                    const taskDoc = globalTasks.find(t => t.id === taskId);
+                    let durationMsg = '';
+                    if (taskDoc && taskDoc.startedAt) {
+                        const diffMins = Math.round((Date.now() - taskDoc.startedAt) / 60000);
+                        const hours = Math.floor(diffMins / 60);
+                        const mins = diffMins % 60;
+                        durationMsg = hours > 0 ? `${hours} ساعة و ${mins} دقيقة` : `${mins} دقيقة`;
+                    }
+
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), { 
+                        status: 'completed',
+                        completedAt: Date.now(),
+                        duration: durationMsg,
+                        reportText: reportText,
+                        reportFile: reportFileData,
+                        reportFileType: reportFileType
+                    });
+                    
+                    window.closeModal('taskCompleteModal');
+                    showToast('أحسنت! تم إنجاز المهمة وإرسال التقرير للمدير.', 'success');
+                    logAction('إنجاز مهمة', `تم إنجاز المهمة "${taskTitle}"`);
+                    
+                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
+                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
+                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
+                            ceo_email: ceoUser.email,
+                            ceo_name: ceoUser.name,
+                            employee_name: currentUserData.name,
+                            task_title: taskTitle,
+                            task_link: taskLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_3);
+                    }
+                } catch(e) {}
+            };
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if(file.size > MAX_FILE_SIZE) { showToast('حجم الملف كبير جداً! الحد الأقصى 600KB.', 'warning'); return; }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    reportFileData = ev.target.result;
+                    reportFileType = file.type;
+                    submitCompletion();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                submitCompletion();
+            }
+        });
+
         function renderTasks() {
             const pending = document.getElementById('tasks-pending');
             const progress = document.getElementById('tasks-progress');
@@ -2966,7 +3050,7 @@
                     if(task.status === 'pending') {
                         actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">${t('البدء بالتنفيذ')}</button>`;
                     } else if(task.status === 'in-progress') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">${t('تأكيد الإنجاز')} <i class="fa-solid fa-check mx-1"></i></button>`;
+                        actionsHtml = `<button onclick="window.openTaskCompleteModal('${task.id}', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">${t('تأكيد الإنجاز ورفع التقرير')} <i class="fa-solid fa-check mx-1"></i></button>`;
                     }
                 }
 
@@ -2974,6 +3058,33 @@
 
                 const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
                 const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
+
+                let timerHtml = '';
+                if (task.status === 'in-progress' && task.startedAt && isCEO) {
+                    const startStr = new Date(task.startedAt).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                    timerHtml = `<p class="text-[10px] text-blue-500 mt-2 font-bold"><i class="fa-solid fa-play"></i> بدأ التنفيذ: ${startStr}</p>`;
+                } else if (task.status === 'completed' && task.duration && isCEO) {
+                    timerHtml = `<p class="text-[10px] text-green-600 mt-2 font-bold"><i class="fa-solid fa-stopwatch"></i> استغرق: ${task.duration}</p>`;
+                }
+
+                let reportHtml = '';
+                if (task.status === 'completed' && isCEO && task.reportText) {
+                    let fileHtml = '';
+                    if(task.reportFile) {
+                         if(task.reportFileType.startsWith('image/') || task.reportFileType.startsWith('video/')) {
+                             fileHtml = `<button onclick="window.openMedia('${task.reportFile}', '${task.reportFileType}')" class="text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-500 transition"><i class="fa-solid fa-paperclip"></i> عرض المرفق</button>`;
+                         } else {
+                             fileHtml = `<a href="${task.reportFile}" download="مرفق_مهمة" class="inline-block text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-2 py-1 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-500 transition"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                         }
+                    }
+                    reportHtml = `
+                        <div class="mt-3 p-2 bg-green-50 dark:bg-gray-700 border border-green-100 dark:border-gray-600 rounded-lg text-xs">
+                            <p class="font-bold text-green-700 dark:text-green-400 mb-1">تقرير الإنجاز:</p>
+                            <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line">${task.reportText}</p>
+                            ${fileHtml}
+                        </div>
+                    `;
+                }
 
                 const card = `
                     <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 rtl:border-r-4 ltr:border-l-4 ${task.status === 'completed' ? 'border-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-secondary' : 'border-gray-400')}">
@@ -2988,6 +3099,8 @@
                             </div>
                             ${isMyTask ? `<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">${t('مهمتك')}</span>` : ''}
                         </div>
+                        ${timerHtml}
+                        ${reportHtml}
                         ${actionsHtml}
                         ${deleteHtml}
                     </div>
@@ -3202,26 +3315,14 @@
 
         window.updateTaskStatus = async (id, newStatus, taskTitle) => {
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
+                let updateData = { status: newStatus };
+                if (newStatus === 'in-progress') {
+                    updateData.startedAt = Date.now();
+                }
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
                 let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
                 logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
                 
-                if(newStatus === 'completed') {
-                    showToast('أحسنت! تم إنجاز المهمة.', 'success');
-                    
-                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
-                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
-                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
-                            ceo_email: ceoUser.email,
-                            ceo_name: ceoUser.name,
-                            employee_name: currentUserData.name,
-                            task_title: taskTitle,
-                            task_link: taskLink,
-                            company_name: 'نظام شركتي'
-                        }, EMAILJS_PUBLIC_KEY_3);
-                    }
-                }
             } catch(e) {}
         };
 
@@ -3250,7 +3351,9 @@
                 let pinBtn = '';
                 let deleteBtn = '';
                 
-                if (isCEO) {
+                const canEdit = isCEO || file.uploaderId === currentUserData.uid;
+                
+                if (canEdit) {
                     pinBtn = `<button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-primary dark:text-secondary' : 'text-gray-300 dark:text-gray-500 hover:text-primary'} transition p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}"><i class="fa-solid fa-thumbtack"></i></button>`;
                     deleteBtn = `<button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 transition p-1 mx-1" title="حذف الملف"><i class="fa-solid fa-trash"></i></button>`;
                 }
@@ -3337,51 +3440,3 @@
                     groupId: currentGroupId,
                     color: selectedChatColor, 
                     timestamp: Date.now()
-                };
-
-                if(pendingChatFileData) {
-                    messageObj.fileData = pendingChatFileData;
-                    messageObj.fileType = pendingChatFileType;
-                    window.clearChatAttachment(); 
-                }
-
-                await addDoc(getColRef('chat'), messageObj);
-
-                if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
-                    const chatLink = window.location.origin + window.location.pathname + '#chat';
-                    const activeGroup = globalGroups.find(g => g.id === currentGroupId);
-                    const groupName = activeGroup?.name || 'الدردشة';
-                    const isMentionAll = text.includes('@الجميع');
-                    
-                    globalUsers.forEach(u => {
-                        if (u.uid === currentUserData.uid) return; 
-                        
-                        if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
-
-                        const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const regex = new RegExp(`@${safeName}`, 'g');
-                        
-                        if ((isMentionAll || regex.test(text)) && u.email && u.email !== 'no-email@company.com') {
-                            
-                            const isOnline = u.lastActive && (Date.now() - u.lastActive < 2 * 60 * 1000);
-                            
-                            if (!isOnline) {
-                                emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
-                                    to_email: u.email,
-                                    to_name: u.name,
-                                    sender_name: currentUserData.name,
-                                    group_name: groupName,
-                                    chat_text: text,
-                                    chat_link: chatLink,
-                                    company_name: 'نظام شركتي'
-                                }, EMAILJS_PUBLIC_KEY_2);
-                            }
-                        }
-                    });
-                }
-            } catch(e) {}
-        });
-
-    </script>
-</body>
-</html>
