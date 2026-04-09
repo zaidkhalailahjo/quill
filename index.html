@@ -1437,7 +1437,10 @@
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b dark:border-gray-700">
-                        <td class="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">${l.name}</td>
+                        <td class="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">
+                            ${l.name}
+                            <div class="text-[10px] md:text-xs font-normal text-gray-500 mt-1 max-w-[200px] break-words whitespace-pre-wrap"><span class="font-bold">التفاصيل:</span> ${l.reason || 'لا يوجد'}</div>
+                        </td>
                         <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${l.type}</td>
                         <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${fromStr}</td>
                         <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${toStr}</td>
