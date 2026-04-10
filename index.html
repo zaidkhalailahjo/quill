@@ -64,27 +64,9 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
 
-    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-[60] flex flex-col items-center justify-center">
+    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
         <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
-    </div>
-
-    <!-- شاشة كلمة مرور النظام الجديدة -->
-    <div id="systemPasswordScreen" class="fixed inset-0 bg-primary z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain block dark:hidden">
-            <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 p-2 rounded-lg object-contain hidden dark:block">
-            
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4">نظام الشركة مقفل</h2>
-            <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm">يرجى إدخال كلمة المرور الخاصة بالنظام للوصول إلى صفحة تسجيل الدخول</p>
-            
-            <input type="password" id="systemPasswordInput" placeholder="كلمة المرور" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-secondary text-center text-lg" style="letter-spacing: 0.5em;">
-            
-            <button id="unlockSystemBtn" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors shadow-sm">
-                دخول للنظام
-            </button>
-            <p id="systemPasswordError" class="text-red-500 text-sm mt-3 hidden font-bold">كلمة المرور غير صحيحة!</p>
-        </div>
     </div>
 
     <!-- شاشة تسجيل الدخول -->
@@ -132,7 +114,7 @@
         </div>
     </div>
 
-    <div id="toastContainer" class="fixed bottom-6 left-6 z-[70] flex flex-col gap-3"></div>
+    <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3"></div>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         
@@ -375,7 +357,8 @@
                 </div>
             </section>
 
-            <!-- 3. نظام الحضور والانصراف -->
+            <!-- ****************************************** -->
+            <!-- 3. نظام الحضور والانصراف (جديد) -->
             <section id="attendance" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="سجل الحضور والانصراف">سجل الحضور والانصراف اليومي</p>
@@ -426,7 +409,8 @@
                 </div>
             </section>
 
-            <!-- 4. نظام طلبات الإجازات -->
+            <!-- ****************************************** -->
+            <!-- 4. نظام طلبات الإجازات (جديد) -->
             <section id="leaves" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="طلبات الإجازات">طلبات الإجازات والمغادرات</p>
@@ -453,7 +437,8 @@
                 </div>
             </section>
 
-            <!-- 5. لوحة الإعلانات -->
+            <!-- ****************************************** -->
+            <!-- 5. لوحة الإعلانات (جديد) -->
             <section id="notices" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="التعميمات">لوحة الإعلانات والتعميمات الرسمية</p>
@@ -466,7 +451,8 @@
                 </div>
             </section>
 
-            <!-- 6. نظام العملاء CRM -->
+            <!-- ****************************************** -->
+            <!-- 6. نظام العملاء CRM (جديد) -->
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="قاعدة بيانات العملاء">قاعدة بيانات العملاء (CRM)</p>
@@ -721,41 +707,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
-
-    <!-- Modal إنهاء المهمة وإضافة التقرير/المرفق -->
-    <div id="taskCompleteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-green-600 text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">تأكيد إنجاز المهمة</h3>
-                <button onclick="window.closeModal('taskCompleteModal')" class="hover:text-green-200"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form id="taskCompleteForm" class="p-4 md:p-6 space-y-4">
-                <input type="hidden" id="completeTaskId">
-                <input type="hidden" id="completeTaskTitle">
-                
-                <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded text-sm text-gray-600 dark:text-gray-300">
-                    يجب كتابة تقرير قصير عن ما تم إنجازه أو إرفاق ملف (صورة/تصميم) لإثبات إتمام المهمة. هذه المعلومات ستظهر للمدير فقط.
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تقرير الإنجاز (اختياري إذا تم رفع ملف)</label>
-                    <textarea id="taskCompleteReport" rows="3" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none"></textarea>
-                </div>
-                
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">ملف المرفق (اختياري إذا تم كتابة تقرير)</label>
-                    <input type="file" id="taskCompleteFile" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
-                </div>
-
-                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('taskCompleteModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base">تأكيد الإنجاز</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <!-- Modals الميزات الجديدة -->
     <!-- Modal طلب إجازة (للموظف) -->
     <div id="leaveModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
@@ -818,8 +770,7 @@
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">حالة العميل مبدئياً</label>
                     <select id="clientStatus" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none">
                         <option value="لم يتم الاتصال به">لم يتم الاتصال به</option>
-                        <option value="تم الاتصال به - يتم متابعته">تم الاتصال به - يتم متابعته</option>
-                        <option value="تم الاتصال - غير مهتم">تم الاتصال - غير مهتم</option>
+                        <option value="تم الاتصال به">تم الاتصال به</option>
                     </select>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
@@ -848,7 +799,7 @@
         </div>
     </div>
 
-    <!-- Modal: معلومات المجموعة -->
+    <!-- Modal: معلومات المجموعة القديمة ... -->
     <div id="groupInfoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
             <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1015,26 +966,6 @@
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // التحقق من حالة حماية النظام وكلمة المرور
-        const SYSTEM_PASSWORD = "1112021";
-        let isSystemUnlocked = localStorage.getItem('systemUnlocked') === 'true';
-
-        document.getElementById('unlockSystemBtn').addEventListener('click', () => {
-            const pass = document.getElementById('systemPasswordInput').value;
-            if(pass === SYSTEM_PASSWORD) {
-                localStorage.setItem('systemUnlocked', 'true');
-                isSystemUnlocked = true;
-                document.getElementById('systemPasswordScreen').classList.add('hidden');
-                
-                // التأكد من إظهار شاشة الدخول إذا لم يكن هناك مستخدم مسجل
-                if (!currentUserAuth) {
-                    document.getElementById('loginScreen').classList.remove('hidden');
-                }
-            } else {
-                document.getElementById('systemPasswordError').classList.remove('hidden');
-            }
-        });
-
         const firebaseConfig = {
             apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
             authDomain: "quill-world.firebaseapp.com",
@@ -1226,7 +1157,7 @@
         let globalGroups = []; 
         let globalMeetings = [];
         
-        // المتغيرات للأنظمة المضافة
+        // المتغيرات الجديدة للأنظمة المضافة
         let globalAttendance = [];
         let globalLeaves = [];
         let globalNotices = [];
@@ -1278,50 +1209,6 @@
                 });
             }
         }
-
-        // ==========================================
-        // إضافة مستمع لحدث (إرسال المهمة) الذي كان مفقوداً
-        // ==========================================
-        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData || currentUserData.role !== 'CEO') return;
-
-            const title = document.getElementById('taskTitle').value;
-            const deadline = document.getElementById('taskDeadline').value;
-            const desc = document.getElementById('taskDesc').value;
-            const assigneeId = document.getElementById('taskAssignee').value;
-
-            if(!assigneeId) {
-                showToast('الرجاء اختيار الموظف المراد إسناد المهمة إليه', 'warning');
-                return;
-            }
-
-            const assigneeUser = globalUsers.find(u => u.id === assigneeId);
-            if(!assigneeUser) return;
-
-            try {
-                await addDoc(getColRef('tasks'), {
-                    title: title,
-                    desc: desc,
-                    deadline: deadline ? new Date(deadline).getTime() : null,
-                    assigneeId: assigneeId,
-                    assigneeName: assigneeUser.name,
-                    status: 'pending',
-                    timestamp: Date.now()
-                });
-
-                window.closeModal('taskModal');
-                showToast('تم إرسال المهمة بنجاح للموظف!', 'success');
-                logAction('إسناد مهمة', `تم إسناد مهمة جديدة إلى ${assigneeUser.name}`);
-
-                // إرسال الإيميل للموظف
-                if(assigneeUser.email && assigneeUser.email !== 'no-email@company.com') {
-                    sendEmailNotification(assigneeUser.email, assigneeUser.name, title, desc);
-                }
-            } catch(err) {
-                showToast('حدث خطأ أثناء حفظ المهمة!', 'primary');
-            }
-        });
 
         // ==========================================
         // النظام الجديد 1: الحضور والانصراف
@@ -1519,10 +1406,7 @@
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b dark:border-gray-700">
-                        <td class="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">
-                            ${l.name}
-                            <div class="text-[10px] md:text-xs font-normal text-gray-500 mt-1 max-w-[200px] break-words whitespace-pre-wrap"><span class="font-bold">التفاصيل:</span> ${l.reason || 'لا يوجد'}</div>
-                        </td>
+                        <td class="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">${l.name}</td>
                         <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${l.type}</td>
                         <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${fromStr}</td>
                         <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${toStr}</td>
@@ -1592,7 +1476,7 @@
         }
 
         // ==========================================
-        // النظام الجديد 4: العملاء CRM (تعديل حالات العميل)
+        // النظام الجديد 4: العملاء CRM
         // ==========================================
         document.getElementById('clientForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1660,6 +1544,7 @@
                 let notesHtml = '';
                 if(c.notes && c.notes.length > 0) {
                     c.notes.forEach(note => {
+                        // خصوصية الملاحظة: للمدير أو لكاتب الملاحظة فقط
                         if(currentUserData.role === 'CEO' || note.authorId === currentUserData.uid) {
                             notesHtml += `
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600">
@@ -1671,19 +1556,15 @@
                     });
                 }
 
-                // تحديد لون الحالة بناءً على الخيارات الجديدة
-                let statusColor = 'text-gray-600 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
-                if(c.status === 'تم الاتصال به - يتم متابعته') statusColor = 'text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-400';
-                if(c.status === 'تم الاتصال - غير مهتم') statusColor = 'text-red-600 bg-red-50 dark:bg-red-900/30 dark:text-red-400';
+                const statusColor = c.status === 'تم الاتصال به' ? 'text-green-600 bg-green-50' : 'text-gray-600 bg-gray-100';
 
                 list.innerHTML += `
                     <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full">
                         <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
                             <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}"><i class="fa-solid fa-user-tie mx-1"></i> ${c.name}</h3>
-                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-[10px] md:text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor}">
-                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال به</option>
-                                <option value="تم الاتصال به - يتم متابعته" ${c.status === 'تم الاتصال به - يتم متابعته' ? 'selected' : ''}>تم الاتصال به - يتم متابعته</option>
-                                <option value="تم الاتصال - غير مهتم" ${c.status === 'تم الاتصال - غير مهتم' ? 'selected' : ''}>تم الاتصال - غير مهتم</option>
+                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor}">
+                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال</option>
+                                <option value="تم الاتصال به" ${c.status === 'تم الاتصال به' ? 'selected' : ''}>تم الاتصال</option>
                             </select>
                         </div>
                         <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1">
@@ -1701,185 +1582,9 @@
         }
 
         // ==========================================
-        // تعديلات نظام المهام (التقارير والمؤقت)
+        // تعديلات الوظائف العامة وإدارة الروابط
         // ==========================================
 
-        window.openTaskCompleteModal = (taskId, taskTitle) => {
-            document.getElementById('completeTaskId').value = taskId;
-            document.getElementById('completeTaskTitle').value = taskTitle;
-            document.getElementById('taskCompleteReport').value = '';
-            document.getElementById('taskCompleteFile').value = '';
-            window.openModal('taskCompleteModal');
-        };
-
-        document.getElementById('taskCompleteForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const taskId = document.getElementById('completeTaskId').value;
-            const taskTitle = document.getElementById('completeTaskTitle').value;
-            const reportText = document.getElementById('taskCompleteReport').value.trim();
-            const fileInput = document.getElementById('taskCompleteFile');
-            const file = fileInput.files[0];
-
-            if(!reportText && !file) {
-                showToast('يرجى كتابة تقرير قصير أو إرفاق ملف لتوثيق الإنجاز', 'warning');
-                return;
-            }
-
-            const task = globalTasks.find(t => t.id === taskId);
-            if(!task) return;
-
-            let durationStr = 'غير محدد';
-            if(task.startedAt) {
-                const diffMs = Date.now() - task.startedAt;
-                const totalMins = Math.floor(diffMs / 60000);
-                if(totalMins < 60) {
-                    durationStr = `${totalMins} دقيقة`;
-                } else {
-                    const hrs = Math.floor(totalMins / 60);
-                    const mins = totalMins % 60;
-                    durationStr = `${hrs} ساعة و ${mins} دقيقة`;
-                }
-            }
-
-            const processCompletion = async (fileData = null) => {
-                try {
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
-                        status: 'completed',
-                        completedAt: Date.now(),
-                        reportText: reportText,
-                        reportFileData: fileData,
-                        duration: durationStr
-                    });
-                    
-                    window.closeModal('taskCompleteModal');
-                    showToast('أحسنت! تم إنجاز المهمة وتسليم التقرير للمدير.', 'success');
-                    logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى مكتملة مع تسليم التقرير`);
-                    
-                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
-                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
-                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
-                            ceo_email: ceoUser.email,
-                            ceo_name: ceoUser.name,
-                            employee_name: currentUserData.name,
-                            task_title: taskTitle,
-                            task_link: taskLink,
-                            company_name: 'نظام شركتي'
-                        }, EMAILJS_PUBLIC_KEY_3);
-                    }
-                } catch(e) {
-                    showToast('حدث خطأ أثناء حفظ التقرير', 'primary');
-                }
-            };
-
-            if(file) {
-                if(file.size > 2 * 1024 * 1024) { 
-                    showToast('حجم الملف كبير جداً! الحد الأقصى 2 ميجابايت', 'warning');
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = (ev) => processCompletion(ev.target.result);
-                reader.readAsDataURL(file);
-            } else {
-                processCompletion(null);
-            }
-        });
-
-        window.updateTaskStatus = async (id, newStatus, taskTitle) => {
-            try {
-                let updateData = { status: newStatus };
-                if (newStatus === 'in-progress') {
-                    updateData.startedAt = Date.now(); 
-                }
-                
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
-                let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
-                logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
-                
-                if (newStatus === 'in-progress') {
-                    showToast('تم بدء المهمة، جاري حساب الوقت..', 'info');
-                }
-            } catch(e) {}
-        };
-
-        function renderTasks() {
-            const pending = document.getElementById('tasks-pending');
-            const progress = document.getElementById('tasks-progress');
-            const completed = document.getElementById('tasks-completed');
-            
-            pending.innerHTML = progress.innerHTML = completed.innerHTML = '';
-
-            globalTasks.forEach(task => {
-                const isMyTask = task.assigneeId === currentUserData.uid;
-                const isCEO = currentUserData.role === 'CEO';
-                
-                if (!isCEO && !isMyTask) return;
-
-                let actionsHtml = '';
-                if(isMyTask && !isCEO) {
-                    if(task.status === 'pending') {
-                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">${t('البدء بالتنفيذ')}</button>`;
-                    } else if(task.status === 'in-progress') {
-                        actionsHtml = `<button onclick="window.openTaskCompleteModal('${task.id}', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">${t('تأكيد الإنجاز')} <i class="fa-solid fa-check mx-1"></i></button>`;
-                    }
-                }
-
-                const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full rtl:text-left ltr:text-right mt-2"><i class="fa-solid fa-trash"></i> ${t('حذف')}</button>` : '';
-
-                const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
-                const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
-
-                let ceoDetailsHtml = '';
-                if (isCEO && (task.status === 'in-progress' || task.status === 'completed')) {
-                    ceoDetailsHtml += `<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">`;
-                    
-                    if (task.startedAt) {
-                        const startStr = new Date(task.startedAt).toLocaleString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-                        ceoDetailsHtml += `<p class="text-[11px] text-blue-500 font-bold mb-1"><i class="fa-solid fa-play mx-1"></i> بدأ التنفيذ: ${startStr}</p>`;
-                    }
-                    
-                    if (task.status === 'completed') {
-                        if (task.duration) {
-                            ceoDetailsHtml += `<p class="text-[11px] text-green-600 font-bold mb-2"><i class="fa-solid fa-stopwatch mx-1"></i> الوقت المستغرق: ${task.duration}</p>`;
-                        }
-                        if (task.reportText) {
-                            ceoDetailsHtml += `<div class="bg-gray-50 dark:bg-gray-700 p-2 rounded text-xs text-gray-700 dark:text-gray-300 border dark:border-gray-600 mb-2"><strong>تقرير الإنجاز:</strong><br>${task.reportText}</div>`;
-                        }
-                        if (task.reportFileData) {
-                            ceoDetailsHtml += `<a href="${task.reportFileData}" download="مرفق_إنجاز_المهمة" class="text-xs text-secondary hover:underline font-bold"><i class="fa-solid fa-paperclip mx-1"></i> تحميل مرفق المهمة</a>`;
-                        }
-                    }
-                    ceoDetailsHtml += `</div>`;
-                }
-
-                const card = `
-                    <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 rtl:border-r-4 ltr:border-l-4 ${task.status === 'completed' ? 'border-green-500 opacity-90' : (task.status === 'in-progress' ? 'border-secondary' : 'border-gray-400')}">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-xs md:text-sm ${task.status === 'completed' ? 'line-through text-gray-500' : ''}">${task.title}</h4>
-                        </div>
-                        <p class="inline-block px-2 py-1 rounded text-[9px] font-bold mb-2 ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}"><i class="fa-regular fa-clock"></i> ${t('مطلوب:')} ${deadlineStr}</p>
-                        <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mb-3">${task.desc}</p>
-                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
-                            <div class="flex items-center text-[10px] md:text-xs text-primary dark:text-secondary font-bold bg-blue-50 dark:bg-gray-700 px-2 py-1 rounded">
-                                <i class="fa-solid fa-user-tie mx-1"></i> ${task.assigneeName}
-                            </div>
-                            ${isMyTask ? `<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">${t('مهمتك')}</span>` : ''}
-                        </div>
-                        ${ceoDetailsHtml}
-                        ${actionsHtml}
-                        ${deleteHtml}
-                    </div>
-                `;
-
-                if(task.status === 'pending') pending.innerHTML += card;
-                else if(task.status === 'in-progress') progress.innerHTML += card;
-                else completed.innerHTML += card;
-            });
-        }
-
-        // ==========================================
-        // بقية الوظائف الأساسية
-        // ==========================================
         window.openGroupInfoModal = () => {
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(!activeGroup) return;
@@ -2226,6 +1931,7 @@
             if(!currentUserData) return; 
             
             const hash = window.location.hash.replace('#', '');
+            // أضفنا الأقسام الجديدة للقائمة المسموحة
             const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'drive', 'settings', 'meetings', 'attendance', 'leaves', 'notices', 'crm'];
             
             let targetSection = hash || 'home-grid';
@@ -2353,7 +2059,6 @@
             if(id === 'noticeModal') document.getElementById('noticeForm').reset();
             if(id === 'clientModal') document.getElementById('clientForm').reset();
             if(id === 'noteModal') document.getElementById('noteForm').reset();
-            if(id === 'taskCompleteModal') document.getElementById('taskCompleteForm').reset();
         };
 
         window.openMedia = (dataUrl, type) => {
@@ -2623,12 +2328,6 @@
         onAuthStateChanged(auth, async (user) => {
             document.getElementById('loadingScreen').classList.add('hidden');
             
-            if(!isSystemUnlocked) {
-                // منع إظهار شاشة تسجيل الدخول إذا لم يتم إدخال كلمة سر النظام بعد
-                document.getElementById('loginScreen').classList.add('hidden');
-                return;
-            }
-
             if (user) {
                 document.getElementById('loginScreen').classList.add('hidden');
                 currentUserAuth = user;
@@ -2724,7 +2423,6 @@
                 document.getElementById('ceoAttendanceView').classList.remove('hidden');
                 
                 const select = document.getElementById('attendanceEmpSelect');
-                select.innerHTML = '<option value="">-- اختر موظف لعرض سجله --</option>'; // تفريغ
                 globalUsers.forEach(u => {
                     select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
                 });
@@ -2860,6 +2558,7 @@
                 renderCRM();
             });
 
+            // الاستماع للأنظمة القديمة
             onSnapshot(getColRef('tasks'), (snapshot) => {
                 globalTasks = [];
                 let hasNewAssignedTask = false;
@@ -2871,6 +2570,7 @@
                     
                     if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
                         knownTaskIds.add(taskData.id);
+                        // منع إشعار باقي الموظفين - الإشعار فقط لمن أسندت له المهمة
                         if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
                             hasNewAssignedTask = true;
                             latestTaskName = taskData.title;
@@ -2959,103 +2659,6 @@
                 renderChatSidebarList(); 
                 renderChat();
             });
-        }
-
-        // --- إضافة دالة renderDriveFiles و updateStorageProgress التي كانت مفقودة للملفات ---
-        function renderDriveFiles() {
-            const pinnedContainer = document.getElementById('pinnedFilesContainer');
-            const allContainer = document.getElementById('allFilesContainer');
-            
-            if (pinnedContainer) pinnedContainer.innerHTML = '';
-            if (allContainer) allContainer.innerHTML = '';
-
-            const isCEO = currentUserData && currentUserData.role === 'CEO';
-
-            globalFiles.forEach(file => {
-                const dateStr = new Date(file.timestamp).toLocaleDateString('ar-EG');
-                const isImage = file.type.startsWith('image/');
-                const isVideo = file.type.startsWith('video/');
-                
-                let icon = 'fa-file text-gray-500';
-                if(isImage) icon = 'fa-file-image text-blue-500';
-                if(isVideo) icon = 'fa-file-video text-red-500';
-                if(file.type === 'application/pdf') icon = 'fa-file-pdf text-red-600';
-
-                const canDelete = isCEO || file.uploaderId === currentUserData.uid;
-                
-                let controlsHtml = '';
-                if(canDelete) {
-                    controlsHtml = `
-                        <div class="flex gap-2">
-                            <button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-primary dark:text-secondary' : 'text-gray-300 hover:text-gray-500'} transition"><i class="fa-solid fa-thumbtack"></i></button>
-                            <button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-300 hover:text-red-500 transition"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    `;
-                }
-
-                const fileCard = `
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition group">
-                        <div class="flex justify-between items-start mb-3">
-                            <i class="fa-solid ${icon} text-3xl"></i>
-                            ${controlsHtml}
-                        </div>
-                        <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200 truncate mb-1" title="${file.name}">${file.name}</h4>
-                        <div class="flex justify-between text-xs text-gray-400">
-                            <span>${file.sizeStr}</span>
-                            <span>${dateStr}</span>
-                        </div>
-                        <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                            <span class="text-[10px] text-gray-400 truncate w-1/2">بواسطة: ${file.uploaderName}</span>
-                            ${(isImage || isVideo) 
-                                ? `<button onclick="window.openMedia('${file.data}', '${file.type}')" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-1 rounded transition font-bold"><i class="fa-solid fa-eye mx-1"></i> عرض</button>`
-                                : `<a href="${file.data}" download="${file.name}" class="text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-2 py-1 rounded transition font-bold"><i class="fa-solid fa-download mx-1"></i> تحميل</a>`
-                            }
-                        </div>
-                    </div>
-                `;
-
-                if (allContainer) allContainer.innerHTML += fileCard;
-                if (file.pinned && pinnedContainer) pinnedContainer.innerHTML += fileCard;
-            });
-            
-            if(globalFiles.length === 0) {
-                if(allContainer) allContainer.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">لا يوجد ملفات مرفوعة حالياً.</p>';
-            }
-            if(globalFiles.filter(f => f.pinned).length === 0) {
-                if(pinnedContainer) pinnedContainer.innerHTML = '<p class="col-span-full text-center text-gray-500 py-4">لا يوجد ملفات مثبتة.</p>';
-            }
-        }
-
-        function updateStorageProgress() {
-            const currentStorage = globalFiles.reduce((acc, f) => acc + (f.size || 0), 0);
-            const percentage = Math.min((currentStorage / MAX_GLOBAL_STORAGE) * 100, 100);
-            
-            const storageText = document.getElementById('storageText');
-            const storageBar = document.getElementById('storageBar');
-            const storageWarning = document.getElementById('storageWarning');
-            const uploadBtn = document.getElementById('uploadFileBtn');
-
-            if(storageText) storageText.innerText = `${formatBytes(currentStorage)} / 15 MB`;
-            if(storageBar) {
-                storageBar.style.width = `${percentage}%`;
-                if(percentage > 90) storageBar.className = 'bg-red-500 h-full transition-all duration-500';
-                else if(percentage > 70) storageBar.className = 'bg-yellow-500 h-full transition-all duration-500';
-                else storageBar.className = 'bg-green-500 h-full transition-all duration-500';
-            }
-
-            if(currentStorage >= MAX_GLOBAL_STORAGE) {
-                if(storageWarning) storageWarning.classList.remove('hidden');
-                if(uploadBtn) {
-                    uploadBtn.disabled = true;
-                    uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                }
-            } else {
-                if(storageWarning) storageWarning.classList.add('hidden');
-                if(uploadBtn) {
-                    uploadBtn.disabled = false;
-                    uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }
-            }
         }
 
         function getGroupUnreadInfo(groupId) {
@@ -3313,17 +2916,6 @@
                 logAction('تعديل موظف', `تم تعديل بيانات الموظف إلى ${newName} (${newRole})`);
             } catch(error) {}
         });
-        
-        window.deleteEmployee = async (id, name) => {
-            if(currentUserData.role !== 'CEO') return;
-            if(confirm(`هل أنت متأكد من حذف الموظف "${name}" بشكل نهائي؟`)) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
-                    showToast('تم حذف الموظف بنجاح', 'success');
-                    logAction('حذف موظف', `تم حذف الموظف: ${name}`);
-                } catch(e){}
-            }
-        };
 
         function renderEmployees() {
             const list = document.getElementById('employeesList');
@@ -3353,6 +2945,57 @@
                         ${actionsHtml}
                     </tr>
                 `;
+            });
+        }
+
+        function renderTasks() {
+            const pending = document.getElementById('tasks-pending');
+            const progress = document.getElementById('tasks-progress');
+            const completed = document.getElementById('tasks-completed');
+            
+            pending.innerHTML = progress.innerHTML = completed.innerHTML = '';
+
+            globalTasks.forEach(task => {
+                const isMyTask = task.assigneeId === currentUserData.uid;
+                const isCEO = currentUserData.role === 'CEO';
+                
+                if (!isCEO && !isMyTask) return;
+
+                let actionsHtml = '';
+                if(isMyTask && !isCEO) {
+                    if(task.status === 'pending') {
+                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title}')" class="text-xs md:text-sm bg-secondary text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-primary transition">${t('البدء بالتنفيذ')}</button>`;
+                    } else if(task.status === 'in-progress') {
+                        actionsHtml = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title}')" class="text-xs md:text-sm bg-green-500 text-white px-3 py-2 rounded-lg w-full mt-2 hover:bg-green-600 transition">${t('تأكيد الإنجاز')} <i class="fa-solid fa-check mx-1"></i></button>`;
+                    }
+                }
+
+                const deleteHtml = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-gray-400 hover:text-red-500 w-full rtl:text-left ltr:text-right mt-2"><i class="fa-solid fa-trash"></i> ${t('حذف')}</button>` : '';
+
+                const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
+                const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
+
+                const card = `
+                    <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 rtl:border-r-4 ltr:border-l-4 ${task.status === 'completed' ? 'border-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-secondary' : 'border-gray-400')}">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-gray-800 dark:text-gray-100 text-xs md:text-sm ${task.status === 'completed' ? 'line-through' : ''}">${task.title}</h4>
+                        </div>
+                        <p class="inline-block px-2 py-1 rounded text-[9px] font-bold mb-2 ${isOverdue ? 'bg-red-100 text-red-600' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}"><i class="fa-regular fa-clock"></i> ${t('مطلوب:')} ${deadlineStr}</p>
+                        <p class="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mb-3">${task.desc}</p>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <div class="flex items-center text-[10px] md:text-xs text-primary dark:text-secondary font-bold bg-blue-50 dark:bg-gray-700 px-2 py-1 rounded">
+                                <i class="fa-solid fa-user-tie mx-1"></i> ${task.assigneeName}
+                            </div>
+                            ${isMyTask ? `<span class="text-[9px] md:text-[10px] bg-red-100 text-red-600 px-1 rounded animate-pulse">${t('مهمتك')}</span>` : ''}
+                        </div>
+                        ${actionsHtml}
+                        ${deleteHtml}
+                    </div>
+                `;
+
+                if(task.status === 'pending') pending.innerHTML += card;
+                else if(task.status === 'in-progress') progress.innerHTML += card;
+                else completed.innerHTML += card;
             });
         }
 
@@ -3513,6 +3156,167 @@
             document.getElementById('mentionsList').classList.add('hidden');
             input.focus();
         };
+
+        window.deleteEmployee = async (id, name) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
+                logAction('حذف موظف', `تم حذف الموظف: ${name}`);
+            }
+        };
+
+        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!currentUserData || currentUserData.role !== 'CEO') return;
+            
+            const assigneeSelect = document.getElementById('taskAssignee');
+            const assigneeId = assigneeSelect.value;
+            const assigneeName = assigneeSelect.options[assigneeSelect.selectedIndex].text.split(' (')[0];
+            const title = document.getElementById('taskTitle').value;
+            const desc = document.getElementById('taskDesc').value;
+            const deadlineVal = document.getElementById('taskDeadline').value;
+            const deadlineTime = new Date(deadlineVal).getTime();
+
+            try {
+                await addDoc(getColRef('tasks'), {
+                    title: title,
+                    desc: desc,
+                    assigneeId: assigneeId,
+                    assigneeName: assigneeName,
+                    deadline: deadlineTime,
+                    status: 'pending',
+                    timestamp: Date.now()
+                });
+                window.closeModal('taskModal');
+                
+                const assignedUser = globalUsers.find(u => u.id === assigneeId);
+                if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
+                    sendEmailNotification(assignedUser.email, assigneeName, title, desc);
+                } else {
+                    showToast('تم إرسال المهمة بنجاح! لكن الموظف لا يمتلك بريد إلكتروني مسجل.', 'warning');
+                }
+                
+                logAction('إسناد مهمة', `تم إسناد مهمة "${title}" إلى ${assigneeName}`);
+            } catch(e) {}
+        });
+
+        window.updateTaskStatus = async (id, newStatus, taskTitle) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
+                let statusText = newStatus === 'in-progress' ? 'قيد التنفيذ' : 'مكتملة';
+                logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى ${statusText}`);
+                
+                if(newStatus === 'completed') {
+                    showToast('أحسنت! تم إنجاز المهمة.', 'success');
+                    
+                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
+                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
+                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
+                            ceo_email: ceoUser.email,
+                            ceo_name: ceoUser.name,
+                            employee_name: currentUserData.name,
+                            task_title: taskTitle,
+                            task_link: taskLink,
+                            company_name: 'نظام شركتي'
+                        }, EMAILJS_PUBLIC_KEY_3);
+                    }
+                }
+            } catch(e) {}
+        };
+
+        window.deleteTask = async (id) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('حذف هذه المهمة؟')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id));
+            }
+        };
+
+        function renderDriveFiles() {
+            const pinnedContainer = document.getElementById('pinnedFilesContainer');
+            const allContainer = document.getElementById('allFilesContainer');
+            pinnedContainer.innerHTML = '';
+            allContainer.innerHTML = '';
+            
+            let pinnedCount = 0;
+
+            globalFiles.forEach(file => {
+                const isCEO = currentUserData && currentUserData.role === 'CEO';
+                let iconClass = 'fa-file text-gray-400';
+                if(file.type.startsWith('image/')) iconClass = 'fa-file-image text-blue-500';
+                if(file.type.startsWith('video/')) iconClass = 'fa-file-video text-red-500';
+                if(file.type === 'application/pdf') iconClass = 'fa-file-pdf text-red-600';
+
+                let pinBtn = '';
+                let deleteBtn = '';
+                
+                if (isCEO) {
+                    pinBtn = `<button onclick="window.togglePinFile('${file.id}', ${file.pinned})" class="${file.pinned ? 'text-primary dark:text-secondary' : 'text-gray-300 dark:text-gray-500 hover:text-primary'} transition p-1" title="${file.pinned ? 'إلغاء التثبيت' : 'تثبيت'}"><i class="fa-solid fa-thumbtack"></i></button>`;
+                    deleteBtn = `<button onclick="window.deleteDriveFile('${file.id}', '${file.name}')" class="text-red-400 hover:text-red-600 transition p-1 mx-1" title="حذف الملف"><i class="fa-solid fa-trash"></i></button>`;
+                }
+
+                let mediaAction = '';
+                if(file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                    mediaAction = `onclick="window.openMedia('${file.data}', '${file.type}')" class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"`;
+                }
+
+                const cardHtml = `
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 shadow-sm flex flex-col justify-between transition-shadow hover:shadow-md h-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="bg-gray-50 dark:bg-gray-700 w-10 h-10 rounded-lg flex items-center justify-center">
+                                <i class="fa-solid ${iconClass} text-xl"></i>
+                            </div>
+                            <div class="flex">
+                                ${deleteBtn}
+                                ${pinBtn}
+                            </div>
+                        </div>
+                        <div ${mediaAction} class="flex-1">
+                            <h4 class="font-bold text-gray-700 dark:text-gray-200 text-sm mb-1 truncate" title="${file.name}">${file.name}</h4>
+                            <p class="text-xs text-gray-400 mb-2">${file.sizeStr}</p>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400"><i class="fa-solid fa-user-circle"></i> ${file.uploaderName}</span>
+                            <a href="${file.data}" download="${file.name}" class="text-secondary hover:text-primary text-xs font-bold transition"><i class="fa-solid fa-download mx-1"></i> تحميل</a>
+                        </div>
+                    </div>
+                `;
+
+                if (file.pinned) {
+                    pinnedContainer.innerHTML += cardHtml;
+                    pinnedCount++;
+                }
+                allContainer.innerHTML += cardHtml;
+            });
+
+            if (pinnedCount === 0) {
+                pinnedContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-full">لا توجد ملفات مثبتة.</p>';
+            }
+            if (globalFiles.length === 0) {
+                allContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-full">مساحة العمل فارغة.</p>';
+            }
+        }
+
+        function updateStorageProgress() {
+            const currentStorage = globalFiles.reduce((acc, f) => acc + (f.size || 0), 0);
+            const percentage = Math.min((currentStorage / MAX_GLOBAL_STORAGE) * 100, 100);
+            
+            document.getElementById('storageText').innerText = `${formatBytes(currentStorage)} / 15 MB`;
+            const bar = document.getElementById('storageBar');
+            bar.style.width = `${percentage}%`;
+            
+            if (percentage > 90) {
+                bar.classList.replace('bg-green-500', 'bg-red-500');
+                document.getElementById('storageWarning').classList.remove('hidden');
+            } else if (percentage > 70) {
+                bar.classList.replace('bg-green-500', 'bg-yellow-500');
+                document.getElementById('storageWarning').classList.add('hidden');
+            } else {
+                bar.classList.remove('bg-red-500', 'bg-yellow-500');
+                bar.classList.add('bg-green-500');
+                document.getElementById('storageWarning').classList.add('hidden');
+            }
+        }
 
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
