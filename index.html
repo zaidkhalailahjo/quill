@@ -288,7 +288,7 @@
                             <i class="fa-solid fa-list-check"></i>
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المهام">المهام</span>
-                        <span id="gridTasksBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                        <span id="gridTasksBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md external-task-badge"></span>
                     </div>
 
                     <div onclick="window.location.hash='crm'" class="app-card hover:border-lime-200 group">
@@ -310,7 +310,7 @@
                             <i class="fa-solid fa-comments"></i>
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المناقشة">المناقشة</span>
-                        <span id="homeChatBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                        <span id="homeChatBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md external-chat-badge"></span>
                     </div>
 
                     <!-- روابط لتطبيقات خارجية (الدومين الثاني) -->
@@ -1022,6 +1022,63 @@
         function getColRef(colName) {
             return collection(db, 'artifacts', appId, 'public', 'data', colName);
         }
+        
+        // --- Added Missing Functions: logAction, clearSystemLogs, clearOrDeleteGroup, selectGroup ---
+        
+        window.logAction = async (action, details) => {
+            if(!currentUserData) return;
+            try {
+                await addDoc(getColRef('logs'), {
+                    action: action,
+                    details: details,
+                    userName: currentUserData.name,
+                    uid: currentUserData.uid,
+                    timestamp: Date.now()
+                });
+            } catch(e) { console.error("Error logging action", e); }
+        };
+
+        window.clearSystemLogs = async () => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من مسح جميع السجلات؟')) {
+                try {
+                    globalLogs.forEach(async (log) => {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', log.id));
+                    });
+                    showToast('تمت عملية المسح بنجاح', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.clearOrDeleteGroup = async (action) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(currentGroupId === 'global' && action === 'delete') return;
+
+            if(confirm(action === 'clear' ? 'هل أنت متأكد من مسح جميع الرسائل في هذه المجموعة؟' : 'هل أنت متأكد من حذف هذه المجموعة نهائياً؟')) {
+                try {
+                    const msgs = globalChat.filter(m => (m.groupId || 'global') === currentGroupId);
+                    msgs.forEach(async (m) => await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', m.id)));
+
+                    if(action === 'delete') {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', currentGroupId));
+                        currentGroupId = 'global';
+                        window.showSection('home-grid');
+                    }
+                    showToast('تم تنفيذ الإجراء بنجاح', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.selectGroup = (groupId) => {
+            currentGroupId = groupId;
+            renderChatSidebarList();
+            renderChat();
+            if(window.innerWidth < 768) {
+               document.getElementById('chatSubMenuMobile').classList.add('max-h-0', 'opacity-0');
+            }
+        };
+
+        // ----------------------------------------------------------------------------
 
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
@@ -1038,7 +1095,7 @@
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
                 });
-            } catch (error) {}
+            } catch (error) { console.error(error); }
         }
 
         function checkAndSendReminders() {
@@ -1056,7 +1113,7 @@
                         
                         updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id), {
                             lastReminder: Date.now()
-                        });
+                        }).catch(e => console.error(e));
 
                         const assignedUser = globalUsers.find(u => u.id === task.assigneeId);
                         if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
@@ -1068,7 +1125,7 @@
                                 task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
                                 task_link: taskLink, 
                                 company_name: 'نظام شركتي'
-                            }, EMAILJS_PUBLIC_KEY_1);
+                            }, EMAILJS_PUBLIC_KEY_1).catch(e => console.error(e));
                         }
 
                         if (ceoUser && ceoUser.email) {
@@ -1084,7 +1141,7 @@
                                 task_deadline: deadlineStr,
                                 task_link: taskLink,
                                 company_name: 'نظام شركتي'
-                            }, EMAILJS_PUBLIC_KEY_3);
+                            }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
                         }
                     }
                 }
@@ -1102,7 +1159,7 @@
                     task_link: taskLink, 
                     company_name: 'نظام شركتي'
                 }, EMAILJS_PUBLIC_KEY_1);
-            } catch (error) {}
+            } catch (error) { console.error(error); }
         }
 
         window.handleProfilePicChange = (e) => {
@@ -1117,7 +1174,7 @@
                         photoURL: ev.target.result
                     });
                     showToast('تم تحديث صورتك الشخصية بنجاح!', 'success');
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             };
             reader.readAsDataURL(file);
         };
@@ -1131,7 +1188,7 @@
                 currentUserData.chatLayout = value; 
                 showToast('تم حفظ تفضيلات الدردشة بنجاح', 'success');
                 renderChat(); 
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         };
 
         window.toggleChatColorPicker = () => {
@@ -1161,7 +1218,7 @@
                         chatColor: colorClass
                     });
                     currentUserData.chatColor = colorClass;
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             }
         };
 
@@ -1213,14 +1270,14 @@
                     });
                     window.closeModal('noticeModal');
                     showToast('تم نشر التعميم بنجاح', 'success');
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             });
         }
 
         window.deleteNotice = async (id) => {
             if(currentUserData.role !== 'CEO') return;
             if(confirm('حذف هذا الإعلان؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)).catch(e => console.error(e));
             }
         };
 
@@ -1279,7 +1336,7 @@
                     });
                     window.closeModal('clientModal');
                     showToast('تم إضافة العميل بنجاح', 'success');
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             });
         }
 
@@ -1311,7 +1368,7 @@
                         window.closeModal('noteModal');
                         showToast('تم إضافة الملاحظة', 'success');
                     }
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             });
         }
 
@@ -1319,7 +1376,7 @@
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { status: newStatus });
                 showToast('تم تحديث حالة العميل', 'success');
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         };
 
         function renderCRM() {
@@ -1517,7 +1574,7 @@
                     readReceipts: groupReadTimestamps
                 });
                 renderChatSidebarList(); 
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         }
 
         window.openGroupInfoModal = () => {
@@ -1584,7 +1641,7 @@
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
                     showToast(`تمت إزالة ${userName} بنجاح`, 'success');
                     window.openGroupInfoModal(); 
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             }
         };
 
@@ -1601,7 +1658,7 @@
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
                 showToast(`تم إضافة ${userName} بنجاح`, 'success');
                 window.openGroupInfoModal(); 
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         };
 
         window.openCreateGroupModal = () => {
@@ -1658,7 +1715,7 @@
                     window.closeModal('editEmployeeModal');
                     showToast('تم تحديث بيانات الموظف بنجاح', 'success');
                     logAction('تعديل موظف', `تم تعديل بيانات الموظف إلى ${newName} (${newRole})`);
-                } catch(error) {}
+                } catch(error) { console.error(error); }
             });
         }
 
@@ -1801,9 +1858,9 @@
                                 task_title: title,
                                 task_link: taskLink,
                                 company_name: 'نظام شركتي'
-                            }, EMAILJS_PUBLIC_KEY_3);
+                            }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
                         }
-                    } catch(e) {}
+                    } catch(e) { console.error(e); }
                 };
 
                 if(file) {
@@ -1829,7 +1886,7 @@
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
                 logAction('تحديث مهمة', `تم تغيير حالة المهمة "${taskTitle}" إلى قيد التنفيذ`);
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         };
 
         function renderTasks() {
@@ -1919,7 +1976,7 @@
         window.deleteEmployee = async (id, name) => {
             if(currentUserData.role !== 'CEO') return;
             if(confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)).catch(e => console.error(e));
                 logAction('حذف موظف', `تم حذف الموظف: ${name}`);
             }
         };
@@ -1958,14 +2015,14 @@
                     }
                     
                     logAction('إسناد مهمة', `تم إسناد مهمة "${title}" إلى ${assigneeName}`);
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             });
         }
 
         window.deleteTask = async (id) => {
             if(currentUserData.role !== 'CEO') return;
             if(confirm('حذف هذه المهمة؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id));
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)).catch(e => console.error(e));
             }
         };
 
@@ -2032,7 +2089,7 @@
                                         chat_text: text,
                                         chat_link: chatLink,
                                         company_name: 'نظام شركتي'
-                                    }, EMAILJS_PUBLIC_KEY_2);
+                                    }, EMAILJS_PUBLIC_KEY_2).catch(e => console.error(e));
                                 }
                             }
                         });
@@ -2072,6 +2129,7 @@
                     logAction('إنشاء مجموعة', `تم إنشاء مجموعة محادثة جديدة "${groupName}"`);
                 } catch(err) {
                     showToast('حدث خطأ أثناء الإنشاء', 'warning');
+                    console.error(err);
                 }
             });
         }
@@ -2376,7 +2434,7 @@
                     if(gridBadge) gridBadge.classList.add('hidden');
                     if(sidebarBadge) sidebarBadge.classList.add('hidden');
                 }
-            });
+            }, (error) => { console.error(error); });
 
             if (currentUserData && currentUserData.role === 'CEO') {
                 onSnapshot(getColRef('leaves'), (snapshot) => {
@@ -2395,7 +2453,7 @@
                         if(gridBadge) gridBadge.classList.add('hidden');
                         if(sidebarBadge) sidebarBadge.classList.add('hidden');
                     }
-                });
+                }, (error) => { console.error(error); });
             }
         }
 
@@ -2447,7 +2505,7 @@
                 if(!document.getElementById('groupInfoModal').classList.contains('hidden')) {
                     window.openGroupInfoModal();
                 }
-            });
+            }, (error) => { console.error(error); });
 
             if(currentUserData.role === 'CEO') {
                 onSnapshot(getColRef('logs'), (snapshot) => {
@@ -2457,7 +2515,7 @@
                     });
                     globalLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
                     renderLogs();
-                });
+                }, (error) => { console.error(error); });
             }
 
             onSnapshot(getColRef('notices'), (snapshot) => {
@@ -2465,14 +2523,14 @@
                 snapshot.forEach(doc => globalNotices.push({ id: doc.id, ...doc.data() }));
                 globalNotices.sort((a, b) => b.timestamp - a.timestamp);
                 renderNotices();
-            });
+            }, (error) => { console.error(error); });
 
             onSnapshot(getColRef('clients'), (snapshot) => {
                 globalCRM = [];
                 snapshot.forEach(doc => globalCRM.push({ id: doc.id, ...doc.data() }));
                 globalCRM.sort((a, b) => b.timestamp - a.timestamp);
                 renderCRM();
-            });
+            }, (error) => { console.error(error); });
 
             onSnapshot(getColRef('tasks'), (snapshot) => {
                 globalTasks = [];
@@ -2529,7 +2587,7 @@
                         }
                     }
                 }
-            });
+            }, (error) => { console.error(error); });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
                 globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
@@ -2549,7 +2607,7 @@
                 
                 renderChatSidebarList();
                 renderChat();
-            });
+            }, (error) => { console.error(error); });
 
             onSnapshot(getColRef('chat'), (snapshot) => {
                 const oldChatCount = globalChat.length;
@@ -2606,7 +2664,7 @@
                 initialChatLoad = false;
                 renderChatSidebarList(); 
                 renderChat();
-            });
+            }, (error) => { console.error(error); });
         }
 
         onAuthStateChanged(auth, async (user) => {
@@ -2630,7 +2688,7 @@
         });
 
         document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) {}
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
         });
 
         document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
@@ -2647,7 +2705,7 @@
                 currentUserData = newUserData;
                 document.getElementById('setupProfileScreen').classList.add('hidden');
                 finishLoginSetup();
-            } catch(e) {}
+            } catch(e) { console.error(e); }
         });
 
         function finishLoginSetup() {
@@ -2705,7 +2763,7 @@
             if (!currentUserData) return;
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
                 lastActive: Date.now()
-            }).catch(e => {});
+            }).catch(e => { console.error(e); });
         }
     </script>
 </body>
