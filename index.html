@@ -495,7 +495,7 @@
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 600KB للملف الواحد)</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 500KB للملف الواحد)</p>
                     <div>
                         <input type="file" id="driveFileInput" class="hidden" onchange="window.handleDriveFileSelect(event)">
                         <button id="uploadFileBtn" onclick="document.getElementById('driveFileInput').click()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto flex justify-center shadow">
@@ -979,7 +979,6 @@
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -2092,10 +2091,12 @@
 
         window.openMedia = (dataUrl, type) => {
             const container = document.getElementById('mediaContainer');
-            if(type.startsWith('image/')) {
+            if(type && type.startsWith('image/')) {
                 container.innerHTML = `<img src="${dataUrl}" class="max-w-full max-h-[90vh] object-contain pointer-events-auto rounded-lg shadow-2xl">`;
-            } else if(type.startsWith('video/')) {
+            } else if(type && type.startsWith('video/')) {
                 container.innerHTML = `<video src="${dataUrl}" controls autoplay class="max-w-full max-h-[90vh] pointer-events-auto rounded-lg shadow-2xl bg-black"></video>`;
+            } else {
+                container.innerHTML = `<img src="${dataUrl}" class="max-w-full max-h-[90vh] object-contain pointer-events-auto rounded-lg shadow-2xl">`;
             }
             window.openModal('mediaModal');
         };
@@ -2284,17 +2285,17 @@
             }
         });
 
-        const MAX_FILE_SIZE = 600 * 1024; 
+        const MAX_FILE_SIZE = 500 * 1024; // تم تقليل الحد الأقصى للملفات لتجنب الرفض من قاعدة البيانات
 
         window.handleChatAttachment = (e) => {
             const file = e.target.files[0];
             if(!file) return;
-            if(file.size > MAX_FILE_SIZE) { showToast('حجم الملف كبير جداً! الحد الأقصى 600KB.', 'warning'); e.target.value = ''; return; }
+            if(file.size > MAX_FILE_SIZE) { showToast('حجم الملف كبير جداً! الحد الأقصى 500KB.', 'warning'); e.target.value = ''; return; }
 
             const reader = new FileReader();
             reader.onload = (ev) => {
                 pendingChatFileData = ev.target.result;
-                pendingChatFileType = file.type;
+                pendingChatFileType = file.type || 'unknown';
                 document.getElementById('attachmentFileName').innerText = file.name;
                 document.getElementById('chatAttachmentPreview').classList.remove('hidden');
                 document.getElementById('chatInput').focus();
@@ -2313,7 +2314,7 @@
             const file = e.target.files[0];
             if(!file) return;
             
-            if(file.size > 800 * 1024) { showToast('الحد الأقصى للرفع هو 800 كيلوبايت لتجنب أخطاء قاعدة البيانات.', 'warning'); e.target.value = ''; return; }
+            if(file.size > MAX_FILE_SIZE) { showToast('الحد الأقصى للرفع هو 500 كيلوبايت لتجنب أخطاء قاعدة البيانات.', 'warning'); e.target.value = ''; return; }
 
             const currentStorage = globalFiles.reduce((acc, f) => acc + (f.size || 0), 0);
             if(currentStorage + file.size > MAX_GLOBAL_STORAGE) { showToast('المساحة ممتلئة! يرجى الحذف أولاً.', 'warning'); e.target.value = ''; return; }
@@ -2519,7 +2520,7 @@
 
         async function logAction(action, details) {
             if(!currentUserData) return;
-            try { await addDoc(getColRef('logs'), { action: action, details: details, userName: currentUserData.name, timestamp: Date.now() }); } catch(e) {}
+            try { await addDoc(getColRef('logs'), { action: action || 'غير معروف', details: details || 'لا يوجد تفاصيل', userName: currentUserData.name || 'مستخدم', timestamp: Date.now() }); } catch(e) {}
         }
         
         window.clearSystemLogs = async () => {
@@ -2625,7 +2626,6 @@
                 updateDashboardStats();
                 
                 if(!document.getElementById('ceoReportsModal').classList.contains('hidden')) {
-                    // Update currently viewed employee tasks if open
                     const container = document.getElementById('ceoReportTasksDetails');
                     if(container.innerHTML.includes('المهام المنجزة لـ:')) {
                         const h4 = container.querySelector('h4');
@@ -2681,7 +2681,7 @@
                     const msg = { id: doc.id, ...doc.data() };
                     globalChat.push(msg);
                 });
-                globalChat.sort((a, b) => a.timestamp - b.timestamp);
+                globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
                 
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
                     const latestMsg = globalChat[globalChat.length - 1];
@@ -2998,7 +2998,7 @@
         }
 
         // ==========================================
-        // تعديل نظام المهام (إضافة تقارير المهام وإرفاق الملفات)
+        // تقارير المهام للمدير
         // ==========================================
         window.openCeoReportsModal = () => {
             window.openModal('ceoReportsModal');
@@ -3061,7 +3061,6 @@
             container.innerHTML = html;
         };
 
-        // معالجة تقديم تقرير المهمة عند الانتهاء
         document.getElementById('taskReportForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('reportTaskId').value;
@@ -3259,10 +3258,12 @@
             }
         };
 
+        // إصلاح الشات
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
+            const submitBtn = document.querySelector('#chatForm button[type="submit"]');
             
             if(!text && !pendingChatFileData) return;
 
@@ -3270,8 +3271,10 @@
                 input.value = '';
                 document.getElementById('mentionsList').classList.add('hidden');
                 
+                if (submitBtn) submitBtn.disabled = true;
+                
                 const messageObj = {
-                    text: text,
+                    text: text || '', // حماية في حال كانت القيمة فارغة
                     uid: currentUserData.uid,
                     senderName: currentUserData.name,
                     photoURL: currentUserData.photoURL, 
@@ -3282,13 +3285,9 @@
 
                 if(pendingChatFileData) {
                     messageObj.fileData = pendingChatFileData;
-                    messageObj.fileType = pendingChatFileType || '';
+                    messageObj.fileType = pendingChatFileType || 'unknown'; // حماية نوع الملف
                     window.clearChatAttachment(); 
                 }
-
-                // منع الضغط المزدوج
-                const submitBtn = document.querySelector('#chatForm button[type="submit"]');
-                if(submitBtn) submitBtn.disabled = true;
 
                 await addDoc(getColRef('chat'), messageObj);
 
@@ -3327,10 +3326,146 @@
                     });
                 }
             } catch(e) {
-                console.error(e);
-                showToast('حدث خطأ في الإرسال', 'error');
+                console.error("خطأ في إرسال الرسالة:", e);
+                showToast('حدث خطأ في الإرسال، حاول مجدداً', 'error');
+                if (submitBtn) submitBtn.disabled = false;
             }
         });
+
+        // إصلاح عرض السجل
+        function renderLogs() {
+            const list = document.getElementById('logsList');
+            list.innerHTML = '';
+            
+            if(globalLogs.length === 0) {
+                list.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-500 dark:text-gray-400">لا يوجد سجلات حتى الآن.</td></tr>`;
+                return;
+            }
+
+            globalLogs.forEach(log => {
+                const timestamp = log.timestamp || 0;
+                const dateObj = new Date(timestamp);
+                const date = (timestamp > 0 && !isNaN(dateObj.getTime())) ? dateObj.toLocaleString('ar-EG') : 'تاريخ غير معروف';
+                
+                // إضافة قيم افتراضية في حال كانت قديمة ومفقودة من السجل لمنع تعطل الجافاسكربت
+                const actionText = log.action || '';
+                const detailsText = log.details || 'لا توجد تفاصيل';
+                const userNameText = log.userName || 'مستخدم غير معروف';
+
+                let icon = 'fa-info-circle text-gray-400';
+                if(actionText.includes('دخول') || actionText.includes('حضور')) icon = 'fa-right-to-bracket text-blue-500';
+                if(actionText.includes('انصراف')) icon = 'fa-person-walking-arrow-right text-red-500';
+                if(actionText.includes('مهمة')) icon = 'fa-check text-green-500';
+                if(actionText.includes('حذف') || actionText.includes('مسح')) icon = 'fa-trash text-red-500';
+                if(actionText.includes('مجموعة')) icon = 'fa-users text-purple-500';
+                if(actionText.includes('إجازات')) icon = 'fa-plane-departure text-pink-500';
+                if(actionText.includes('تعديل')) icon = 'fa-pen text-blue-500';
+                if(actionText.includes('ملف')) icon = 'fa-file text-secondary';
+                if(actionText.includes('اجتماع') || actionText.includes('فيديو')) icon = 'fa-video text-green-500';
+
+                list.innerHTML += `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 transition">
+                        <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500 dark:text-gray-400" dir="ltr">${date}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary dark:text-secondary">${userNameText}</td>
+                        <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600 dark:text-gray-300"><i class="fa-solid ${icon} mx-2"></i>${detailsText}</td>
+                    </tr>
+                `;
+            });
+        }
+        
+        function renderChat() {
+            const chatBox = document.getElementById('chatMessages');
+            chatBox.innerHTML = '';
+            
+            const filteredChat = globalChat.filter(msg => (msg.groupId || 'global') === currentGroupId);
+
+            if(filteredChat.length === 0) {
+                chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300 dark:text-gray-600"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
+                return;
+            }
+
+            const layoutPref = currentUserData?.chatLayout || 'media-top';
+
+            filteredChat.forEach(msg => {
+                const isMe = msg.uid === currentUserData.uid;
+                
+                let formattedText = msg.text || '';
+                if (formattedText) {
+                    if (formattedText.includes('@الجميع')) {
+                        formattedText = formattedText.replace(/@الجميع/g, '<span class="text-white font-bold bg-red-500/80 px-1 rounded mx-1">@الجميع</span>');
+                    }
+
+                    let mentionedNames = [];
+                    const sortedNames = globalUsers.map(u => u.name).sort((a, b) => b.length - a.length);
+                    
+                    let counter = 0;
+                    sortedNames.forEach((name) => {
+                        const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`@${safeName}`, 'g');
+                        if (regex.test(formattedText)) {
+                            mentionedNames.push({key: `__MENTION_${counter}__`, name: name});
+                            formattedText = formattedText.replace(regex, `__MENTION_${counter}__`);
+                            counter++;
+                        }
+                    });
+                    
+                    formattedText = formattedText.replace(/@([^\s_<>]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
+                    
+                    mentionedNames.forEach((item) => {
+                        formattedText = formattedText.replace(new RegExp(item.key, 'g'), `<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@${item.name}</span>`);
+                    });
+                }
+                
+                const alignClass = isMe ? 'justify-start' : 'justify-end';
+                
+                const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200');
+                
+                const isColored = msg.color && msg.color !== 'bg-white' && msg.color !== 'bg-gray-800';
+                const textClass = isColored || isMe ? 'text-gray-400 font-bold' : 'text-gray-800 dark:text-gray-300 font-bold';
+                
+                const radiusClass = isMe ? 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-bl-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-br-xl' : 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-br-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-bl-xl';
+                const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName || 'مستخدم')}&background=00839b&color=fff`;
+
+                let attachmentHtml = '';
+                if(msg.fileData) {
+                    const fileTypeSafe = msg.fileType || '';
+                    if(fileTypeSafe.startsWith('image/')) {
+                        attachmentHtml = `<img src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10 shadow-sm" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')">`;
+                    } else if(fileTypeSafe.startsWith('video/')) {
+                        attachmentHtml = `<div class="relative cursor-pointer" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')"><video src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 bg-black shadow-sm"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
+                    } else {
+                        attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit shadow-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                    }
+                }
+
+                let messageBody = '';
+                if (layoutPref === 'text-top') {
+                    messageBody = `
+                        ${formattedText ? `<p class="text-sm md:text-base break-words ${msg.fileData ? 'mb-2' : ''}">${formattedText}</p>` : ''}
+                        ${attachmentHtml}
+                    `;
+                } else {
+                    messageBody = `
+                        ${attachmentHtml}
+                        ${formattedText ? `<p class="text-sm md:text-base break-words ${msg.fileData ? 'mt-2' : ''}">${formattedText}</p>` : ''}
+                    `;
+                }
+
+                chatBox.innerHTML += `
+                    <div class="flex ${alignClass} mb-4 items-end gap-2">
+                        ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
+                        <div class="max-w-[85%] md:max-w-[70%] min-w-[150px]">
+                            <span class="text-[10px] ${textClass} block mb-1 px-1 ${isMe ? 'rtl:text-right ltr:text-left' : 'rtl:text-left ltr:text-right'}">${msg.senderName || 'مجهول'}</span>
+                            <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
+                                ${messageBody}
+                            </div>
+                        </div>
+                        ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
+                    </div>
+                `;
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
     </script>
 </body>
