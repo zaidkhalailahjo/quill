@@ -192,8 +192,8 @@
             </div>
 
             <div class="flex items-center flex-row-reverse z-10">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 block dark:hidden">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 hidden dark:block">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain block dark:hidden">
+                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain hidden dark:block">
             </div>
         </header>
 
@@ -1226,11 +1226,15 @@
 
         function renderNotices() {
             const list = document.getElementById('noticesList');
+            if(!list) return;
             list.innerHTML = '';
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             
-            if(isCEO) document.getElementById('addNoticeBtn').classList.remove('hidden');
-            else document.getElementById('addNoticeBtn').classList.add('hidden');
+            const addNoticeBtn = document.getElementById('addNoticeBtn');
+            if (addNoticeBtn) {
+                if(isCEO) addNoticeBtn.classList.remove('hidden');
+                else addNoticeBtn.classList.add('hidden');
+            }
 
             if(globalNotices.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد إعلانات أو تعميمات حالياً.</p>';
@@ -1280,7 +1284,8 @@
         }
 
         window.openNoteModal = (clientId) => {
-            document.getElementById('noteClientId').value = clientId;
+            const noteClientId = document.getElementById('noteClientId');
+            if(noteClientId) noteClientId.value = clientId;
             window.openModal('noteModal');
         };
 
@@ -1319,6 +1324,7 @@
 
         function renderCRM() {
             const list = document.getElementById('crmList');
+            if(!list) return;
             list.innerHTML = '';
             
             if(globalCRM.length === 0) {
@@ -1616,9 +1622,14 @@
         };
 
         window.updateDashboardStats = () => {
-            document.getElementById('stat-employees').innerText = globalUsers.length;
-            document.getElementById('stat-tasks').innerText = globalTasks.length;
-            document.getElementById('stat-completed').innerText = globalTasks.filter(t => t.status === 'completed').length;
+            const statEmp = document.getElementById('stat-employees');
+            if(statEmp) statEmp.innerText = globalUsers.length;
+            
+            const statTasks = document.getElementById('stat-tasks');
+            if(statTasks) statTasks.innerText = globalTasks.length;
+            
+            const statComp = document.getElementById('stat-completed');
+            if(statComp) statComp.innerText = globalTasks.filter(t => t.status === 'completed').length;
         };
 
         window.openEditEmployeeModal = (id, name, role) => {
@@ -1653,6 +1664,7 @@
 
         function renderEmployees() {
             const list = document.getElementById('employeesList');
+            if(!list) return;
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             list.innerHTML = '';
             
@@ -1824,6 +1836,8 @@
             const pending = document.getElementById('tasks-pending');
             const progress = document.getElementById('tasks-progress');
             const completed = document.getElementById('tasks-completed');
+            
+            if(!pending || !progress || !completed) return;
             
             pending.innerHTML = progress.innerHTML = completed.innerHTML = '';
 
@@ -2064,6 +2078,7 @@
 
         function renderLogs() {
             const list = document.getElementById('logsList');
+            if(!list) return;
             list.innerHTML = '';
             
             if(globalLogs.length === 0) {
@@ -2103,6 +2118,7 @@
         
         function renderChat() {
             const chatBox = document.getElementById('chatMessages');
+            if(!chatBox) return;
             chatBox.innerHTML = '';
             
             const filteredChat = globalChat.filter(msg => (msg.groupId || 'global') === currentGroupId);
@@ -2299,37 +2315,39 @@
                 const readOnlyMsg = document.getElementById('readOnlyMessage');
 
                 if(activeGroup.id === 'global') {
-                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
+                    const desc = document.getElementById('chatHeaderDesc');
+                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
                     
                     if(isCEO) {
-                        clearMessagesBtn.classList.remove('hidden');
-                        deleteGroupBtn.classList.add('hidden'); 
+                        if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden'); 
                     } else {
-                        clearMessagesBtn.classList.add('hidden');
-                        deleteGroupBtn.classList.add('hidden');
+                        if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
                     }
                     
-                    chatForm.classList.remove('hidden');
-                    readOnlyMsg.classList.add('hidden');
+                    if(chatForm) chatForm.classList.remove('hidden');
+                    if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                 } else {
-                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
+                    const desc = document.getElementById('chatHeaderDesc');
+                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
                     
                     if(isCEO) {
-                        clearMessagesBtn.classList.remove('hidden');
-                        deleteGroupBtn.classList.remove('hidden');
+                        if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.remove('hidden');
                         
                         if(!activeGroup.members.includes(currentUserData.uid)) {
-                            chatForm.classList.add('hidden');
-                            readOnlyMsg.classList.remove('hidden');
+                            if(chatForm) chatForm.classList.add('hidden');
+                            if(readOnlyMsg) readOnlyMsg.classList.remove('hidden');
                         } else {
-                            chatForm.classList.remove('hidden');
-                            readOnlyMsg.classList.add('hidden');
+                            if(chatForm) chatForm.classList.remove('hidden');
+                            if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                         }
                     } else {
-                        clearMessagesBtn.classList.add('hidden');
-                        deleteGroupBtn.classList.add('hidden');
-                        chatForm.classList.remove('hidden');
-                        readOnlyMsg.classList.add('hidden');
+                        if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
+                        if(chatForm) chatForm.classList.remove('hidden');
+                        if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                     }
                 }
             }
@@ -2502,7 +2520,7 @@
                 
                 if(!document.getElementById('ceoReportsModal').classList.contains('hidden')) {
                     const container = document.getElementById('ceoReportTasksDetails');
-                    if(container.innerHTML.includes('المهام المنجزة لـ:')) {
+                    if(container && container.innerHTML.includes('المهام المنجزة لـ:')) {
                         const h4 = container.querySelector('h4');
                         if(h4) {
                             const empName = h4.innerText.split('لـ: ')[1];
