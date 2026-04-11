@@ -485,8 +485,8 @@
             <section id="drive" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="flex justify-between text-sm mb-2 font-bold text-gray-700 dark:text-gray-300">
-                        <span data-i18n="المساحة المستخدمة">المساحة المستخدمة</span>
-                        <span id="storageText">0 MB / 15 MB</span>
+                        <span data-i18n="المساحة المستخدمة">المساحة المستخدمة (على قاعدة البيانات الجديدة)</span>
+                        <span id="storageText">0 MB / 50 MB</span>
                     </div>
                     <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 border border-gray-200 dark:border-gray-600 overflow-hidden">
                         <div id="storageBar" class="bg-green-500 h-full transition-all duration-500 w-0"></div>
@@ -495,7 +495,7 @@
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 500KB للملف الواحد)</p>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">مشاركة وتثبيت الملفات الهامة (الحد الأقصى 900KB للملف الواحد)</p>
                     <div>
                         <input type="file" id="driveFileInput" class="hidden" onchange="window.handleDriveFileSelect(event)">
                         <button id="uploadFileBtn" onclick="document.getElementById('driveFileInput').click()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto flex justify-center shadow">
@@ -984,7 +984,8 @@
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        const firebaseConfig = {
+        // 1. الحساب الأول (الأساسي - للمهام والمستخدمين والشات)
+        const primaryFirebaseConfig = {
             apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
             authDomain: "quill-world.firebaseapp.com",
             projectId: "quill-world",
@@ -994,9 +995,25 @@
             measurementId: "G-BMEZ49L6CN"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // 2. الحساب الثاني (للملفات والمستندات فقط)
+        const filesFirebaseConfig = {
+            apiKey: "AIzaSyBjPerebbHAtkKWJV_LFkoaL-15oTNHRdg",
+            authDomain: "quill-worl.firebaseapp.com",
+            projectId: "quill-worl",
+            storageBucket: "quill-worl.firebasestorage.app",
+            messagingSenderId: "192227363160",
+            appId: "1:192227363160:web:59a620429b4bfdfb7cfd2d",
+            measurementId: "G-NLY5LN0830"
+        };
+
+        // تهيئة قواعد البيانات
+        const primaryApp = initializeApp(primaryFirebaseConfig, "PRIMARY");
+        const filesApp = initializeApp(filesFirebaseConfig, "FILES");
+
+        const auth = getAuth(primaryApp);
+        const db = getFirestore(primaryApp); // قاعدة البيانات الأساسية
+        const dbFiles = getFirestore(filesApp); // قاعدة بيانات الملفات
+
         const appId = 'quill-world-system';
 
         const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
@@ -1016,155 +1033,6 @@
 
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
 
-        // ==========================================
-        // متغيرات النظام العامة
-        // ==========================================
-        const i18nDict = {
-            "التطبيقات": "Applications",
-            "اختر التطبيق الذي تود العمل عليه": "Choose an application to work on",
-            "لوحات البيانات": "Dashboards",
-            "الموظفون": "Employees",
-            "المهام": "Tasks",
-            "المستندات": "Documents",
-            "الاجتماعات": "Meetings",
-            "المناقشة": "Chat",
-            "سجل النظام": "System Logs",
-            "الإعدادات": "Settings",
-            "الرئيسية": "Home",
-            "الحضور والانصراف": "Attendance",
-            "الإجازات": "Leaves",
-            "التعميمات": "Notice Board",
-            "العملاء": "CRM",
-            "جاري التحميل...": "Loading...",
-            "مرحباً بك": "Welcome",
-            "يجب تسجيل الدخول": "Please login to access the system",
-            "تسجيل الدخول باستخدام Google": "Login with Google",
-            "إكمال بيانات الملف الشخصي": "Complete Profile Setup",
-            "الاسم الكامل": "Full Name",
-            "الوظيفة (الدور)": "Role",
-            "الدخول للنظام": "Enter System",
-            "الموظفين المسجلين": "Registered Employees",
-            "إجمالي المهام": "Total Tasks",
-            "مهام مكتملة": "Completed Tasks",
-            "فريق العمل المسجل": "Registered Team Members",
-            "الاسم": "Name",
-            "الوظيفة": "Job Role",
-            "الإجراءات": "Actions",
-            "إدارة المهام": "Task Management",
-            "إسناد مهمة جديدة": "Assign New Task",
-            "قيد الانتظار": "Pending ⏳",
-            "قيد التنفيذ": "In Progress 🛠️",
-            "مكتمل": "Completed ✅",
-            "المساحة المستخدمة": "Used Storage",
-            "مشاركة الملفات": "Share Important Files (Max 600KB)",
-            "رفع ملف جديد": "Upload New File",
-            "الملفات المثبتة": "Pinned Files",
-            "كل الملفات": "All Files",
-            "إدارة الاجتماعات": "Manage Video Calls",
-            "بدء / جدولة اجتماع": "Start/Schedule Meeting",
-            "الاجتماعات الحالية": "Active & Scheduled Meetings",
-            "سجل الاجتماعات": "Past Meetings Log",
-            "القنوات والمجموعات": "Channels & Groups",
-            "مسح الرسائل": "Clear Messages",
-            "حذف المجموعة": "Delete Group",
-            "أنت تشاهد كمراقب": "You are viewing this as an observer (CEO).",
-            "إعدادات الحساب": "Account Settings",
-            "معلومات الحساب": "Basic Info",
-            "تغيير الصورة": "Change Avatar",
-            "اختر صورة تعبر عنك": "Choose an image (Max 500KB)",
-            "اختيار صورة": "Choose Image",
-            "(لا يمكن تعديله)": "(Cannot be changed except by CEO)",
-            "ترتيب عرض الوسائط": "Chat Media Layout",
-            "الوسائط في الأعلى": "Media top, Text bottom (Default)",
-            "النص في الأعلى": "Text top, Media bottom",
-            "تسجيل حي ومباشر": "Live System Log (CEO)",
-            "تفريغ السجل": "Clear Log",
-            "الوقت": "Time",
-            "المستخدم": "User",
-            "الحدث": "Event",
-            "إضافة عضو جديد": "Add New Member",
-            "إضافة": "Add",
-            "أعضاء المجموعة": "Current Group Members",
-            "عنوان المهمة": "Task Title",
-            "وقت وتاريخ": "Deadline",
-            "التفاصيل": "Details",
-            "إسناد إلى": "Assign to",
-            "إلغاء": "Cancel",
-            "إرسال المهمة": "Send Task",
-            "إنشاء مجموعة": "Create Group",
-            "اسم المجموعة": "Group Name",
-            "إضافة الأعضاء": "Add Members",
-            "تأكيد": "Confirm",
-            "جدولة اجتماع": "Schedule Video Meeting",
-            "عنوان الاجتماع": "Meeting Title",
-            "وقت الاجتماع": "Meeting Time",
-            "المدعوين": "Invitees",
-            "إنشاء الاجتماع": "Create Meeting",
-            "تعديل بيانات": "Edit Employee Data",
-            "حفظ": "Save",
-            "مكالمة جارية": "Active Call",
-            "إنهاء/مغادرة": "End / Leave",
-            "بواسطة:": "By:",
-            "مجهول": "Unknown",
-            "أنت (المدير)": "You (CEO)",
-            "مطلوب:": "Due:",
-            "مدير": "Admin",
-            "مراقب": "Viewer",
-            "حذف": "Delete",
-            "مهمتك": "Your Task",
-            "البدء بالتنفيذ": "Start Progress",
-            "تأكيد الإنجاز": "Confirm Done",
-            "سجل الحضور والانصراف": "Attendance Log",
-            "طلبات الإجازات": "Leave Requests",
-            "قاعدة بيانات العملاء": "CRM",
-            "إضافة عميل جديد": "Add New Client"
-        };
-
-        window.currentLang = localStorage.getItem('appLang') || 'ar';
-        window.t = function(arString) { return (window.currentLang === 'en' && i18nDict[arString]) ? i18nDict[arString] : arString; };
-
-        function applyLanguageToDOM() {
-            document.documentElement.lang = window.currentLang;
-            document.documentElement.dir = window.currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('langIconTxt').innerText = window.currentLang === 'ar' ? 'EN' : 'AR';
-            const sendIconDir = document.getElementById('sendIconDir');
-            if(sendIconDir) sendIconDir.className = window.currentLang === 'ar' ? 'fa-regular fa-paper-plane transform -scale-x-100' : 'fa-regular fa-paper-plane';
-            if (window.currentLang === 'en') {
-                document.querySelectorAll('[data-i18n]').forEach(el => {
-                    const key = el.getAttribute('data-i18n');
-                    if (i18nDict[key]) {
-                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = i18nDict[key];
-                        else {
-                            const icon = el.querySelector('i');
-                            el.innerHTML = (icon ? icon.outerHTML + ' ' : '') + i18nDict[key];
-                        }
-                    }
-                });
-            }
-        }
-
-        window.toggleLanguage = () => {
-            window.currentLang = window.currentLang === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('appLang', window.currentLang);
-            window.location.reload();
-        };
-
-        window.toggleTheme = () => {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('appTheme', isDark ? 'dark' : 'light');
-            document.getElementById('themeToggleIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        };
-
-        if (localStorage.getItem('appTheme') === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.addEventListener("DOMContentLoaded", () => {
-                const icon = document.getElementById('themeToggleIcon');
-                if (icon) icon.className = 'fa-solid fa-sun';
-            });
-        }
-        document.addEventListener("DOMContentLoaded", applyLanguageToDOM);
-
         let currentUserAuth = null;
         let currentUserData = null; 
         let globalUsers = []; 
@@ -1174,7 +1042,6 @@
         let globalFiles = []; 
         let globalGroups = []; 
         let globalMeetings = [];
-        
         let globalAttendance = [];
         let globalLeaves = [];
         let globalNotices = [];
@@ -1190,8 +1057,16 @@
         let pendingChatFileData = null;
         let pendingChatFileType = null;
         let selectedChatColor = 'bg-[#00839b]'; 
-        const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; 
+        const MAX_GLOBAL_STORAGE = 100 * 1024 * 1024; // تم الرفع إلى 100 ميجابايت كحد أمان مرئي
         let jitsiApi = null; 
+
+        // دالة التوجيه الذكي لقواعد البيانات
+        function getColRef(colName) {
+            if (colName === 'files') {
+                return collection(dbFiles, 'artifacts', appId, 'public', 'data', colName);
+            }
+            return collection(db, 'artifacts', appId, 'public', 'data', colName);
+        }
 
         function formatBytes(bytes, decimals = 2) {
             if (bytes === 0) return '0 Bytes';
@@ -1202,19 +1077,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
-        let hasRequestedNotification = false;
-        let latestNotificationMsg = window.t('لا توجد إشعارات جديدة حالياً');
-
-        window.requestNotifications = () => {
-            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") showToast('تم تفعيل إشعارات المتصفح بنجاح', 'success');
-                });
-            } else if (Notification.permission === "granted" || Notification.permission === "denied") {
-                showToast(latestNotificationMsg, 'info');
-            }
-        };
-
+        let latestNotificationMsg = 'لا توجد إشعارات جديدة حالياً';
         window.showLatestNotification = () => showToast(latestNotificationMsg, 'info');
 
         function sendPushNotification(title, body) {
@@ -1227,9 +1090,6 @@
             }
         }
 
-        // ==========================================
-        // النظام الجديد 1: شاشة الدخول المبدئي بكلمة السر
-        // ==========================================
         window.checkSystemPassword = () => {
             const pass = document.getElementById('sysPasswordInput').value;
             if(pass === '1112021') {
@@ -1240,9 +1100,6 @@
             }
         };
 
-        // ==========================================
-        // النظام الجديد 2: الحضور والانصراف
-        // ==========================================
         function getTodayDateString() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1363,10 +1220,6 @@
             });
         };
 
-        // ==========================================
-        // النظام الجديد 2: الإجازات والمغادرات
-        // ==========================================
-
         document.getElementById('leaveForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUserData) return;
@@ -1446,9 +1299,6 @@
             });
         }
 
-        // ==========================================
-        // النظام الجديد 3: لوحة التعميمات
-        // ==========================================
         document.getElementById('noticeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(currentUserData.role !== 'CEO') return;
@@ -1504,9 +1354,6 @@
             });
         }
 
-        // ==========================================
-        // النظام الجديد 4: العملاء CRM
-        // ==========================================
         document.getElementById('clientForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUserData) return;
@@ -1608,10 +1455,6 @@
                 `;
             });
         }
-
-        // ==========================================
-        // تعديلات الوظائف العامة وإدارة الروابط
-        // ==========================================
 
         window.openGroupInfoModal = () => {
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
@@ -2131,10 +1974,6 @@
             }, 4000);
         }
 
-        function getColRef(colName) {
-            return collection(db, 'artifacts', appId, 'public', 'data', colName);
-        }
-
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -2285,7 +2124,7 @@
             }
         });
 
-        const MAX_FILE_SIZE = 500 * 1024; // تم تقليل الحد الأقصى للملفات لتجنب الرفض من قاعدة البيانات
+        const MAX_FILE_SIZE = 500 * 1024; // حد آمن لضمان استقرار قاعدة البيانات
 
         window.handleChatAttachment = (e) => {
             const file = e.target.files[0];
@@ -2346,13 +2185,13 @@
         };
 
         window.togglePinFile = async (fileId, currentPinStatus) => {
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'files', fileId), { pinned: !currentPinStatus }); } catch(e) {}
+            try { await updateDoc(doc(dbFiles, 'artifacts', appId, 'public', 'data', 'files', fileId), { pinned: !currentPinStatus }); } catch(e) {}
         };
 
         window.deleteDriveFile = async (fileId, fileName) => {
             if(confirm('هل أنت متأكد من حذف هذا الملف؟')) {
                 try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'files', fileId));
+                    await deleteDoc(doc(dbFiles, 'artifacts', appId, 'public', 'data', 'files', fileId));
                     showToast('تم حذف الملف', 'success');
                     logAction('حذف ملف', `تم حذف الملف: ${fileName}`);
                 } catch(e) {}
@@ -2638,6 +2477,7 @@
                 }
             });
 
+            // هنا استدعاء الملفات باستخدام قاعدة البيانات الثانية dbFiles
             onSnapshot(getColRef('files'), (snapshot) => {
                 globalFiles = [];
                 snapshot.forEach(doc => globalFiles.push({ id: doc.id, ...doc.data() }));
@@ -2997,9 +2837,6 @@
             });
         }
 
-        // ==========================================
-        // تقارير المهام للمدير
-        // ==========================================
         window.openCeoReportsModal = () => {
             window.openModal('ceoReportsModal');
             const list = document.getElementById('ceoReportEmployeesList');
@@ -3258,7 +3095,7 @@
             }
         };
 
-        // إصلاح الشات
+        // إصلاح الشات مع تفعيل إرسال إيميل المنشن template_93xzb4z
         document.getElementById('chatForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const input = document.getElementById('chatInput');
@@ -3274,7 +3111,7 @@
                 if (submitBtn) submitBtn.disabled = true;
                 
                 const messageObj = {
-                    text: text || '', // حماية في حال كانت القيمة فارغة
+                    text: text || '',
                     uid: currentUserData.uid,
                     senderName: currentUserData.name,
                     photoURL: currentUserData.photoURL, 
@@ -3285,7 +3122,7 @@
 
                 if(pendingChatFileData) {
                     messageObj.fileData = pendingChatFileData;
-                    messageObj.fileType = pendingChatFileType || 'unknown'; // حماية نوع الملف
+                    messageObj.fileType = pendingChatFileType || 'unknown'; 
                     window.clearChatAttachment(); 
                 }
 
@@ -3293,6 +3130,7 @@
 
                 if(submitBtn) submitBtn.disabled = false;
 
+                // تفعيل إيميل المنشن إذا ذكر موظف أو الجميع وكان الموظف غير متصل
                 if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
                     const chatLink = window.location.origin + window.location.pathname + '#chat';
                     const activeGroup = globalGroups.find(g => g.id === currentGroupId);
@@ -3320,7 +3158,11 @@
                                     chat_text: text,
                                     chat_link: chatLink,
                                     company_name: 'نظام شركتي'
-                                }, EMAILJS_PUBLIC_KEY_2);
+                                }, EMAILJS_PUBLIC_KEY_2).then(() => {
+                                    console.log('تم إرسال إيميل التنبيه بنجاح');
+                                }).catch((error) => {
+                                    console.log('فشل في إرسال الإيميل:', error);
+                                });
                             }
                         }
                     });
@@ -3347,7 +3189,6 @@
                 const dateObj = new Date(timestamp);
                 const date = (timestamp > 0 && !isNaN(dateObj.getTime())) ? dateObj.toLocaleString('ar-EG') : 'تاريخ غير معروف';
                 
-                // إضافة قيم افتراضية في حال كانت قديمة ومفقودة من السجل لمنع تعطل الجافاسكربت
                 const actionText = log.action || '';
                 const detailsText = log.details || 'لا توجد تفاصيل';
                 const userNameText = log.userName || 'مستخدم غير معروف';
