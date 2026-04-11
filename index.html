@@ -191,17 +191,15 @@
                 <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary dark:text-secondary hidden md:block" data-i18n="الرئيسية">الرئيسية - التطبيقات</h2>
             </div>
 
-            <div class="flex items-center flex-row-reverse z-10">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 block dark:hidden">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain ml-2 hidden dark:block">
+            <div class="flex items-center flex-row-reverse z-10 font-bold text-2xl text-primary dark:text-white">
+                QUILL
             </div>
         </header>
 
         <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
         <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary dark:bg-gray-800 text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
             <div class="p-6 flex items-center justify-between border-b border-white/10 dark:border-gray-700">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 object-contain filter brightness-0 invert block dark:hidden">
-                <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 object-contain hidden dark:block">
+                <span class="font-bold text-xl">QUILL</span>
                 <button onclick="window.toggleSidebar()" class="text-white hover:text-gray-300">
                     <i class="fa-solid fa-xmark text-2xl"></i>
                 </button>
@@ -223,6 +221,7 @@
                 <button onclick="window.location.hash='crm'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="crm">
                     <i class="fa-solid fa-address-book w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="العملاء">العملاء</span>
                 </button>
+                
                 <button id="nav-tasks-btn" onclick="window.location.hash='tasks'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="tasks">
                     <i class="fa-solid fa-list-check w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="المهام">المهام</span>
                 </button>
@@ -246,6 +245,7 @@
                         <span id="sidebarMeetingsBadge" class="absolute left-4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden"></span>
                     </a>
                 </div>
+                <!-- نهاية الروابط الخارجية -->
                 
                 <div class="mt-2 border-t border-white/10 dark:border-gray-700 pt-2">
                     <button onclick="window.toggleMobileChatMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
@@ -257,7 +257,8 @@
                             <i id="chatMenuIconMobile" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                         </div>
                     </button>
-                    <div id="chatSubMenuMobile" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0"></div>
+                    <div id="chatSubMenuMobile" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
+                    </div>
                 </div>
 
                 <button onclick="window.location.hash='settings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="settings">
@@ -279,8 +280,9 @@
                 </div>
                 
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    
                     <!-- تطبيقات الدومين الحالي (الداخلية) -->
-                    <div onclick="window.location.hash='tasks'" class="app-card hover:border-emerald-200 group relative">
+                    <div onclick="window.location.hash='tasks'" class="app-card hover:border-emerald-200 group">
                         <div class="app-icon-container bg-emerald-50 text-emerald-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-list-check"></i>
                         </div>
@@ -314,14 +316,14 @@
                         <div class="app-icon-container bg-indigo-50 text-indigo-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-user-clock"></i>
                         </div>
-                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الحضور والانصراف">الحضور والانصراف <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الحضور والانصراف">الحضور والانصراف</span>
                     </a>
 
                     <a href="https://tasks.farah-snacks.store/#leaves" class="app-card hover:border-pink-200 group relative">
                         <div class="app-icon-container bg-pink-50 text-pink-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-plane-departure"></i>
                         </div>
-                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الإجازات">الإجازات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الإجازات">الإجازات</span>
                         <span id="gridLeavesBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                     </a>
 
@@ -329,14 +331,14 @@
                         <div class="app-icon-container bg-cyan-50 text-cyan-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-folder-open"></i>
                         </div>
-                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المستندات">المستندات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المستندات">المستندات</span>
                     </a>
 
                     <a href="https://tasks.farah-snacks.store/#meetings" class="app-card hover:border-blue-200 group relative">
                         <div class="app-icon-container bg-blue-50 text-blue-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-video"></i>
                         </div>
-                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الاجتماعات">الاجتماعات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الاجتماعات">الاجتماعات</span>
                         <span id="gridMeetingsBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                     </a>
 
@@ -361,6 +363,7 @@
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="سجل النظام">سجل النظام</span>
                     </div>
+
                 </div>
             </section>
 
@@ -406,7 +409,8 @@
                         <i class="fa-solid fa-bullhorn mx-2"></i> إضافة إعلان جديد
                     </button>
                 </div>
-                <div id="noticesList" class="space-y-4"></div>
+                <div id="noticesList" class="space-y-4">
+                </div>
             </section>
 
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
@@ -416,7 +420,8 @@
                         <i class="fa-solid fa-user-plus mx-2"></i> إضافة عميل جديد
                     </button>
                 </div>
-                <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
             </section>
 
             <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
@@ -449,6 +454,7 @@
 
             <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
                 <div class="flex h-full bg-white dark:bg-gray-800 md:rounded-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden relative">
+                    
                     <div class="w-64 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex-col hidden md:flex flex-shrink-0 z-10">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 h-[68px]">
                             <span class="font-bold text-gray-700 dark:text-gray-200 text-sm"><i class="fa-solid fa-list-ul mx-2 text-gray-400"></i><span data-i18n="القنوات والمجموعات">القنوات والمجموعات</span></span>
@@ -462,7 +468,10 @@
                     <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 relative">
                         <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-3 md:p-4 flex justify-between items-center z-10 shadow-sm flex-shrink-0 h-[68px]">
                             <div class="flex items-center gap-3 min-w-0 overflow-hidden">
-                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary"><i class="fa-solid fa-bars text-xl"></i></button>
+                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary">
+                                    <i class="fa-solid fa-bars text-xl"></i>
+                                </button>
+
                                 <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
                                     <i class="fa-solid fa-comments"></i>
                                 </div>
@@ -473,6 +482,7 @@
                                     </p>
                                 </div>
                             </div>
+                            
                             <div class="flex items-center gap-2 flex-shrink-0" id="chatHeaderActions">
                                 <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-gray-600 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-gray-600 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
                                     <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline" data-i18n="مسح الرسائل">مسح الرسائل</span>
@@ -486,7 +496,9 @@
                         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
 
                         <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between flex-shrink-0">
-                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold"><i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span></div>
+                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold">
+                                <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
+                            </div>
                             <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-xmark"></i> إزالة</button>
                         </div>
                         
@@ -494,12 +506,12 @@
                             <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
 
                             <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg p-3 flex gap-2 z-20">
-                                <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform"></button>
-                                <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform"></button>
-                                <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform"></button>
-                                <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform"></button>
-                                <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform"></button>
-                                <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform"></button>
+                                <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
+                                <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
+                                <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
                             </div>
 
                             <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
@@ -507,10 +519,14 @@
                             </div>
 
                             <form id="chatForm" class="flex items-center bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full pr-4 pl-1 py-1 w-full relative shadow-sm">
-                                <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors font-bold">@</button>
+                                <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors font-bold" title="ذكر شخص">@</button>
                                 <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
-                                <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors"><i class="fa-solid fa-paperclip"></i></button>
-                                <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors"><i class="fa-solid fa-palette"></i></button>
+                                <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors" title="إرفاق ملف (صورة/فيديو/pdf)">
+                                    <i class="fa-solid fa-paperclip"></i>
+                                </button>
+                                <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors" title="تغيير لون الرسالة">
+                                    <i class="fa-solid fa-palette"></i>
+                                </button>
                                 <input type="text" id="chatInput" placeholder="اكتب رسالتك..." class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-2 px-2 text-gray-700 dark:text-gray-200" autocomplete="off">
                                 <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow">
                                     <i class="fa-regular fa-paper-plane transform -scale-x-100" id="sendIconDir"></i>
@@ -548,14 +564,14 @@
 
                     <div class="space-y-5">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الاسم الكامل">الاسم الكامل</span></label>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الاسم الكامل">الاسم الكامل</span> <span class="text-[10px] text-red-400 font-normal mx-1" data-i18n="(لا يمكن تعديله)">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
                                 <i class="fa-solid fa-user absolute rtl:right-3 ltr:left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="settingsName" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg rtl:pr-10 ltr:pl-10 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</span></label>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</span> <span class="text-[10px] text-red-400 font-normal mx-1" data-i18n="(لا يمكن تعديله)">(لا يمكن تعديله إلا من قبل المدير)</span></label>
                             <div class="relative">
                                 <i class="fa-solid fa-briefcase absolute rtl:right-3 ltr:left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg rtl:pr-10 ltr:pl-10 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
@@ -616,6 +632,7 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">إرفاق ملف إثبات (صورة / PDF / Excel)</label>
                     <input type="file" id="reportFileInput" accept="image/*,application/pdf,.xlsx,.xls,.doc,.docx" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg px-3 py-2 focus:outline-none text-sm">
+                    <p class="text-[10px] text-gray-400 mt-1">الحد الأقصى للملف هو 1 ميجابايت.</p>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
                     <button type="button" onclick="window.closeModal('taskReportModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
@@ -633,7 +650,12 @@
             </div>
             <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
                 <div class="w-full md:w-1/3 border-b md:border-b-0 md:rtl:border-l md:ltr:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2" id="ceoReportEmployeesList"></div>
-                <div class="w-full md:w-2/3 p-4 overflow-y-auto bg-white dark:bg-gray-800 relative" id="ceoReportTasksDetails"></div>
+                <div class="w-full md:w-2/3 p-4 overflow-y-auto bg-white dark:bg-gray-800 relative" id="ceoReportTasksDetails">
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                        <i class="fa-solid fa-clipboard-list text-4xl mb-3"></i>
+                        <p>اختر موظفاً من القائمة لعرض تقاريره</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -806,7 +828,7 @@
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // ----------------------------------------------------
-        // قاعدة البيانات الأساسية
+        // قاعدة البيانات الأساسية للمهام والدردشة وغيرها
         // ----------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
@@ -1331,6 +1353,151 @@
             });
         }
 
+        // ===============================================
+        // التوجيه (Routing) والقوائم
+        // ===============================================
+        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.add('hidden');
+            if(id === 'taskModal') document.getElementById('addTaskForm').reset();
+            if(id === 'createGroupModal') document.getElementById('createGroupForm').reset();
+            if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm').reset();
+            if(id === 'noticeModal') document.getElementById('noticeForm').reset();
+            if(id === 'clientModal') document.getElementById('clientForm').reset();
+            if(id === 'noteModal') document.getElementById('noteForm').reset();
+            if(id === 'taskReportModal') document.getElementById('taskReportForm').reset();
+        };
+
+        window.openMedia = (dataUrl, type) => {
+            const container = document.getElementById('mediaContainer');
+            if(type && type.startsWith('image/')) {
+                container.innerHTML = `<img src="${dataUrl}" class="max-w-full max-h-[90vh] object-contain pointer-events-auto rounded-lg shadow-2xl">`;
+            } else if(type && type.startsWith('video/')) {
+                container.innerHTML = `<video src="${dataUrl}" controls autoplay class="max-w-full max-h-[90vh] pointer-events-auto rounded-lg shadow-2xl bg-black"></video>`;
+            } else {
+                container.innerHTML = `<img src="${dataUrl}" class="max-w-full max-h-[90vh] object-contain pointer-events-auto rounded-lg shadow-2xl">`;
+            }
+            window.openModal('mediaModal');
+        };
+
+        window.closeMediaModal = () => {
+            window.closeModal('mediaModal');
+            document.getElementById('mediaContainer').innerHTML = '';
+        };
+
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('translate-x-full');
+            document.getElementById('mobileOverlay').classList.toggle('hidden');
+        };
+
+        window.openChatAndToggleMenu = () => {
+            window.selectGroup('global');
+            if (window.innerWidth < 768) {
+                window.toggleMobileChatMenu();
+            }
+        };
+
+        window.toggleMobileChatMenu = () => {
+            const menu = document.getElementById('chatSubMenuMobile');
+            const icon = document.getElementById('chatMenuIconMobile');
+            
+            if(menu.classList.contains('max-h-0')) {
+                menu.classList.remove('max-h-0', 'opacity-0', 'hidden');
+                menu.classList.add('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.add('rotate-180');
+            } else {
+                menu.classList.add('max-h-0', 'opacity-0');
+                menu.classList.remove('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.remove('rotate-180');
+            }
+        };
+
+        window.showSection = (sectionId) => {
+            if(window.location.hash !== `#${sectionId}`) {
+                window.history.pushState(null, null, `#${sectionId}`);
+            }
+
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            const targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.classList.remove('hidden');
+            
+            const titles = { 
+                'home-grid': t('الرئيسية'),
+                'dashboard': t('لوحات البيانات'), 
+                'employees': t('الموظفون'), 
+                'tasks': t('المهام المراد تنفيذها'), 
+                'logs': t('سجل النظام'), 
+                'chat': t('المناقشة'),
+                'settings': t('الإعدادات'),
+                'notices': t('التعميمات'),
+                'crm': t('العملاء')
+            };
+            
+            if (sectionId === 'home-grid') {
+                document.getElementById('backToHomeBtn').classList.add('hidden');
+                document.getElementById('page-title').classList.remove('hidden');
+            } else {
+                document.getElementById('backToHomeBtn').classList.remove('hidden');
+                document.getElementById('page-title').classList.add('hidden');
+            }
+            
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-secondary', 'text-white');
+                b.classList.add('text-gray-300');
+            });
+            
+            if(sectionId !== 'chat') {
+                const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
+                if(activeBtn) {
+                    activeBtn.classList.remove('text-gray-300');
+                    activeBtn.classList.add('bg-secondary', 'text-white');
+                }
+            }
+            
+            if(window.innerWidth < 768 && sectionId !== 'chat') {
+                document.getElementById('sidebar').classList.add('translate-x-full');
+                document.getElementById('mobileOverlay').classList.add('hidden');
+            }
+            if(sectionId === 'chat') {
+                updateReadReceipt(currentGroupId);
+                const chatBox = document.getElementById('chatMessages');
+                if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+
+        function handleHashChange() {
+            if(!currentUserData) return; 
+            
+            const hash = window.location.hash.replace('#', '');
+            const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'settings', 'notices', 'crm'];
+            
+            let targetSection = hash || 'home-grid';
+            
+            if (currentUserData.role !== 'CEO') {
+                if (['dashboard', 'employees', 'logs'].includes(targetSection)) {
+                    targetSection = 'home-grid';
+                }
+            }
+
+            if (validSections.includes(targetSection)) {
+                window.showSection(targetSection);
+            } else {
+                window.showSection('home-grid');
+            }
+        }
+        window.addEventListener('hashchange', handleHashChange);
+
+        async function updateReadReceipt(groupId) {
+            if(!currentUserData) return;
+            groupReadTimestamps[groupId] = Date.now();
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    readReceipts: groupReadTimestamps
+                });
+                renderChatSidebarList(); 
+            } catch(e) {}
+        }
+
         window.openGroupInfoModal = () => {
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(!activeGroup) return;
@@ -1555,6 +1722,15 @@
             });
             html += `</div>`;
             container.innerHTML = html;
+        };
+
+        window.openTaskModal = () => {
+            const select = document.getElementById('taskAssignee');
+            select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
+            globalUsers.forEach(emp => {
+                select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.role})</option>`;
+            });
+            window.openModal('taskModal');
         };
 
         document.getElementById('taskReportForm').addEventListener('submit', async (e) => {
@@ -1960,8 +2136,148 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        // مستمع ذكي للاجتماعات لجلب الإشعارات من الدومين الثاني
-        function listenForMeetingInvites() {
+        function getGroupUnreadInfo(groupId) {
+            const lastRead = groupReadTimestamps[groupId] || 0;
+            const activeGroup = globalGroups.find(g => g.id === groupId);
+            if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
+                return { count: 0, hasMention: false }; 
+            }
+
+            const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
+            
+            let unreadCount = groupMessages.length;
+            let hasMention = groupMessages.some(m => m.text && (m.text.includes(`@${currentUserData.name}`) || m.text.includes(`@الجميع`)));
+            
+            return { count: unreadCount, hasMention: hasMention };
+        }
+
+        function renderChatSidebarList() {
+            const innerList = document.getElementById('innerChatSidebarList');
+            const mobileList = document.getElementById('chatSubMenuMobile');
+            
+            if(innerList) innerList.innerHTML = '';
+            if(mobileList) mobileList.innerHTML = '';
+            
+            let totalUnreadCount = 0;
+            let totalMentions = false;
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
+
+            globalGroups.forEach(g => {
+                const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
+                
+                const unreadInfo = getGroupUnreadInfo(g.id);
+                totalUnreadCount += unreadInfo.count;
+                if(unreadInfo.hasMention) totalMentions = true;
+
+                let badgeHtml = '';
+                if(unreadInfo.hasMention) {
+                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">@</span>`;
+                } else if(unreadInfo.count > 0) {
+                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                }
+                
+                let creatorHtml = '';
+                if (isCEO && g.id !== 'global') {
+                    const creatorUser = globalUsers.find(u => u.uid === g.createdBy);
+                    const creatorName = creatorUser ? creatorUser.name : t('مجهول');
+                    creatorHtml = `<span class="block text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">${t('بواسطة:')} ${creatorName}</span>`;
+                }
+
+                if (innerList) {
+                    innerList.innerHTML += `
+                        <button onclick="window.selectGroup('${g.id}')" class="w-full text-right rtl:text-right ltr:text-left py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-white font-bold border border-gray-100 dark:border-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center mx-2 text-gray-400 ${isActive ? 'text-primary dark:text-secondary' : ''}"></i> 
+                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                <span class="truncate">${g.name}</span>
+                                ${creatorHtml}
+                            </div>
+                            ${badgeHtml}
+                        </button>
+                    `;
+                }
+
+                if (mobileList) {
+                    mobileList.innerHTML += `
+                        <button onclick="window.selectGroup('${g.id}')" class="text-right rtl:text-right ltr:text-left w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
+                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center mx-2"></i> 
+                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                <span>${g.name}</span>
+                                ${creatorHtml.replace('text-gray-400', 'text-gray-400/70')}
+                            </div>
+                            ${badgeHtml}
+                        </button>
+                    `;
+                }
+            });
+            
+            const homeBadge = document.getElementById('homeChatBadge');
+            const mobileBadge = document.getElementById('globalChatBadgeMobile');
+            
+            [homeBadge, mobileBadge].forEach(badge => {
+                if(badge) {
+                    if(totalMentions) {
+                        badge.innerText = '@';
+                        badge.classList.remove('hidden');
+                        badge.classList.replace('bg-blue-500', 'bg-red-500');
+                    } else if(totalUnreadCount > 0) {
+                        badge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
+                        badge.classList.remove('hidden');
+                        badge.classList.replace('bg-red-500', 'bg-blue-500');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            });
+            
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(activeGroup) {
+                const titleEl = document.getElementById('chatHeaderTitle');
+                if (titleEl) titleEl.innerText = activeGroup.name;
+                
+                const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+                const deleteGroupBtn = document.getElementById('deleteGroupBtn');
+                const chatForm = document.getElementById('chatForm');
+                const readOnlyMsg = document.getElementById('readOnlyMessage');
+
+                if(activeGroup.id === 'global') {
+                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
+                    
+                    if(isCEO) {
+                        clearMessagesBtn.classList.remove('hidden');
+                        deleteGroupBtn.classList.add('hidden'); 
+                    } else {
+                        clearMessagesBtn.classList.add('hidden');
+                        deleteGroupBtn.classList.add('hidden');
+                    }
+                    
+                    chatForm.classList.remove('hidden');
+                    readOnlyMsg.classList.add('hidden');
+                } else {
+                    document.getElementById('chatHeaderDesc').innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
+                    
+                    if(isCEO) {
+                        clearMessagesBtn.classList.remove('hidden');
+                        deleteGroupBtn.classList.remove('hidden');
+                        
+                        if(!activeGroup.members.includes(currentUserData.uid)) {
+                            chatForm.classList.add('hidden');
+                            readOnlyMsg.classList.remove('hidden');
+                        } else {
+                            chatForm.classList.remove('hidden');
+                            readOnlyMsg.classList.add('hidden');
+                        }
+                    } else {
+                        clearMessagesBtn.classList.add('hidden');
+                        deleteGroupBtn.classList.add('hidden');
+                        chatForm.classList.remove('hidden');
+                        readOnlyMsg.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        // مستمع ذكي للإشعارات من الدومين الثاني (الاجتماعات، الإجازات)
+        function listenForExternalBadges() {
             onSnapshot(getColRef('meetings'), (snapshot) => {
                 if(!currentUserData) return;
                 let activeMeetingsCount = 0;
@@ -1984,6 +2300,26 @@
                     if(sidebarBadge) sidebarBadge.classList.add('hidden');
                 }
             });
+
+            if (currentUserData && currentUserData.role === 'CEO') {
+                onSnapshot(getColRef('leaves'), (snapshot) => {
+                    let pendingLeavesCount = 0;
+                    snapshot.forEach(doc => {
+                        if (doc.data().status === 'pending') pendingLeavesCount++;
+                    });
+                    
+                    const gridBadge = document.getElementById('gridLeavesBadge');
+                    const sidebarBadge = document.getElementById('sidebarLeavesBadge');
+                    
+                    if(pendingLeavesCount > 0) {
+                        if(gridBadge) { gridBadge.innerText = pendingLeavesCount; gridBadge.classList.remove('hidden'); }
+                        if(sidebarBadge) { sidebarBadge.innerText = pendingLeavesCount; sidebarBadge.classList.remove('hidden'); }
+                    } else {
+                        if(gridBadge) gridBadge.classList.add('hidden');
+                        if(sidebarBadge) sidebarBadge.classList.add('hidden');
+                    }
+                });
+            }
         }
 
         function startDatabaseListeners() {
@@ -2017,36 +2353,6 @@
                 });
             }
 
-            onSnapshot(getColRef('attendance'), (snapshot) => {
-                globalAttendance = [];
-                snapshot.forEach(doc => globalAttendance.push({ id: doc.id, ...doc.data() }));
-                if(!document.getElementById('attendance').classList.contains('hidden')){
-                    renderEmpAttendanceView();
-                    if(currentUserData && currentUserData.role === 'CEO') window.renderSelectedEmpAttendance();
-                }
-            });
-
-            onSnapshot(getColRef('leaves'), (snapshot) => {
-                globalLeaves = [];
-                snapshot.forEach(doc => globalLeaves.push({ id: doc.id, ...doc.data() }));
-                globalLeaves.sort((a, b) => b.timestamp - a.timestamp);
-                renderLeaves();
-                
-                // تحديث الـ Badge للمدير (طلبات الإجازة قيد الانتظار)
-                if (currentUserData.role === 'CEO') {
-                    const pendingLeavesCount = globalLeaves.filter(l => l.status === 'pending').length;
-                    const gridLeavesBadge = document.getElementById('gridLeavesBadge');
-                    const sidebarLeavesBadge = document.getElementById('sidebarLeavesBadge');
-                    if (pendingLeavesCount > 0) {
-                        if (gridLeavesBadge) { gridLeavesBadge.innerText = pendingLeavesCount; gridLeavesBadge.classList.remove('hidden'); }
-                        if (sidebarLeavesBadge) { sidebarLeavesBadge.innerText = pendingLeavesCount; sidebarLeavesBadge.classList.remove('hidden'); }
-                    } else {
-                        if (gridLeavesBadge) gridLeavesBadge.classList.add('hidden');
-                        if (sidebarLeavesBadge) sidebarLeavesBadge.classList.add('hidden');
-                    }
-                }
-            });
-
             onSnapshot(getColRef('notices'), (snapshot) => {
                 globalNotices = [];
                 snapshot.forEach(doc => globalNotices.push({ id: doc.id, ...doc.data() }));
@@ -2065,15 +2371,10 @@
                 globalTasks = [];
                 let hasNewAssignedTask = false;
                 let latestTaskName = "";
-                let pendingTasksForMe = 0;
 
                 snapshot.forEach(doc => {
                     const taskData = { id: doc.id, ...doc.data() };
                     globalTasks.push(taskData);
-                    
-                    if (taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
-                        pendingTasksForMe++;
-                    }
 
                     if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
                         knownTaskIds.add(taskData.id);
@@ -2083,17 +2384,6 @@
                         }
                     } else if (initialTaskLoad) {
                         knownTaskIds.add(taskData.id);
-                    }
-                });
-                
-                // Update Task Badges
-                const externalTaskBadges = document.querySelectorAll('.external-task-badge');
-                externalTaskBadges.forEach(badge => {
-                    if (pendingTasksForMe > 0) {
-                        badge.innerText = pendingTasksForMe;
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
                     }
                 });
 
@@ -2116,21 +2406,6 @@
                         }
                     }
                 }
-            });
-
-            onSnapshot(getStorageColRef('files'), (snapshot) => {
-                globalFiles = [];
-                snapshot.forEach(doc => globalFiles.push({ id: doc.id, ...doc.data() }));
-                globalFiles.sort((a, b) => b.timestamp - a.timestamp); 
-                renderDriveFiles();
-                updateStorageProgress();
-            });
-
-            onSnapshot(getColRef('meetings'), (snapshot) => {
-                globalMeetings = [];
-                snapshot.forEach(doc => globalMeetings.push({ id: doc.id, ...doc.data() }));
-                globalMeetings.sort((a, b) => b.timestamp - a.timestamp);
-                renderMeetings();
             });
 
             onSnapshot(getColRef('groups'), (snapshot) => {
@@ -2156,33 +2431,12 @@
             onSnapshot(getColRef('chat'), (snapshot) => {
                 const oldChatCount = globalChat.length;
                 globalChat = [];
-                let hasUnreadChat = false;
                 
                 snapshot.forEach(doc => {
                     const msg = { id: doc.id, ...doc.data() };
                     globalChat.push(msg);
-                    
-                    // Check for unread across all groups
-                    const groupId = msg.groupId || 'global';
-                    const lastRead = groupReadTimestamps[groupId] || 0;
-                    if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
-                        // is it a group I belong to?
-                        const inMyGroup = globalGroups.some(g => g.id === groupId);
-                        if (inMyGroup) hasUnreadChat = true;
-                    }
                 });
                 globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-
-                // Update Chat External Badges
-                const externalChatBadges = document.querySelectorAll('.external-chat-badge');
-                externalChatBadges.forEach(badge => {
-                    if (hasUnreadChat) {
-                        badge.innerText = '!';
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                });
                 
                 if (!initialChatLoad && globalChat.length > oldChatCount) {
                     const latestMsg = globalChat[globalChat.length - 1];
@@ -2243,7 +2497,7 @@
                 const newUserData = {
                     name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                    readReceipts: {}, lastActive: Date.now(), timestamp: Date.now()
+                    readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now()
                 };
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
                 currentUserData = newUserData;
@@ -2258,15 +2512,46 @@
             document.getElementById('userAvatar').src = currentUserData.photoURL;
             document.getElementById('settingsAvatarPreview').src = currentUserData.photoURL;
             document.getElementById('settingsName').value = currentUserData.name;
-            
-            if(currentUserData.role === 'CEO') {
-                document.getElementById('createMeetingBtn').classList.remove('hidden');
-                document.getElementById('ceoAttendanceView').classList.remove('hidden');
-            }
+            document.getElementById('settingsRole').value = currentUserData.role;
 
-            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (نطاق المهام)`);
+            if(currentUserData.role === 'CEO') {
+                document.getElementById('grid-employees').classList.remove('hidden');
+                document.getElementById('grid-dashboard').classList.remove('hidden');
+                document.getElementById('grid-logs').classList.remove('hidden');
+                
+                document.getElementById('nav-employees-btn').classList.remove('hidden');
+                document.getElementById('nav-dashboard-btn').classList.remove('hidden');
+                document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                
+                document.getElementById('clearLogsBtn').classList.remove('hidden'); 
+                document.getElementById('clearLogsBtn').style.display = 'flex';
+                document.getElementById('addTaskBtn').classList.remove('hidden');
+                document.getElementById('addTaskBtn').style.display = 'flex';
+                document.getElementById('viewReportsBtn').classList.remove('hidden');
+                document.getElementById('viewReportsBtn').style.display = 'flex';
+                document.getElementById('empActionHeader').classList.remove('hidden');
+                document.getElementById('addNoticeBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('grid-employees').classList.add('hidden');
+                document.getElementById('grid-dashboard').classList.add('hidden');
+                document.getElementById('grid-logs').classList.add('hidden');
+
+                document.getElementById('nav-employees-btn').classList.add('hidden');
+                document.getElementById('nav-dashboard-btn').classList.add('hidden');
+                document.getElementById('nav-logs-btn').classList.add('hidden'); 
+                
+                document.getElementById('clearLogsBtn').classList.add('hidden');
+                document.getElementById('viewReportsBtn').classList.add('hidden');
+                document.getElementById('addTaskBtn').style.display = 'none';
+                document.getElementById('empActionHeader').classList.add('hidden');
+                document.getElementById('addNoticeBtn').classList.add('hidden');
+            }
+            
+            document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+
+            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
             startDatabaseListeners();
-            listenForMeetingInvites(); 
+            listenForExternalBadges(); 
             handleHashChange();
             
             updateActivity();
