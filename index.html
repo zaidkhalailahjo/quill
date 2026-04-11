@@ -745,6 +745,54 @@
         </div>
     </div>
 
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-secondary text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إسناد مهمة جديدة">إسناد مهمة جديدة</h3>
+                <button onclick="window.closeModal('taskModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
+                <div><label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="عنوان المهمة">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></div>
+                <div>
+                    <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="وقت وتاريخ">وقت وتاريخ الإنجاز المطلوب</label>
+                    <input type="datetime-local" id="taskDeadline" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                </div>
+                <div><label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="التفاصيل">التفاصيل</label><textarea id="taskDesc" rows="2" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></textarea></div>
+                <div>
+                    <label class="block text-sm text-gray-600 dark:text-gray-300 mb-1" data-i18n="إسناد إلى">إسناد إلى الموظف</label>
+                    <select id="taskAssignee" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none"></select>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base" data-i18n="إرسال المهمة">إرسال المهمة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إنشاء مجموعة">إنشاء مجموعة دردشة</h3>
+                <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="createGroupForm" class="p-4 md:p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="اسم المجموعة">اسم المجموعة</label>
+                    <input type="text" id="newGroupName" required placeholder="مثال: فريق التسويق" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة الأعضاء">إضافة الأعضاء</label>
+                    <div id="groupMembersSelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700"></div>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base" data-i18n="تأكيد">تأكيد الإنشاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="editEmployeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
@@ -1151,20 +1199,23 @@
         };
 
         // تعميمات
-        document.getElementById('noticeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(currentUserData.role !== 'CEO') return;
-            try {
-                await addDoc(getColRef('notices'), {
-                    title: document.getElementById('noticeTitle').value,
-                    body: document.getElementById('noticeBody').value,
-                    author: currentUserData.name,
-                    timestamp: Date.now()
-                });
-                window.closeModal('noticeModal');
-                showToast('تم نشر التعميم بنجاح', 'success');
-            } catch(e) {}
-        });
+        const noticeForm = document.getElementById('noticeForm');
+        if(noticeForm) {
+            noticeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentUserData.role !== 'CEO') return;
+                try {
+                    await addDoc(getColRef('notices'), {
+                        title: document.getElementById('noticeTitle').value,
+                        body: document.getElementById('noticeBody').value,
+                        author: currentUserData.name,
+                        timestamp: Date.now()
+                    });
+                    window.closeModal('noticeModal');
+                    showToast('تم نشر التعميم بنجاح', 'success');
+                } catch(e) {}
+            });
+        }
 
         window.deleteNotice = async (id) => {
             if(currentUserData.role !== 'CEO') return;
@@ -1207,51 +1258,57 @@
         }
 
         // العملاء (CRM)
-        document.getElementById('clientForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData) return;
-            try {
-                await addDoc(getColRef('clients'), {
-                    name: document.getElementById('clientName').value,
-                    phone: document.getElementById('clientPhone').value,
-                    email: document.getElementById('clientEmail').value,
-                    status: document.getElementById('clientStatus').value,
-                    addedBy: currentUserData.name,
-                    notes: [], 
-                    timestamp: Date.now()
-                });
-                window.closeModal('clientModal');
-                showToast('تم إضافة العميل بنجاح', 'success');
-            } catch(e) {}
-        });
+        const clientForm = document.getElementById('clientForm');
+        if(clientForm) {
+            clientForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData) return;
+                try {
+                    await addDoc(getColRef('clients'), {
+                        name: document.getElementById('clientName').value,
+                        phone: document.getElementById('clientPhone').value,
+                        email: document.getElementById('clientEmail').value,
+                        status: document.getElementById('clientStatus').value,
+                        addedBy: currentUserData.name,
+                        notes: [], 
+                        timestamp: Date.now()
+                    });
+                    window.closeModal('clientModal');
+                    showToast('تم إضافة العميل بنجاح', 'success');
+                } catch(e) {}
+            });
+        }
 
         window.openNoteModal = (clientId) => {
             document.getElementById('noteClientId').value = clientId;
             window.openModal('noteModal');
         };
 
-        document.getElementById('noteForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData) return;
-            const cId = document.getElementById('noteClientId').value;
-            const text = document.getElementById('noteText').value;
-            
-            try {
-                const clientDoc = globalCRM.find(c => c.id === cId);
-                if(clientDoc) {
-                    const updatedNotes = clientDoc.notes || [];
-                    updatedNotes.push({
-                        authorId: currentUserData.uid,
-                        authorName: currentUserData.name,
-                        text: text,
-                        timestamp: Date.now()
-                    });
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { notes: updatedNotes });
-                    window.closeModal('noteModal');
-                    showToast('تم إضافة الملاحظة', 'success');
-                }
-            } catch(e) {}
-        });
+        const noteForm = document.getElementById('noteForm');
+        if(noteForm) {
+            noteForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData) return;
+                const cId = document.getElementById('noteClientId').value;
+                const text = document.getElementById('noteText').value;
+                
+                try {
+                    const clientDoc = globalCRM.find(c => c.id === cId);
+                    if(clientDoc) {
+                        const updatedNotes = clientDoc.notes || [];
+                        updatedNotes.push({
+                            authorId: currentUserData.uid,
+                            authorName: currentUserData.name,
+                            text: text,
+                            timestamp: Date.now()
+                        });
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { notes: updatedNotes });
+                        window.closeModal('noteModal');
+                        showToast('تم إضافة الملاحظة', 'success');
+                    }
+                } catch(e) {}
+            });
+        }
 
         window.updateClientStatus = async (cId, newStatus) => {
             try {
@@ -1309,19 +1366,22 @@
             });
         }
 
-        // ===============================================
-        // التوجيه (Routing) والقوائم
-        // ===============================================
-        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
+        window.openModal = (id) => {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('hidden');
+        };
         window.closeModal = (id) => {
-            document.getElementById(id).classList.add('hidden');
-            if(id === 'taskModal') document.getElementById('addTaskForm').reset();
-            if(id === 'createGroupModal') document.getElementById('createGroupForm').reset();
-            if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm').reset();
-            if(id === 'noticeModal') document.getElementById('noticeForm').reset();
-            if(id === 'clientModal') document.getElementById('clientForm').reset();
-            if(id === 'noteModal') document.getElementById('noteForm').reset();
-            if(id === 'taskReportModal') document.getElementById('taskReportForm').reset();
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.add('hidden');
+                if(id === 'taskModal') document.getElementById('addTaskForm')?.reset();
+                if(id === 'createGroupModal') document.getElementById('createGroupForm')?.reset();
+                if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm')?.reset();
+                if(id === 'noticeModal') document.getElementById('noticeForm')?.reset();
+                if(id === 'clientModal') document.getElementById('clientForm')?.reset();
+                if(id === 'noteModal') document.getElementById('noteForm')?.reset();
+                if(id === 'taskReportModal') document.getElementById('taskReportForm')?.reset();
+            }
         };
 
         window.openMedia = (dataUrl, type) => {
@@ -1572,21 +1632,24 @@
             window.openModal('editEmployeeModal');
         };
 
-        document.getElementById('editEmployeeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(currentUserData.role !== 'CEO') return;
+        const editEmployeeForm = document.getElementById('editEmployeeForm');
+        if (editEmployeeForm) {
+            editEmployeeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentUserData.role !== 'CEO') return;
 
-            const id = document.getElementById('editEmpId').value;
-            const newName = document.getElementById('editEmpName').value;
-            const newRole = document.getElementById('editEmpRole').value;
+                const id = document.getElementById('editEmpId').value;
+                const newName = document.getElementById('editEmpName').value;
+                const newRole = document.getElementById('editEmpRole').value;
 
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { name: newName, role: newRole });
-                window.closeModal('editEmployeeModal');
-                showToast('تم تحديث بيانات الموظف بنجاح', 'success');
-                logAction('تعديل موظف', `تم تعديل بيانات الموظف إلى ${newName} (${newRole})`);
-            } catch(error) {}
-        });
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { name: newName, role: newRole });
+                    window.closeModal('editEmployeeModal');
+                    showToast('تم تحديث بيانات الموظف بنجاح', 'success');
+                    logAction('تعديل موظف', `تم تعديل بيانات الموظف إلى ${newName} (${newRole})`);
+                } catch(error) {}
+            });
+        }
 
         function renderEmployees() {
             const list = document.getElementById('employeesList');
@@ -1689,55 +1752,58 @@
             window.openModal('taskModal');
         };
 
-        document.getElementById('taskReportForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('reportTaskId').value;
-            const title = document.getElementById('reportTaskTitle').value;
-            const reportText = document.getElementById('reportText').value;
-            const fileInput = document.getElementById('reportFileInput');
-            const file = fileInput.files[0];
+        const taskReportForm = document.getElementById('taskReportForm');
+        if (taskReportForm) {
+            taskReportForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('reportTaskId').value;
+                const title = document.getElementById('reportTaskTitle').value;
+                const reportText = document.getElementById('reportText').value;
+                const fileInput = document.getElementById('reportFileInput');
+                const file = fileInput.files[0];
 
-            const completeTask = async (fileData, fileType) => {
-                try {
-                    const updateData = {
-                        status: 'completed',
-                        reportText: reportText,
-                        completedAt: Date.now()
-                    };
-                    if(fileData) {
-                        updateData.reportFileData = fileData;
-                        updateData.reportFileType = fileType || '';
-                    }
+                const completeTask = async (fileData, fileType) => {
+                    try {
+                        const updateData = {
+                            status: 'completed',
+                            reportText: reportText,
+                            completedAt: Date.now()
+                        };
+                        if(fileData) {
+                            updateData.reportFileData = fileData;
+                            updateData.reportFileType = fileType || '';
+                        }
 
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
-                    logAction('تحديث مهمة', `تم إنجاز المهمة "${title}" مع إرفاق تقرير`);
-                    window.closeModal('taskReportModal');
-                    showToast('أحسنت! تم إنجاز المهمة وإرسال التقرير للمدير.', 'success');
-                    
-                    const ceoUser = globalUsers.find(u => u.role === 'CEO');
-                    if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
-                        const taskLink = window.location.origin + window.location.pathname + '#tasks';
-                        emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
-                            ceo_email: ceoUser.email,
-                            ceo_name: ceoUser.name,
-                            employee_name: currentUserData.name,
-                            task_title: title,
-                            task_link: taskLink,
-                            company_name: 'نظام شركتي'
-                        }, EMAILJS_PUBLIC_KEY_3);
-                    }
-                } catch(e) {}
-            };
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
+                        logAction('تحديث مهمة', `تم إنجاز المهمة "${title}" مع إرفاق تقرير`);
+                        window.closeModal('taskReportModal');
+                        showToast('أحسنت! تم إنجاز المهمة وإرسال التقرير للمدير.', 'success');
+                        
+                        const ceoUser = globalUsers.find(u => u.role === 'CEO');
+                        if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
+                                ceo_email: ceoUser.email,
+                                ceo_name: ceoUser.name,
+                                employee_name: currentUserData.name,
+                                task_title: title,
+                                task_link: taskLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_3);
+                        }
+                    } catch(e) {}
+                };
 
-            if(file) {
-                if(file.size > 1024 * 1024) { showToast('الملف كبير جداً! الحد الأقصى 1MB', 'warning'); return; }
-                const reader = new FileReader();
-                reader.onload = (ev) => completeTask(ev.target.result, file.type);
-                reader.readAsDataURL(file);
-            } else {
-                completeTask(null, null);
-            }
-        });
+                if(file) {
+                    if(file.size > 1024 * 1024) { showToast('الملف كبير جداً! الحد الأقصى 1MB', 'warning'); return; }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => completeTask(ev.target.result, file.type);
+                    reader.readAsDataURL(file);
+                } else {
+                    completeTask(null, null);
+                }
+            });
+        }
 
         window.updateTaskStatus = async (id, newStatus, taskTitle) => {
             if(newStatus === 'completed') {
@@ -1844,40 +1910,43 @@
             }
         };
 
-        document.getElementById('addTaskForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData || currentUserData.role !== 'CEO') return;
-            
-            const assigneeSelect = document.getElementById('taskAssignee');
-            const assigneeId = assigneeSelect.value;
-            const assigneeName = assigneeSelect.options[assigneeSelect.selectedIndex].text.split(' (')[0];
-            const title = document.getElementById('taskTitle').value;
-            const desc = document.getElementById('taskDesc').value;
-            const deadlineVal = document.getElementById('taskDeadline').value;
-            const deadlineTime = new Date(deadlineVal).getTime();
+        const addTaskForm = document.getElementById('addTaskForm');
+        if (addTaskForm) {
+            addTaskForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData || currentUserData.role !== 'CEO') return;
+                
+                const assigneeSelect = document.getElementById('taskAssignee');
+                const assigneeId = assigneeSelect.value;
+                const assigneeName = assigneeSelect.options[assigneeSelect.selectedIndex].text.split(' (')[0];
+                const title = document.getElementById('taskTitle').value;
+                const desc = document.getElementById('taskDesc').value;
+                const deadlineVal = document.getElementById('taskDeadline').value;
+                const deadlineTime = new Date(deadlineVal).getTime();
 
-            try {
-                await addDoc(getColRef('tasks'), {
-                    title: title,
-                    desc: desc,
-                    assigneeId: assigneeId,
-                    assigneeName: assigneeName,
-                    deadline: deadlineTime,
-                    status: 'pending',
-                    timestamp: Date.now()
-                });
-                window.closeModal('taskModal');
-                
-                const assignedUser = globalUsers.find(u => u.id === assigneeId);
-                if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
-                    sendEmailNotification(assignedUser.email, assigneeName, title, desc);
-                } else {
-                    showToast('تم إرسال المهمة بنجاح! لكن الموظف لا يمتلك بريد إلكتروني مسجل.', 'warning');
-                }
-                
-                logAction('إسناد مهمة', `تم إسناد مهمة "${title}" إلى ${assigneeName}`);
-            } catch(e) {}
-        });
+                try {
+                    await addDoc(getColRef('tasks'), {
+                        title: title,
+                        desc: desc,
+                        assigneeId: assigneeId,
+                        assigneeName: assigneeName,
+                        deadline: deadlineTime,
+                        status: 'pending',
+                        timestamp: Date.now()
+                    });
+                    window.closeModal('taskModal');
+                    
+                    const assignedUser = globalUsers.find(u => u.id === assigneeId);
+                    if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
+                        sendEmailNotification(assignedUser.email, assigneeName, title, desc);
+                    } else {
+                        showToast('تم إرسال المهمة بنجاح! لكن الموظف لا يمتلك بريد إلكتروني مسجل.', 'warning');
+                    }
+                    
+                    logAction('إسناد مهمة', `تم إسناد مهمة "${title}" إلى ${assigneeName}`);
+                } catch(e) {}
+            });
+        }
 
         window.deleteTask = async (id) => {
             if(currentUserData.role !== 'CEO') return;
@@ -1886,78 +1955,112 @@
             }
         };
 
-        document.getElementById('chatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            const submitBtn = document.querySelector('#chatForm button[type="submit"]');
-            
-            if(!text && !pendingChatFileData) return;
-
-            try {
-                input.value = '';
-                document.getElementById('mentionsList').classList.add('hidden');
+        const chatForm = document.getElementById('chatForm');
+        if (chatForm) {
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('chatInput');
+                const text = input.value.trim();
+                const submitBtn = document.querySelector('#chatForm button[type="submit"]');
                 
-                if (submitBtn) submitBtn.disabled = true;
-                
-                const messageObj = {
-                    text: text || '', 
-                    uid: currentUserData.uid,
-                    senderName: currentUserData.name,
-                    photoURL: currentUserData.photoURL, 
-                    groupId: currentGroupId,
-                    color: selectedChatColor, 
-                    timestamp: Date.now()
-                };
+                if(!text && !pendingChatFileData) return;
 
-                if(pendingChatFileData) {
-                    messageObj.fileData = pendingChatFileData;
-                    messageObj.fileType = pendingChatFileType || 'unknown'; 
-                    window.clearChatAttachment(); 
-                }
-
-                await addDoc(getColRef('chat'), messageObj);
-
-                if(submitBtn) submitBtn.disabled = false;
-
-                if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
-                    const chatLink = window.location.origin + window.location.pathname + '#chat';
-                    const activeGroup = globalGroups.find(g => g.id === currentGroupId);
-                    const groupName = activeGroup?.name || 'الدردشة';
-                    const isMentionAll = text.includes('@الجميع');
+                try {
+                    input.value = '';
+                    document.getElementById('mentionsList').classList.add('hidden');
                     
-                    globalUsers.forEach(u => {
-                        if (u.uid === currentUserData.uid) return; 
-                        
-                        if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
+                    if (submitBtn) submitBtn.disabled = true;
+                    
+                    const messageObj = {
+                        text: text || '', 
+                        uid: currentUserData.uid,
+                        senderName: currentUserData.name,
+                        photoURL: currentUserData.photoURL, 
+                        groupId: currentGroupId,
+                        color: selectedChatColor, 
+                        timestamp: Date.now()
+                    };
 
-                        const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const regex = new RegExp(`@${safeName}`, 'g');
+                    if(pendingChatFileData) {
+                        messageObj.fileData = pendingChatFileData;
+                        messageObj.fileType = pendingChatFileType || 'unknown'; 
+                        window.clearChatAttachment(); 
+                    }
+
+                    await addDoc(getColRef('chat'), messageObj);
+
+                    if(submitBtn) submitBtn.disabled = false;
+
+                    if (EMAILJS_TEMPLATE_MENTION !== 'YOUR_MENTION_TEMPLATE_ID') {
+                        const chatLink = window.location.origin + window.location.pathname + '#chat';
+                        const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                        const groupName = activeGroup?.name || 'الدردشة';
+                        const isMentionAll = text.includes('@الجميع');
                         
-                        if ((isMentionAll || regex.test(text)) && u.email && u.email !== 'no-email@company.com') {
+                        globalUsers.forEach(u => {
+                            if (u.uid === currentUserData.uid) return; 
                             
-                            const isOnline = u.lastActive && (Date.now() - u.lastActive < 2 * 60 * 1000);
+                            if (activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(u.id)) return;
+
+                            const safeName = u.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const regex = new RegExp(`@${safeName}`, 'g');
                             
-                            if (!isOnline) {
-                                emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
-                                    to_email: u.email,
-                                    to_name: u.name,
-                                    sender_name: currentUserData.name,
-                                    group_name: groupName,
-                                    chat_text: text,
-                                    chat_link: chatLink,
-                                    company_name: 'نظام شركتي'
-                                }, EMAILJS_PUBLIC_KEY_2);
+                            if ((isMentionAll || regex.test(text)) && u.email && u.email !== 'no-email@company.com') {
+                                
+                                const isOnline = u.lastActive && (Date.now() - u.lastActive < 2 * 60 * 1000);
+                                
+                                if (!isOnline) {
+                                    emailjs.send(EMAILJS_SERVICE_ID_2, EMAILJS_TEMPLATE_MENTION, {
+                                        to_email: u.email,
+                                        to_name: u.name,
+                                        sender_name: currentUserData.name,
+                                        group_name: groupName,
+                                        chat_text: text,
+                                        chat_link: chatLink,
+                                        company_name: 'نظام شركتي'
+                                    }, EMAILJS_PUBLIC_KEY_2);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
+                } catch(e) {
+                    console.error("خطأ في إرسال الرسالة:", e);
+                    showToast('حدث خطأ في الإرسال، حاول مجدداً', 'error');
+                    if (submitBtn) submitBtn.disabled = false;
                 }
-            } catch(e) {
-                console.error("خطأ في إرسال الرسالة:", e);
-                showToast('حدث خطأ في الإرسال، حاول مجدداً', 'error');
-                if (submitBtn) submitBtn.disabled = false;
-            }
-        });
+            });
+        }
+
+        const createGroupForm = document.getElementById('createGroupForm');
+        if (createGroupForm) {
+            createGroupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData) return; 
+                
+                const groupName = document.getElementById('newGroupName').value;
+                const checkboxes = document.querySelectorAll('.group-member-checkbox:checked');
+                const members = Array.from(checkboxes).map(cb => cb.value);
+                members.push(currentUserData.uid); 
+
+                try {
+                    const newGroupRef = await addDoc(getColRef('groups'), {
+                        name: groupName,
+                        members: members,
+                        createdBy: currentUserData.uid,
+                        timestamp: Date.now()
+                    });
+
+                    window.closeModal('createGroupModal');
+                    showToast('تم إنشاء المجموعة بنجاح!', 'success');
+                    
+                    currentGroupId = newGroupRef.id;
+                    window.location.hash = 'chat';
+                    logAction('إنشاء مجموعة', `تم إنشاء مجموعة محادثة جديدة "${groupName}"`);
+                } catch(err) {
+                    showToast('حدث خطأ أثناء الإنشاء', 'warning');
+                }
+            });
+        }
 
         function renderLogs() {
             const list = document.getElementById('logsList');
@@ -2560,14 +2663,17 @@
                 
                 document.getElementById('clearLogsBtn').classList.add('hidden');
                 document.getElementById('viewReportsBtn').classList.add('hidden');
-                document.getElementById('addTaskBtn').style.display = 'none';
+                
+                const addTaskBtn = document.getElementById('addTaskBtn');
+                if (addTaskBtn) addTaskBtn.style.display = 'none';
+                
                 document.getElementById('empActionHeader').classList.add('hidden');
                 document.getElementById('addNoticeBtn').classList.add('hidden');
             }
             
             document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
 
-            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام`);
+            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (المنصة الرئيسية)`);
             startDatabaseListeners();
             listenForExternalBadges(); 
             handleHashChange();
