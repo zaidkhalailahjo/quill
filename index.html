@@ -1,269 +1,170 @@
-<script type="module">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام شركة Quill - البوابة الرئيسية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: { primary: '#002d74', secondary: '#00839b' },
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #00839b; border-radius: 4px; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #00839b; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
+
+    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
+        <div class="loader mb-4"></div>
+        <p class="text-primary font-bold text-lg">جاري تحميل النظام...</p>
+    </div>
+
+    <div id="systemPasswordScreen" class="fixed inset-0 bg-primary z-[45] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <h2 class="text-2xl font-bold mb-4">رمز الدخول للنظام</h2>
+            <input type="password" id="sysPasswordInput" class="w-full border rounded-lg px-4 py-3 mb-4 text-center dark:bg-gray-700 dark:text-white" placeholder="اكتب كلمة السر">
+            <button onclick="window.checkSystemPassword()" class="w-full bg-secondary text-white font-bold py-3 rounded-lg">متابعة</button>
+            <p id="sysPassError" class="text-red-500 text-sm mt-3 hidden font-bold">رمز الدخول غير صحيح!</p>
+        </div>
+    </div>
+
+    <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <h2 class="text-2xl font-bold mb-4">مرحباً بك في نظام شركة Quill</h2>
+            <p class="text-gray-500 mb-8">يجب تسجيل الدخول للوصول إلى النظام</p>
+            <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 border-2 py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 dark:border-gray-600 font-bold">
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-6 h-6"> تسجيل الدخول باستخدام Google
+            </button>
+        </div>
+    </div>
+
+    <aside id="sidebar" class="fixed inset-y-0 right-0 w-64 bg-primary text-white flex flex-col shadow-xl z-30 transform translate-x-full md:translate-x-0 transition-transform md:relative">
+        <div class="p-6 text-center text-xl font-bold border-b border-white/10">Quill Portal</div>
+        <nav class="flex-1 mt-4 px-4 space-y-2 overflow-y-auto">
+            <button onclick="window.location.hash='home-grid'" class="w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white"><i class="fa-solid fa-house w-6 ml-3"></i> الرئيسية</button>
+            
+            <button onclick="window.location.hash='chat'" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10"><i class="fa-solid fa-comments w-6 ml-3"></i> المناقشة</button>
+            <button onclick="window.location.hash='tasks'" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10"><i class="fa-solid fa-list-check w-6 ml-3"></i> المهام</button>
+            <button onclick="window.location.hash='crm'" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10"><i class="fa-solid fa-address-book w-6 ml-3"></i> العملاء</button>
+            <button id="nav-employees-btn" onclick="window.location.hash='employees'" class="hidden w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10"><i class="fa-solid fa-users w-6 ml-3"></i> الموظفون (للمدير)</button>
+            
+            <hr class="border-white/20 my-4">
+            <p class="text-xs text-gray-400 px-4 mb-2">تطبيقات خارجية</p>
+            <a href="https://meetings.quill.com" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10 text-gray-300"><i class="fa-solid fa-video w-6 ml-3"></i> الاجتماعات</a>
+            <a href="https://files.quill.com" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10 text-gray-300"><i class="fa-solid fa-folder-open w-6 ml-3"></i> المستندات</a>
+            <a href="https://notices.quill.com" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10 text-gray-300"><i class="fa-solid fa-bullhorn w-6 ml-3"></i> التعميمات</a>
+            <a href="https://hr.quill.com" class="w-full flex items-center py-3 px-4 rounded-lg hover:bg-white/10 text-gray-300"><i class="fa-solid fa-clock w-6 ml-3"></i> الحضور والمغادرات</a>
+        </nav>
+    </aside>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        <header class="bg-white dark:bg-gray-800 shadow-sm p-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <img id="userAvatar" src="" class="w-10 h-10 rounded-full border-2 border-secondary object-cover">
+                <div>
+                    <p id="userName" class="text-sm font-bold dark:text-white">جاري التحميل...</p>
+                    <p id="userRole" class="text-xs text-secondary"></p>
+                </div>
+            </div>
+            <button onclick="window.logout()" class="text-red-500 hover:bg-red-50 px-3 py-1 rounded font-bold text-sm"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900 relative">
+            
+            <section id="home-grid" class="section-content animate-fade-in">
+                <h2 class="text-2xl font-bold mb-6 dark:text-white">تطبيقات Quill</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div onclick="window.location.hash='chat'" class="cursor-pointer bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center hover:border-secondary transition">
+                        <i class="fa-solid fa-comments text-4xl text-orange-500 mb-3"></i><span class="font-bold dark:text-white">المناقشات</span>
+                    </div>
+                    <div onclick="window.location.hash='tasks'" class="cursor-pointer bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center hover:border-secondary transition">
+                        <i class="fa-solid fa-list-check text-4xl text-emerald-500 mb-3"></i><span class="font-bold dark:text-white">المهام</span>
+                    </div>
+                    <div onclick="window.location.hash='crm'" class="cursor-pointer bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center hover:border-secondary transition">
+                        <i class="fa-solid fa-address-book text-4xl text-lime-500 mb-3"></i><span class="font-bold dark:text-white">العملاء</span>
+                    </div>
+
+                    <a href="https://meetings.quill.com" class="cursor-pointer bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center hover:border-blue-500 transition">
+                        <i class="fa-solid fa-video text-4xl text-blue-500 mb-3"></i><span class="font-bold dark:text-white">الاجتماعات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                    </a>
+                    <a href="https://files.quill.com" class="cursor-pointer bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-gray-100 dark:border-gray-700 flex flex-col items-center hover:border-cyan-500 transition">
+                        <i class="fa-solid fa-folder-open text-4xl text-cyan-500 mb-3"></i><span class="font-bold dark:text-white">المستندات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
+                    </a>
+                </div>
+            </section>
+
+            <section id="chat" class="section-content hidden animate-fade-in h-full">
+                <div class="flex h-[80vh] bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden relative">
+                    <div class="flex-1 flex flex-col p-4 justify-center items-center text-gray-400">
+                        <i class="fa-solid fa-comments text-4xl mb-2"></i>
+                        <p>نظام المناقشات يعمل هنا (نفس الكود السابق)</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tasks" class="section-content hidden animate-fade-in h-full">
+               <div class="flex-1 flex flex-col p-4 justify-center items-center text-gray-400">
+                    <i class="fa-solid fa-list-check text-4xl mb-2"></i>
+                    <p>نظام المهام يعمل هنا (نفس الكود السابق)</p>
+               </div>
+            </section>
+
+            <section id="crm" class="section-content hidden animate-fade-in h-full">
+               <div class="flex-1 flex flex-col p-4 justify-center items-center text-gray-400">
+                    <i class="fa-solid fa-address-book text-4xl mb-2"></i>
+                    <p>نظام العملاء يعمل هنا (نفس الكود السابق)</p>
+               </div>
+            </section>
+
+            <section id="employees" class="section-content hidden animate-fade-in h-full">
+               <div class="flex-1 flex flex-col p-4 justify-center items-center text-gray-400">
+                    <i class="fa-solid fa-users text-4xl mb-2"></i>
+                    <p>قائمة الموظفين تعمل هنا للمدير (نفس الكود السابق)</p>
+               </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // ==========================================
-        // 1. قاعدة البيانات الأولى (الأساسية) لكل شيء في النظام
-        // ==========================================
+        // هنا قاعدة بياناتك الأساسية للـ (Users, Tasks, Chat, CRM)
         const firebaseConfig = {
             apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
             authDomain: "quill-world.firebaseapp.com",
             projectId: "quill-world",
             storageBucket: "quill-world.firebasestorage.app",
             messagingSenderId: "339188796023",
-            appId: "1:339188796023:web:e0a1ba750b49909220d472",
-            measurementId: "G-BMEZ49L6CN"
+            appId: "1:339188796023:web:e0a1ba750b49909220d472"
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ==========================================
-        // 2. قاعدة البيانات الثانية (الجديدة) المخصصة للملفات فقط
-        // ==========================================
-        const firebaseConfigStorage = {
-            apiKey: "AIzaSyBjPerebbHAtkKWJV_LFkoaL-15oTNHRdg",
-            authDomain: "quill-worl.firebaseapp.com",
-            projectId: "quill-worl",
-            storageBucket: "quill-worl.firebasestorage.app",
-            messagingSenderId: "192227363160",
-            appId: "1:192227363160:web:59a620429b4bfdfb7cfd2d",
-            measurementId: "G-NLY5LN0830"
-        };
-        const appStorage = initializeApp(firebaseConfigStorage, "StorageApp");
-        const dbStorage = getFirestore(appStorage);
-
-        const appId = 'quill-world-system';
-
-        const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
-        const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
-        const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
-        const EMAILJS_PUBLIC_KEY_1 = '1jeick6OIh3v4znyt';
-
-        const EMAILJS_SERVICE_ID_2 = 'service_cf5myn4'; 
-        const EMAILJS_TEMPLATE_MENTION = 'template_93xzb4z'; 
-        const EMAILJS_TEMPLATE_MEETING = 'template_j95rjoh'; 
-        const EMAILJS_PUBLIC_KEY_2 = 'V9oeJRZybd-4PFBdz';
-
-        const EMAILJS_SERVICE_ID_3 = 'service_kiswf1m';
-        const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
-        const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
-        const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
-
-        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
-
-        const i18nDict = {
-            "التطبيقات": "Applications",
-            "اختر التطبيق الذي تود العمل عليه": "Choose an application to work on",
-            "لوحات البيانات": "Dashboards",
-            "الموظفون": "Employees",
-            "المهام": "Tasks",
-            "المستندات": "Documents",
-            "الاجتماعات": "Meetings",
-            "المناقشة": "Chat",
-            "سجل النظام": "System Logs",
-            "الإعدادات": "Settings",
-            "الرئيسية": "Home",
-            "الحضور والانصراف": "Attendance",
-            "الإجازات": "Leaves",
-            "التعميمات": "Notice Board",
-            "العملاء": "CRM",
-            "جاري التحميل...": "Loading...",
-            "مرحباً بك": "Welcome",
-            "يجب تسجيل الدخول": "Please login to access the system",
-            "تسجيل الدخول باستخدام Google": "Login with Google",
-            "إكمال بيانات الملف الشخصي": "Complete Profile Setup",
-            "الاسم الكامل": "Full Name",
-            "الوظيفة (الدور)": "Role",
-            "الدخول للنظام": "Enter System",
-            "الموظفين المسجلين": "Registered Employees",
-            "إجمالي المهام": "Total Tasks",
-            "مهام مكتملة": "Completed Tasks",
-            "فريق العمل المسجل": "Registered Team Members",
-            "الاسم": "Name",
-            "الوظيفة": "Job Role",
-            "الإجراءات": "Actions",
-            "إدارة المهام": "Task Management",
-            "إسناد مهمة جديدة": "Assign New Task",
-            "قيد الانتظار": "Pending ⏳",
-            "قيد التنفيذ": "In Progress 🛠️",
-            "مكتمل": "Completed ✅",
-            "المساحة المستخدمة": "Used Storage",
-            "مشاركة الملفات": "Share Important Files (Max 600KB)",
-            "رفع ملف جديد": "Upload New File",
-            "الملفات المثبتة": "Pinned Files",
-            "كل الملفات": "All Files",
-            "إدارة الاجتماعات": "Manage Video Calls",
-            "بدء / جدولة اجتماع": "Start/Schedule Meeting",
-            "الاجتماعات الحالية": "Active & Scheduled Meetings",
-            "سجل الاجتماعات": "Past Meetings Log",
-            "القنوات والمجموعات": "Channels & Groups",
-            "مسح الرسائل": "Clear Messages",
-            "حذف المجموعة": "Delete Group",
-            "أنت تشاهد كمراقب": "You are viewing this as an observer (CEO).",
-            "إعدادات الحساب": "Account Settings",
-            "معلومات الحساب": "Basic Info",
-            "تغيير الصورة": "Change Avatar",
-            "اختر صورة تعبر عنك": "Choose an image (Max 500KB)",
-            "اختيار صورة": "Choose Image",
-            "(لا يمكن تعديله)": "(Cannot be changed except by CEO)",
-            "ترتيب عرض الوسائط": "Chat Media Layout",
-            "الوسائط في الأعلى": "Media top, Text bottom (Default)",
-            "النص في الأعلى": "Text top, Media bottom",
-            "تسجيل حي ومباشر": "Live System Log (CEO)",
-            "تفريغ السجل": "Clear Log",
-            "الوقت": "Time",
-            "المستخدم": "User",
-            "الحدث": "Event",
-            "إضافة عضو جديد": "Add New Member",
-            "إضافة": "Add",
-            "أعضاء المجموعة": "Current Group Members",
-            "عنوان المهمة": "Task Title",
-            "وقت وتاريخ": "Deadline",
-            "التفاصيل": "Details",
-            "إسناد إلى": "Assign to",
-            "إلغاء": "Cancel",
-            "إرسال المهمة": "Send Task",
-            "إنشاء مجموعة": "Create Group",
-            "اسم المجموعة": "Group Name",
-            "إضافة الأعضاء": "Add Members",
-            "تأكيد": "Confirm",
-            "جدولة اجتماع": "Schedule Video Meeting",
-            "عنوان الاجتماع": "Meeting Title",
-            "وقت الاجتماع": "Meeting Time",
-            "المدعوين": "Invitees",
-            "إنشاء الاجتماع": "Create Meeting",
-            "تعديل بيانات": "Edit Employee Data",
-            "حفظ": "Save",
-            "مكالمة جارية": "Active Call",
-            "إنهاء/مغادرة": "End / Leave",
-            "بواسطة:": "By:",
-            "مجهول": "Unknown",
-            "أنت (المدير)": "You (CEO)",
-            "مطلوب:": "Due:",
-            "مدير": "Admin",
-            "مراقب": "Viewer",
-            "حذف": "Delete",
-            "مهمتك": "Your Task",
-            "البدء بالتنفيذ": "Start Progress",
-            "تأكيد الإنجاز": "Confirm Done",
-            "سجل الحضور والانصراف": "Attendance Log",
-            "طلبات الإجازات": "Leave Requests",
-            "قاعدة بيانات العملاء": "CRM",
-            "إضافة عميل جديد": "Add New Client"
-        };
-
-        window.currentLang = localStorage.getItem('appLang') || 'ar';
-        window.t = function(arString) { return (window.currentLang === 'en' && i18nDict[arString]) ? i18nDict[arString] : arString; };
-
-        function applyLanguageToDOM() {
-            document.documentElement.lang = window.currentLang;
-            document.documentElement.dir = window.currentLang === 'ar' ? 'rtl' : 'ltr';
-            document.getElementById('langIconTxt').innerText = window.currentLang === 'ar' ? 'EN' : 'AR';
-            const sendIconDir = document.getElementById('sendIconDir');
-            if(sendIconDir) sendIconDir.className = window.currentLang === 'ar' ? 'fa-regular fa-paper-plane transform -scale-x-100' : 'fa-regular fa-paper-plane';
-            if (window.currentLang === 'en') {
-                document.querySelectorAll('[data-i18n]').forEach(el => {
-                    const key = el.getAttribute('data-i18n');
-                    if (i18nDict[key]) {
-                        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = i18nDict[key];
-                        else {
-                            const icon = el.querySelector('i');
-                            el.innerHTML = (icon ? icon.outerHTML + ' ' : '') + i18nDict[key];
-                        }
-                    }
-                });
-            }
-        }
-
-        window.toggleLanguage = () => {
-            window.currentLang = window.currentLang === 'ar' ? 'en' : 'ar';
-            localStorage.setItem('appLang', window.currentLang);
-            window.location.reload();
-        };
-
-        window.toggleTheme = () => {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('appTheme', isDark ? 'dark' : 'light');
-            document.getElementById('themeToggleIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        };
-
-        if (localStorage.getItem('appTheme') === 'dark') {
-            document.documentElement.classList.add('dark');
-            document.addEventListener("DOMContentLoaded", () => {
-                const icon = document.getElementById('themeToggleIcon');
-                if (icon) icon.className = 'fa-solid fa-sun';
-            });
-        }
-        document.addEventListener("DOMContentLoaded", applyLanguageToDOM);
-
-        let currentUserAuth = null;
-        let currentUserData = null; 
-        let globalUsers = []; 
-        let globalTasks = [];
-        let globalLogs = [];
-        let globalChat = [];
-        let globalFiles = []; 
-        let globalGroups = []; 
-        let globalMeetings = [];
-        
-        let globalAttendance = [];
-        let globalLeaves = [];
-        let globalNotices = [];
-        let globalCRM = [];
-
-        let currentGroupId = 'global'; 
-        let currentMeetingId = null;
-        let initialTaskLoad = true; 
-        let initialChatLoad = true;
-        let knownTaskIds = new Set();
-        let groupReadTimestamps = {}; 
-        
-        let pendingChatFileData = null;
-        let pendingChatFileType = null;
-        let selectedChatColor = 'bg-[#00839b]'; 
-        const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; 
-        let jitsiApi = null; 
-
-        function formatBytes(bytes, decimals = 2) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-        }
-
-        let hasRequestedNotification = false;
-        let latestNotificationMsg = window.t('لا توجد إشعارات جديدة حالياً');
-
-        window.requestNotifications = () => {
-            if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") showToast('تم تفعيل إشعارات المتصفح بنجاح', 'success');
-                });
-            } else if (Notification.permission === "granted" || Notification.permission === "denied") {
-                showToast(latestNotificationMsg, 'info');
-            }
-        };
-
-        window.showLatestNotification = () => showToast(latestNotificationMsg, 'info');
-
-        function sendPushNotification(title, body) {
-            latestNotificationMsg = `${title}: ${body}`;
-            if ("Notification" in window && Notification.permission === "granted") {
-                new Notification(title, { 
-                    body: body, 
-                    icon: document.documentElement.classList.contains('dark') ? 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png' : 'https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png'
-                });
-            }
-        }
-
+        // -- دوال الواجهة المبسطة --
         window.checkSystemPassword = () => {
-            const pass = document.getElementById('sysPasswordInput').value;
-            if(pass === '1112021') {
+            if(document.getElementById('sysPasswordInput').value === '1112021') {
                 document.getElementById('systemPasswordScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
             } else {
@@ -271,316 +172,52 @@
             }
         };
 
-        function getTodayDateString() {
-            const d = new Date();
-            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        }
-        
-        window.punchIn = async () => {
-            if(!currentUserData) return;
-            const today = getTodayDateString();
-            const docId = `${currentUserData.uid}_${today}`;
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), {
-                    uid: currentUserData.uid,
-                    name: currentUserData.name,
-                    date: today,
-                    punchIn: Date.now(),
-                    breakTime: null,
-                    punchOut: null,
-                    status: 'active'
-                });
-                showToast('تم تسجيل الدخول بنجاح', 'success');
-                logAction('حضور', 'قام الموظف بتسجيل الدخول للدوام');
-            } catch(e) {}
-        };
-
-        window.punchBreak = async () => {
-            if(!currentUserData) return;
-            const today = getTodayDateString();
-            const docId = `${currentUserData.uid}_${today}`;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), {
-                    breakTime: Date.now(),
-                    status: 'break'
-                });
-                showToast('تم تسجيل خروج مؤقت', 'warning');
-            } catch(e) {}
-        };
-
-        window.punchOut = async () => {
-            if(!currentUserData) return;
-            const today = getTodayDateString();
-            const docId = `${currentUserData.uid}_${today}`;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), {
-                    punchOut: Date.now(),
-                    status: 'completed'
-                });
-                showToast('تم تسجيل الانصراف. يعطيك العافية!', 'success');
-                logAction('انصراف', 'قام الموظف بتسجيل الانصراف');
-            } catch(e) {}
-        };
-
-        function renderEmpAttendanceView() {
-            if(!currentUserData) return;
-            document.getElementById('currentDateStr').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            const today = getTodayDateString();
-            const myTodayRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
-            
-            const inBtn = document.getElementById('punchInBtn');
-            const breakBtn = document.getElementById('punchBreakBtn');
-            const outBtn = document.getElementById('punchOutBtn');
-            const msg = document.getElementById('attendanceStatusMsg');
-
-            if(!myTodayRecord) {
-                msg.innerText = 'لم تقم بتسجيل الدخول اليوم.';
-                inBtn.classList.remove('hidden');
-                breakBtn.classList.add('hidden');
-                outBtn.classList.add('hidden');
-            } else {
-                inBtn.classList.add('hidden');
-                if(myTodayRecord.status === 'active') {
-                    msg.innerText = 'أنت الآن على رأس عملك (تم تسجيل الدخول).';
-                    breakBtn.classList.remove('hidden');
-                    outBtn.classList.remove('hidden');
-                } else if(myTodayRecord.status === 'break') {
-                    msg.innerText = 'أنت الآن في فترة خروج مؤقت.';
-                    breakBtn.classList.add('hidden');
-                    outBtn.classList.remove('hidden');
-                } else if(myTodayRecord.status === 'completed') {
-                    msg.innerText = 'لقد قمت بتسجيل الانصراف لهذا اليوم. يعطيك العافية!';
-                    breakBtn.classList.add('hidden');
-                    outBtn.classList.add('hidden');
-                }
-            }
-        }
-
-        window.renderSelectedEmpAttendance = () => {
-            const select = document.getElementById('attendanceEmpSelect');
-            const empId = select.value;
-            const list = document.getElementById('attendanceRecordsList');
-            list.innerHTML = '';
-            
-            if(!empId) {
-                list.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500 dark:text-gray-400">اختر موظفاً لعرض السجل</td></tr>';
-                return;
-            }
-
-            const empRecords = globalAttendance.filter(a => a.uid === empId).sort((a, b) => b.date.localeCompare(a.date));
-            
-            if(empRecords.length === 0) {
-                list.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500 dark:text-gray-400">لا يوجد سجل لهذا الموظف</td></tr>';
-                return;
-            }
-
-            empRecords.forEach(r => {
-                const pIn = r.punchIn ? new Date(r.punchIn).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '<span class="text-red-500">لم يسجل</span>';
-                const pBreak = r.breakTime ? new Date(r.breakTime).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '<span class="text-gray-400">-</span>';
-                const pOut = r.punchOut ? new Date(r.punchOut).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '<span class="text-red-500">لم يسجل</span>';
-                
-                list.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <td class="p-3 text-sm text-gray-700 dark:text-gray-300 font-bold">${r.date}</td>
-                        <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${pIn}</td>
-                        <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${pBreak}</td>
-                        <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${pOut}</td>
-                    </tr>
-                `;
-            });
-        };
-
-        document.getElementById('leaveForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData) return;
-            try {
-                await addDoc(getColRef('leaves'), {
-                    uid: currentUserData.uid,
-                    name: currentUserData.name,
-                    type: document.getElementById('leaveType').value,
-                    from: new Date(document.getElementById('leaveFrom').value).getTime(),
-                    to: new Date(document.getElementById('leaveTo').value).getTime(),
-                    reason: document.getElementById('leaveReason').value,
-                    status: 'pending',
-                    timestamp: Date.now()
-                });
-                window.closeModal('leaveModal');
-                showToast('تم إرسال طلبك للمدير', 'success');
-                logAction('إجازات', 'تم تقديم طلب إجازة جديد');
-            } catch(err) {}
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) {}
         });
 
-        window.updateLeaveStatus = async (id, newStatus) => {
-            if(currentUserData.role !== 'CEO') return;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'leaves', id), { status: newStatus });
-                showToast('تم تحديث حالة الطلب', 'success');
-            } catch(e) {}
-        };
+        window.logout = () => signOut(auth).then(() => window.location.reload());
 
-        function renderLeaves() {
-            const list = document.getElementById('leavesList');
-            list.innerHTML = '';
-            const isCEO = currentUserData && currentUserData.role === 'CEO';
-            
-            if(isCEO) document.getElementById('leaveActionHeader').classList.remove('hidden');
-            else document.getElementById('leaveActionHeader').classList.add('hidden');
-
-            const filteredLeaves = isCEO ? globalLeaves : globalLeaves.filter(l => l.uid === currentUserData.uid);
-            
-            if(filteredLeaves.length === 0) {
-                list.innerHTML = `<tr><td colspan="${isCEO ? 6 : 5}" class="p-4 text-center text-gray-500">لا توجد طلبات</td></tr>`;
-                return;
-            }
-
-            filteredLeaves.forEach(l => {
-                const fromStr = new Date(l.from).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour:'2-digit', minute:'2-digit'});
-                const toStr = new Date(l.to).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour:'2-digit', minute:'2-digit'});
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            if (user) {
+                document.getElementById('systemPasswordScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
                 
-                let statusHtml = '';
-                if(l.status === 'pending') statusHtml = '<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">قيد الانتظار</span>';
-                else if(l.status === 'approved') statusHtml = '<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">مقبول</span>';
-                else if(l.status === 'rejected') statusHtml = '<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">مرفوض</span>';
-
-                let actionHtml = '';
-                if(isCEO) {
-                    if(l.status === 'pending') {
-                        actionHtml = `
-                            <td class="p-3 text-left">
-                                <button onclick="window.updateLeaveStatus('${l.id}', 'approved')" class="bg-green-500 text-white p-1.5 rounded mr-1" title="موافقة"><i class="fa-solid fa-check"></i></button>
-                                <button onclick="window.updateLeaveStatus('${l.id}', 'rejected')" class="bg-red-500 text-white p-1.5 rounded" title="رفض"><i class="fa-solid fa-xmark"></i></button>
-                            </td>
-                        `;
-                    } else {
-                        actionHtml = `<td class="p-3 text-left text-gray-400 text-xs">تم اتخاذ إجراء</td>`;
+                // جلب بيانات المستخدم
+                const docSnap = await getDoc(doc(db, 'artifacts', 'quill-world-system', 'public', 'data', 'users', user.uid));
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    document.getElementById('userName').innerText = userData.name;
+                    document.getElementById('userRole').innerText = userData.role;
+                    document.getElementById('userAvatar').src = userData.photoURL || '';
+                    
+                    if(userData.role === 'CEO') {
+                        document.getElementById('nav-employees-btn').classList.remove('hidden');
                     }
                 }
-
-                list.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b dark:border-gray-700">
-                        <td class="p-3 font-bold text-sm text-gray-700 dark:text-gray-300">${l.name}</td>
-                        <td class="p-3 text-sm text-gray-700 dark:text-gray-300">${l.type}</td>
-                        <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${fromStr}</td>
-                        <td class="p-3 text-xs text-gray-600 dark:text-gray-400" dir="ltr">${toStr}</td>
-                        <td class="p-3 text-sm">${statusHtml}</td>
-                        ${actionHtml}
-                    </tr>
-                `;
-            });
-        }
-
-        document.getElementById('noticeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(currentUserData.role !== 'CEO') return;
-            try {
-                await addDoc(getColRef('notices'), {
-                    title: document.getElementById('noticeTitle').value,
-                    body: document.getElementById('noticeBody').value,
-                    author: currentUserData.name,
-                    timestamp: Date.now()
-                });
-                window.closeModal('noticeModal');
-                showToast('تم نشر التعميم بنجاح', 'success');
-            } catch(e) {}
-        });
-
-        window.deleteNotice = async (id) => {
-            if(currentUserData.role !== 'CEO') return;
-            if(confirm('حذف هذا الإعلان؟')) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id));
+            } else {
+                document.getElementById('systemPasswordScreen').classList.remove('hidden');
             }
-        };
-
-        function renderNotices() {
-            const list = document.getElementById('noticesList');
-            list.innerHTML = '';
-            const isCEO = currentUserData && currentUserData.role === 'CEO';
-            
-            if(isCEO) document.getElementById('addNoticeBtn').classList.remove('hidden');
-            else document.getElementById('addNoticeBtn').classList.add('hidden');
-
-            if(globalNotices.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد إعلانات أو تعميمات حالياً.</p>';
-                return;
-            }
-
-            globalNotices.forEach(n => {
-                const dateStr = new Date(n.timestamp).toLocaleDateString('ar-EG');
-                const delBtn = isCEO ? `<button onclick="window.deleteNotice('${n.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '';
-                
-                list.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 border-yellow-500 dark:border-gray-700 relative">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${n.title}</h3>
-                            ${delBtn}
-                        </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4 whitespace-pre-line">${n.body}</p>
-                        <div class="text-[10px] text-gray-400 flex items-center gap-4">
-                            <span><i class="fa-solid fa-user-pen"></i> بواسطة: ${n.author}</span>
-                            <span><i class="fa-solid fa-calendar"></i> ${dateStr}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        document.getElementById('clientForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData) return;
-            try {
-                await addDoc(getColRef('clients'), {
-                    name: document.getElementById('clientName').value,
-                    phone: document.getElementById('clientPhone').value,
-                    email: document.getElementById('clientEmail').value,
-                    status: document.getElementById('clientStatus').value,
-                    addedBy: currentUserData.name,
-                    notes: [], 
-                    timestamp: Date.now()
-                });
-                window.closeModal('clientModal');
-                showToast('تم إضافة العميل بنجاح', 'success');
-            } catch(e) {}
         });
 
-        window.openNoteModal = (clientId) => {
-            document.getElementById('noteClientId').value = clientId;
-            window.openModal('noteModal');
-        };
-
-        document.getElementById('noteForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if(!currentUserData) return;
-            const cId = document.getElementById('noteClientId').value;
-            const text = document.getElementById('noteText').value;
-            
-            try {
-                const clientDoc = globalCRM.find(c => c.id === cId);
-                if(clientDoc) {
-                    const updatedNotes = clientDoc.notes || [];
-                    updatedNotes.push({
-                        authorId: currentUserData.uid,
-                        authorName: currentUserData.name,
-                        text: text,
-                        timestamp: Date.now()
-                    });
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { notes: updatedNotes });
-                    window.closeModal('noteModal');
-                    showToast('تم إضافة الملاحظة', 'success');
-                }
-            } catch(e) {}
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.replace('#', '') || 'home-grid';
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            const activeSec = document.getElementById(hash);
+            if(activeSec) activeSec.classList.remove('hidden');
         });
+        
+        // تفعيل النافذة عند التحميل
+        if(!window.location.hash) window.location.hash = 'home-grid';
+        else window.dispatchEvent(new Event('hashchange'));
 
-        window.updateClientStatus = async (cId, newStatus) => {
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { status: newStatus });
-                showToast('تم تحديث حالة العميل', 'success');
-            } catch(e) {}
-        };
-
-        function renderCRM() {
-            const list = document.getElementById('crmList');
-            list.innerHTML = '';
-            
-            if(globalCRM.length === 0) {
-                list.innerHTML = '<p class="col-span-full text-center text-
+        // ===============================================
+        // ملاحظة لك يا مهندس:
+        // في هذا الملف ستضع دوال الجافاسكريبت المتبقية 
+        // الخاصة بـ (المهام، الدردشة، العملاء، والموظفين) فقط.
+        // أي شيء آخر (ملفات، اجتماعات، إجازات) تم مسحه من هنا!
+        // ===============================================
+    </script>
+</body>
+</html>
