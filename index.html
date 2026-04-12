@@ -86,8 +86,7 @@
             margin-bottom: 1rem;
             font-size: 1.5rem;
         }
-        
-        /* تحسينات لشريط التمرير داخل مربع النص */
+
         textarea::-webkit-scrollbar { width: 4px; }
         textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         .dark textarea::-webkit-scrollbar-thumb { background: #4b5563; }
@@ -97,10 +96,9 @@
 
     <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
-        <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام والاتصال بقاعدة البيانات...</p>
+        <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام...</p>
     </div>
 
-    <!-- شاشة إدخال رمز النظام -->
     <div id="systemPasswordScreen" class="fixed inset-0 bg-primary z-[45] hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
@@ -114,7 +112,6 @@
         </div>
     </div>
 
-    <!-- شاشة تسجيل الدخول -->
     <div id="loginScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
@@ -129,7 +126,6 @@
         </div>
     </div>
 
-    <!-- شاشة إكمال البيانات -->
     <div id="setupProfileScreen" class="fixed inset-0 bg-primary z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
@@ -211,7 +207,7 @@
                 </button>
             </div>
             
-            <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto">
+            <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto" id="mainNavigationMenu">
                 <button id="nav-home-grid-btn" onclick="window.location.hash='home-grid'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg bg-secondary text-white transition-colors" data-section="home-grid">
                     <i class="fa-solid fa-house w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الرئيسية">الرئيسية</span>
                 </button>
@@ -250,8 +246,11 @@
                         <i class="fa-solid fa-video w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الاجتماعات">الاجتماعات</span>
                         <span id="sidebarMeetingsBadge" class="absolute left-4 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden"></span>
                     </a>
+                    
+                    <a id="nav-expenses-ext" href="https://tasks.farah-snacks.store/#expenses" class="hidden w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
+                        <i class="fa-solid fa-file-invoice-dollar w-6 text-center ml-3"></i><span class="font-semibold text-sm">المصاريف والنثريات</span>
+                    </a>
                 </div>
-                <!-- نهاية الروابط الخارجية -->
                 
                 <div class="mt-2 border-t border-white/10 dark:border-gray-700 pt-2">
                     <button onclick="window.toggleMobileChatMenu()" class="w-full flex items-center justify-between py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors relative">
@@ -275,17 +274,34 @@
                     <i class="fa-solid fa-clock-rotate-left w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="سجل النظام">سجل النظام</span>
                 </button>
             </nav>
+            
+            <div id="sidebarLockMessage" class="flex-1 mt-6 px-4 text-center hidden flex flex-col justify-center">
+                <i class="fa-solid fa-lock text-4xl text-gray-500 mb-3"></i>
+                <p class="text-sm text-gray-400 font-bold">يجب تسجيل الدخول (الحضور) أولاً للوصول إلى النظام.</p>
+            </div>
         </aside>
 
         <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 dark:bg-gray-900 relative">
             
             <section id="home-grid" class="section-content animate-fade-in p-4 md:p-10 max-w-6xl mx-auto">
-                <div class="mb-10 text-right">
-                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white" data-i18n="التطبيقات">التطبيقات</h2>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2" data-i18n="اختر التطبيق الذي تود العمل عليه">اختر التطبيق الذي تود العمل عليه</p>
+                <div id="attendanceLockBanner" class="bg-red-500 text-white p-4 rounded-xl mb-6 text-center font-bold shadow-md hidden">
+                    <i class="fa-solid fa-lock text-2xl mb-2 block"></i>
+                    النظام مقفل. يجب <a href="https://tasks.farah-snacks.store/#attendance" class="underline text-yellow-200 mx-1">تسجيل الدخول (الحضور) من هنا</a> أولاً لفتح التطبيقات.
+                </div>
+
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div class="text-right">
+                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white" data-i18n="التطبيقات">التطبيقات</h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-2" data-i18n="اختر التطبيق الذي تود العمل عليه">اختر التطبيق الذي تود العمل عليه</p>
+                    </div>
+                    <div id="homePunchOutContainer" class="hidden w-full md:w-auto">
+                        <button onclick="window.punchOutFromMain()" class="w-full md:w-auto bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-person-walking-arrow-right"></i> تسجيل الانصراف (إنهاء الدوام)
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="homeGridContainer">
                     
                     <!-- تطبيقات الدومين الحالي (الداخلية) -->
                     <div onclick="window.location.hash='tasks'" class="app-card hover:border-emerald-200 group relative">
@@ -293,7 +309,7 @@
                             <i class="fa-solid fa-list-check"></i>
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المهام">المهام</span>
-                        <span id="gridTasksBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md external-task-badge"></span>
+                        <span id="gridTasksBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                     </div>
 
                     <div onclick="window.location.hash='crm'" class="app-card hover:border-lime-200 group">
@@ -315,7 +331,7 @@
                             <i class="fa-solid fa-comments"></i>
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المناقشة">المناقشة</span>
-                        <span id="homeChatBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md external-chat-badge"></span>
+                        <span id="homeChatBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
                     </div>
 
                     <!-- روابط لتطبيقات خارجية (الدومين الثاني) -->
@@ -347,6 +363,13 @@
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الاجتماعات">الاجتماعات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
                         <span id="gridMeetingsBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </a>
+                    
+                    <a id="grid-expenses-ext" href="https://tasks.farah-snacks.store/#expenses" class="hidden app-card hover:border-teal-200 group relative">
+                        <div class="app-icon-container bg-teal-50 text-teal-600 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">المصاريف والنثريات <i class="fa-solid fa-external-link-alt text-xs ml-1"></i></span>
                     </a>
 
                     <!-- تطبيقات خاصة بالمدير -->
@@ -535,7 +558,6 @@
                                     <i class="fa-solid fa-palette"></i>
                                 </button>
                                 
-                                <!-- تم تحويل Input إلى Textarea لدعم الأسطر المتعددة -->
                                 <textarea id="chatInput" rows="1" placeholder="اكتب رسالتك... (Shift+Enter لسطر جديد)" class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-3 px-2 text-gray-700 dark:text-gray-200 resize-none overflow-y-auto min-h-[44px] max-h-[120px]"></textarea>
                                 
                                 <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow self-end mb-1">
@@ -965,12 +987,14 @@
         let globalGroups = []; 
         let globalNotices = [];
         let globalCRM = [];
+        let globalAttendance = []; // لمراقبة الحضور وقفل النظام
 
         let currentGroupId = 'global'; 
         let initialTaskLoad = true; 
         let initialChatLoad = true;
         let knownTaskIds = new Set();
         let groupReadTimestamps = {}; 
+        let hasPunchedInToday = true;
         
         let pendingChatFileData = null;
         let pendingChatFileType = null;
@@ -1107,6 +1131,36 @@
             }
         });
 
+        // ===============================================
+        // ميزة الانصراف من الواجهة الرئيسية
+        // ===============================================
+        function getTodayDateString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        window.punchOutFromMain = async () => {
+            if(!confirm('هل أنت متأكد من تسجيل الانصراف وإنهاء الدوام لهذا اليوم؟')) return;
+            if(!currentUserData) return;
+            const today = getTodayDateString();
+            const docId = `${currentUserData.uid}_${today}`;
+            try {
+                const record = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                if(record) {
+                    let breaks = record.breaks || [];
+                    if(breaks.length > 0 && breaks[breaks.length - 1].end === null) {
+                        breaks[breaks.length - 1].end = Date.now();
+                    }
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), { breaks: breaks, punchOut: Date.now(), status: 'completed' });
+                    showToast('تم تسجيل الانصراف بنجاح.', 'success');
+                    window.logAction('انصراف', 'قام الموظف بتسجيل الانصراف من المنصة الرئيسية');
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        // ===============================================
+        // إيميلات التذكير
+        // ===============================================
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -1491,10 +1545,35 @@
             document.getElementById('mediaContainer').innerHTML = '';
         };
 
+        // ===============================================
+        // التوجيه (Routing) والقفل
+        // ===============================================
         window.toggleSidebar = () => {
             document.getElementById('sidebar').classList.toggle('translate-x-full');
             document.getElementById('mobileOverlay').classList.toggle('hidden');
         };
+
+        function lockNavigationIfNeeded() {
+            if(currentUserData && currentUserData.role !== 'CEO' && !hasPunchedInToday) {
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('opacity-50', 'pointer-events-none'));
+                document.getElementById('homeGridContainer').classList.add('hidden');
+                document.getElementById('sidebarLockMessage').classList.remove('hidden');
+                document.getElementById('attendanceLockBanner').classList.remove('hidden');
+                
+                const punchOutBtn = document.getElementById('homePunchOutContainer');
+                if(punchOutBtn) punchOutBtn.classList.add('hidden');
+            }
+        }
+
+        function unlockNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('opacity-50', 'pointer-events-none'));
+            document.getElementById('homeGridContainer').classList.remove('hidden');
+            document.getElementById('sidebarLockMessage').classList.add('hidden');
+            document.getElementById('attendanceLockBanner').classList.add('hidden');
+            
+            const punchOutBtn = document.getElementById('homePunchOutContainer');
+            if(punchOutBtn) punchOutBtn.classList.remove('hidden');
+        }
 
         window.openChatAndToggleMenu = () => {
             window.selectGroup('global');
@@ -1526,18 +1605,6 @@
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             const targetSec = document.getElementById(sectionId);
             if(targetSec) targetSec.classList.remove('hidden');
-            
-            const titles = { 
-                'home-grid': t('الرئيسية'),
-                'dashboard': t('لوحات البيانات'), 
-                'employees': t('الموظفون'), 
-                'tasks': t('المهام المراد تنفيذها'), 
-                'logs': t('سجل النظام'), 
-                'chat': t('المناقشة'),
-                'settings': t('الإعدادات'),
-                'notices': t('التعميمات'),
-                'crm': t('العملاء')
-            };
             
             if (sectionId === 'home-grid') {
                 document.getElementById('backToHomeBtn').classList.add('hidden');
@@ -1585,11 +1652,7 @@
                 }
             }
 
-            if (validSections.includes(targetSection)) {
-                window.showSection(targetSection);
-            } else {
-                window.showSection('home-grid');
-            }
+            window.showSection(validSections.includes(targetSection) ? targetSection : 'home-grid');
         }
         window.addEventListener('hashchange', handleHashChange);
 
@@ -2356,7 +2419,7 @@
             const lastRead = groupReadTimestamps[groupId] || 0;
             const activeGroup = globalGroups.find(g => g.id === groupId);
             if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
-                return { count: 0, hasMention: false }; 
+                return { count: 0, hasMention: false }; 
             }
 
             const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
@@ -2494,7 +2557,7 @@
             }
         }
 
-        // مستمع ذكي للإشعارات من الدومين الثاني (الاجتماعات، الإجازات)
+        // مستمع ذكي للإشعارات من الدومين الثاني
         function listenForExternalBadges() {
             onSnapshot(getColRef('meetings'), (snapshot) => {
                 if(!currentUserData) return;
@@ -2640,7 +2703,6 @@
                     }
                 });
                 
-                // Update Task Badges
                 const externalTaskBadges = document.querySelectorAll('.external-task-badge');
                 externalTaskBadges.forEach(badge => {
                     if (pendingTasksForMe > 0) {
@@ -2701,18 +2763,15 @@
                     const msg = { id: doc.id, ...doc.data() };
                     globalChat.push(msg);
                     
-                    // Check for unread across all groups
                     const groupId = msg.groupId || 'global';
                     const lastRead = groupReadTimestamps[groupId] || 0;
                     if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
-                        // is it a group I belong to?
                         const inMyGroup = globalGroups.some(g => g.id === groupId);
                         if (inMyGroup) hasUnreadChat = true;
                     }
                 });
                 globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
-                // Update Chat External Badges
                 const externalChatBadges = document.querySelectorAll('.external-chat-badge');
                 externalChatBadges.forEach(badge => {
                     if (hasUnreadChat) {
@@ -2748,10 +2807,42 @@
                 renderChatSidebarList(); 
                 renderChat();
             }, (error) => { console.error(error); });
+            
+            // مستمع المصاريف للمدير والمحاسب
+            if(currentUserData && (currentUserData.role === 'CEO' || currentUserData.role === 'accountant')) {
+                onSnapshot(getColRef('expenses'), (snapshot) => {
+                    globalExpenses = [];
+                    snapshot.forEach(doc => globalExpenses.push({id: doc.id, ...doc.data()}));
+                    globalExpenses.sort((a,b) => b.timestamp - a.timestamp);
+                }, (error) => console.error(error));
+            }
+            
+            // مستمع الحضور للقفل الذكي
+            onSnapshot(getColRef('attendance'), (snapshot) => {
+                globalAttendance = [];
+                snapshot.forEach(d => globalAttendance.push({ id: d.id, ...d.data() }));
+                
+                if (currentUserData) {
+                    const today = getTodayDateString();
+                    const myTodayRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                    
+                    if (!myTodayRecord || myTodayRecord.status === 'completed') {
+                        hasPunchedInToday = false;
+                        lockNavigationIfNeeded();
+                    } else {
+                        hasPunchedInToday = true;
+                        unlockNavigation();
+                    }
+                }
+            }, (error) => console.error(error));
+            
+            // جلب الإجازات للتقارير
+            onSnapshot(getColRef('leaves'), (snapshot) => {
+                globalLeaves = []; snapshot.forEach(d => globalLeaves.push({ id: d.id, ...d.data() }));
+            }, (error) => console.error(error));
         }
 
         onAuthStateChanged(auth, async (user) => {
-            document.getElementById('loadingScreen').classList.add('hidden');
             if (user) {
                 document.getElementById('systemPasswordScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.add('hidden');
@@ -2761,11 +2852,21 @@
                     if (docSnap.exists()) {
                         currentUserData = docSnap.data();
                         groupReadTimestamps = currentUserData.readReceipts || {};
+                        
                         document.getElementById('setupProfileScreen').classList.add('hidden');
                         finishLoginSetup();
-                    } else document.getElementById('setupProfileScreen').classList.remove('hidden');
-                } catch(e) { console.error(e); }
+                    } else {
+                        document.getElementById('loadingScreen').classList.add('hidden');
+                        document.getElementById('setupProfileScreen').classList.remove('hidden');
+                    }
+                } catch(e) { 
+                    console.error("Error fetching user data:", e); 
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    showToast('حدث خطأ، يرجى تحديث الصفحة', 'error');
+                }
             } else {
+                localStorage.removeItem('quill_user_cache_main');
+                document.getElementById('loadingScreen').classList.add('hidden');
                 document.getElementById('systemPasswordScreen').classList.remove('hidden');
             }
         });
@@ -2792,6 +2893,10 @@
         });
 
         function finishLoginSetup() {
+            localStorage.setItem('quill_user_cache_main', JSON.stringify(currentUserData));
+            
+            document.getElementById('loadingScreen').classList.add('hidden');
+            
             updateUIWithUserData();
 
             if(currentUserData.role === 'CEO') {
@@ -2805,11 +2910,11 @@
                 
                 document.getElementById('clearLogsBtn').classList.remove('hidden'); 
                 document.getElementById('clearLogsBtn').style.display = 'flex';
-                // إظهار زر الإضافة للجميع
                 document.getElementById('viewReportsBtn').classList.remove('hidden');
                 document.getElementById('viewReportsBtn').style.display = 'flex';
                 document.getElementById('empActionHeader').classList.remove('hidden');
                 document.getElementById('addNoticeBtn').classList.remove('hidden');
+                document.getElementById('ceoExportSection').classList.remove('hidden');
             } else {
                 document.getElementById('grid-employees').classList.add('hidden');
                 document.getElementById('grid-dashboard').classList.add('hidden');
@@ -2824,9 +2929,15 @@
                 
                 document.getElementById('empActionHeader').classList.add('hidden');
                 document.getElementById('addNoticeBtn').classList.add('hidden');
+                document.getElementById('ceoExportSection').classList.add('hidden');
             }
             
-            // جعل زر إضافة مهمة متاحاً للمدير والموظفين
+            if(currentUserData.role === 'CEO' || currentUserData.role === 'accountant') {
+                document.getElementById('nav-expenses-ext').classList.remove('hidden');
+                document.getElementById('nav-expenses-ext').style.display = 'flex';
+                document.getElementById('grid-expenses-ext').classList.remove('hidden');
+            }
+            
             const addTaskBtn = document.getElementById('addTaskBtn');
             if (addTaskBtn) {
                 addTaskBtn.classList.remove('hidden');
@@ -2834,6 +2945,11 @@
             }
             
             document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+            
+            if(currentUserData.lastSystemExport) {
+                const txt = document.getElementById('lastSystemExportTxt');
+                if(txt) txt.innerText = 'آخر سحب: ' + new Date(currentUserData.lastSystemExport).toLocaleString('ar-EG');
+            }
 
             logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (المنصة الرئيسية)`);
             startDatabaseListeners();
