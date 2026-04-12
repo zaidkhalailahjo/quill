@@ -7,7 +7,7 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#002d74">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="https://uploads.onecompiler.io/43n8uttmw/44k64ynk5/Screenshot%202025-06-20%20213937.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -186,6 +186,10 @@
                     </div>
                 </div>
                 
+                <button id="installAppBtn" class="hidden text-gray-400 hover:text-secondary p-2 rounded transition font-bold" title="تثبيت التطبيق على الجهاز">
+                    <i class="fa-solid fa-download text-lg"></i>
+                </button>
+
                 <button onclick="window.toggleLanguage()" class="text-gray-400 hover:text-secondary p-2 rounded transition font-bold" title="تبديل اللغة">
                     <span id="langIconTxt">EN</span>
                 </button>
@@ -1120,6 +1124,44 @@
 
         let hasRequestedNotification = false;
         let latestNotificationMsg = window.t('لا توجد إشعارات جديدة حالياً');
+
+        // ====== PWA INSTALL LOGIC ======
+        let deferredPrompt;
+        const installAppBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            // Update UI to notify the user they can add to home screen
+            if(installAppBtn) installAppBtn.classList.remove('hidden');
+        });
+
+        if(installAppBtn) {
+            installAppBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    // Show the install prompt
+                    deferredPrompt.prompt();
+                    // Wait for the user to respond to the prompt
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installAppBtn.classList.add('hidden');
+                    }
+                    // We've used the prompt, and can't use it again, throw it away
+                    deferredPrompt = null;
+                }
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            // Hide the app-provided install promotion
+            if(installAppBtn) installAppBtn.classList.add('hidden');
+            // Clear the deferredPrompt so it can be garbage collected
+            deferredPrompt = null;
+            showToast('تم تثبيت التطبيق بنجاح!', 'success');
+        });
+        // ===============================
 
         window.requestNotifications = () => {
             if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
