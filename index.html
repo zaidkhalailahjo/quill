@@ -455,7 +455,7 @@
                             <tr>
                                 <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الاسم">الاسم</th>
                                 <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الوظيفة">الوظيفة</th>
-                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200 hidden text-left" data-i18n="الإجراءات">الإجراءات</th>
+                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200 hidden text-center" data-i18n="الإجراءات">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="employeesList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
@@ -879,6 +879,111 @@
         </div>
     </div>
 
+    <div id="groupInfoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-base md:text-lg" id="infoModalTitle">معلومات المجموعة</h3>
+                <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-4 md:p-6 overflow-y-auto flex-1">
+                
+                <div id="addMemberSection" class="hidden mb-4 border-b border-gray-100 dark:border-gray-700 pb-4">
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة عضو جديد">إضافة عضو جديد للمجموعة (خاص بالمدير)</label>
+                    <div class="flex gap-2">
+                        <select id="newMemberSelect" class="flex-1 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-2 py-2 focus:border-secondary focus:outline-none text-sm"></select>
+                        <button onclick="window.addGroupMember()" class="bg-secondary text-white px-3 py-2 rounded-lg text-sm hover:bg-primary transition shadow-sm font-bold whitespace-nowrap">
+                            <i class="fa-solid fa-user-plus ml-1"></i> <span data-i18n="إضافة">إضافة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="أعضاء المجموعة">أعضاء المجموعة المتواجدين</label>
+                <div id="groupInfoMembersList" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-secondary text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إسناد مهمة جديدة">إسناد مهمة جديدة</h3>
+                <button onclick="window.closeModal('taskModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
+                <div><label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="عنوان المهمة">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold"></div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="وقت وتاريخ">وقت وتاريخ التسليم المطلوب</label>
+                    <input type="datetime-local" id="taskDeadline" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold">
+                </div>
+                <div><label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="التفاصيل">التفاصيل الكاملة</label><textarea id="taskDesc" rows="3" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none whitespace-pre-wrap"></textarea></div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="إسناد إلى">إسناد إلى الموظف</label>
+                    <select id="taskAssignee" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold"></select>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base font-bold" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base font-bold" data-i18n="إرسال المهمة">تأكيد المهمة</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="إنشاء مجموعة">إنشاء مجموعة دردشة</h3>
+                <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="createGroupForm" class="p-4 md:p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="اسم المجموعة">اسم المجموعة</label>
+                    <input type="text" id="newGroupName" required placeholder="مثال: فريق التسويق" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2" data-i18n="إضافة الأعضاء">إضافة الأعضاء</label>
+                    <div id="groupMembersSelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700"></div>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base" data-i18n="تأكيد">تأكيد الإنشاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editEmployeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg" data-i18n="تعديل بيانات">تعديل بيانات الموظف</h3>
+                <button onclick="window.closeModal('editEmployeeModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="editEmployeeForm" class="p-4 md:p-6 space-y-4">
+                <input type="hidden" id="editEmpId">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الاسم الكامل">الاسم الكامل</label>
+                    <input type="text" id="editEmpName" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</label>
+                    <select id="editEmpRole" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none">
+                        <option value="technical team supervisor">Technical Team Supervisor</option>
+                        <option value="Technical Engineer">Technical Engineer</option>
+                        <option value="accountant">Accountant</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow" data-i18n="حفظ">حفظ التغييرات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="mediaModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-[70] p-4" onclick="window.closeMediaModal()">
+        <button class="absolute top-4 right-4 md:top-6 md:right-6 text-white text-3xl hover:text-gray-300 transition-colors z-10"><i class="fa-solid fa-xmark"></i></button>
+        <div id="mediaContainer" class="max-w-5xl w-full max-h-[90vh] flex items-center justify-center pointer-events-none" onclick="event.stopPropagation()"></div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1011,8 +1116,6 @@
         let globalNotices = [];
         let globalCRM = [];
         let globalAttendance = []; // لمراقبة الحضور وقفل النظام
-        let globalLeaves = []; // من اجل التقارير
-        let globalExpenses = []; // من اجل التقارير
 
         let currentGroupId = 'global'; 
         let initialTaskLoad = true; 
@@ -1249,92 +1352,6 @@
                 }
             } catch(e) { console.error(e); }
         };
-
-        // ===============================================
-        // سحب تفاصيل النظام الشامل (PDF/Excel)
-        // ===============================================
-        window.exportSystemData = (format) => {
-            if(!currentUserData || currentUserData.role !== 'CEO') return;
-
-            showToast('جاري تجهيز البيانات، سيتم التحميل خلال لحظات...', 'info');
-
-            const now = new Date();
-            let content = "";
-            let htmlContent = "";
-
-            if (format === 'excel') {
-                content = "\uFEFF"; 
-                content += `تقرير نظام شركة Quill الشامل (كامل السجل)\nتاريخ السحب: ${now.toLocaleString('ar-EG')}\n\n`;
-
-                content += "--- الموظفون ---\nالاسم,الوظيفة,تاريخ الانضمام\n";
-                globalUsers.forEach(u => { content += `"${u.name}","${u.role}","${new Date(u.timestamp||0).toLocaleDateString('ar-EG')}"\n`; });
-                
-                content += "\n--- الحضور والانصراف (السجل الكامل) ---\nالموظف,التاريخ,تسجيل الدخول,تسجيل الانصراف,الحالة\n";
-                globalAttendance.forEach(a => {
-                    const pIn = a.punchIn ? new Date(a.punchIn).toLocaleTimeString('ar-EG') : '-';
-                    const pOut = a.punchOut ? new Date(a.punchOut).toLocaleTimeString('ar-EG') : '-';
-                    content += `"${a.name}","${a.date}","${pIn}","${pOut}","${a.status}"\n`;
-                });
-
-                content += "\n--- الإجازات والمغادرات (السجل الكامل) ---\nالموظف,النوع,من,إلى,السبب,الحالة\n";
-                globalLeaves.forEach(l => {
-                    const fromStr = new Date(l.from).toLocaleString('ar-EG');
-                    const toStr = new Date(l.to).toLocaleString('ar-EG');
-                    const reasonStr = l.reason ? l.reason.replace(/"/g, '""').replace(/\n/g, ' ') : '-';
-                    content += `"${l.name}","${l.type}","${fromStr}","${toStr}","${reasonStr}","${l.status}"\n`;
-                });
-
-                content += "\n--- المهام (السجل الكامل) ---\nالعنوان,المسؤول,تاريخ الإنشاء,وقت التسليم,الحالة\n";
-                globalTasks.forEach(t => {
-                    const createdStr = new Date(t.timestamp).toLocaleString('ar-EG');
-                    const deadlineStr = t.deadline ? new Date(t.deadline).toLocaleString('ar-EG') : '-';
-                    content += `"${t.title.replace(/"/g, '""')}","${t.assigneeName}","${createdStr}","${deadlineStr}","${t.status}"\n`;
-                });
-
-                if(globalExpenses && globalExpenses.length > 0) {
-                    content += "\n--- المصاريف والنثريات (السجل الكامل) ---\nالتاريخ,البيان,المبلغ,بواسطة\n";
-                    globalExpenses.forEach(e => { content += `"${e.date}","${e.desc.replace(/"/g, '""')}","${e.amount}","${e.addedBy}"\n`; });
-                }
-
-                const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.setAttribute("href", url);
-                link.setAttribute("download", `Quill_System_Export_${now.getTime()}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-            } else if (format === 'pdf') {
-                htmlContent = `
-                    <div style="font-family: 'Cairo', sans-serif; padding: 20px;">
-                        <h1 style="color: #002d74; border-bottom: 2px solid #00839b; padding-bottom: 10px;">تقرير نظام شركة Quill الشامل</h1>
-                        <p style="color: gray;">تاريخ سحب التقرير: ${now.toLocaleString('ar-EG')}</p>
-                        
-                        <h3 style="color: #00839b; margin-top: 30px;">إحصائيات النظام:</h3>
-                        <ul>
-                            <li>عدد الموظفين المسجلين: ${globalUsers.length}</li>
-                            <li>إجمالي المهام في النظام: ${globalTasks.length}</li>
-                            <li>إجمالي طلبات الإجازات والمغادرات: ${globalLeaves.length}</li>
-                            <li>إجمالي عدد المصاريف المسجلة: ${globalExpenses ? globalExpenses.length : 0}</li>
-                        </ul>
-                        <p style="margin-top: 50px; text-align: center; color: gray; font-size: 12px;">نهاية التقرير.</p>
-                    </div>
-                `;
-                const printDiv = document.getElementById('printArea');
-                printDiv.innerHTML = htmlContent;
-                window.print();
-            }
-
-            const exportTime = Date.now();
-            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { lastSystemExport: exportTime }).catch(e=>console.log(e));
-            const txt = document.getElementById('lastSystemExportTxt');
-            if(txt) txt.innerText = 'آخر سحب: ' + new Date(exportTime).toLocaleString('ar-EG');
-            
-            window.closeModal('exportModal');
-            window.logAction('تحميل تقرير', `قام المدير بسحب تفاصيل النظام الكاملة بصيغة ${format.toUpperCase()}`);
-        };
-
 
         // ===============================================
         // إيميلات التذكير
@@ -1937,7 +1954,7 @@
                 if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
             }
             
-            setTimeout(() => document.getElementById('sectionLoader').classList.add('hidden'), 500);
+            setTimeout(() => document.getElementById('sectionLoader').classList.add('hidden'), 300);
         };
 
         function handleHashChange() {
@@ -2090,8 +2107,13 @@
             
             const addTaskBtn = document.getElementById('addTaskBtn');
             if (addTaskBtn) {
-                addTaskBtn.classList.remove('hidden');
-                addTaskBtn.style.display = 'flex';
+                if (isCEO || perms.canAssignTasks) {
+                    addTaskBtn.classList.remove('hidden');
+                    addTaskBtn.style.display = 'flex';
+                } else {
+                    addTaskBtn.classList.add('hidden');
+                    addTaskBtn.style.display = 'none';
+                }
             }
             
             document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
