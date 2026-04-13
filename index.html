@@ -758,7 +758,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
             <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
-                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-4 overflow-y-auto flex-1" id="msgReadersList">
             </div>
@@ -769,7 +769,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-green-600 text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg">تأكيد إنجاز المهمة والتقرير</h3>
-                <button onclick="window.closeModal('taskReportModal')" class="hover:text-green-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('taskReportModal')" class="hover:text-green-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="taskReportForm" class="p-4 md:p-6 space-y-4">
                 <input type="hidden" id="reportTaskId">
@@ -795,7 +795,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
             <div class="bg-gray-700 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg"><i class="fa-solid fa-folder-open mx-2"></i> تقارير المهام المنجزة</h3>
-                <button onclick="window.closeModal('ceoReportsModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('ceoReportsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
                 <div class="w-full md:w-1/3 border-b md:border-b-0 md:rtl:border-l md:ltr:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2" id="ceoReportEmployeesList"></div>
@@ -813,19 +813,25 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-yellow-500 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg">إضافة إعلان أو تعميم</h3>
-                <button onclick="window.closeModal('noticeModal')" class="hover:text-yellow-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('noticeModal')" class="hover:text-yellow-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-4 md:p-6 overflow-y-auto flex-1">
                 <form id="noticeForm" class="space-y-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">نوع الإعلان</label>
-                        <select id="noticeType" onchange="window.togglePollOptions()" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none">
-                            <option value="normal">تعميم عادي</option>
-                            <option value="poll">تصويت (Poll)</option>
-                        </select>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تصنيف / نوع الإعلان</label>
+                        <div class="flex flex-col gap-2">
+                            <select id="noticeType" onchange="window.togglePollOptions()" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none">
+                                <option value="تعميم إداري">تعميم إداري</option>
+                                <option value="إعلان هام">إعلان هام</option>
+                                <option value="قرار جديد">قرار جديد</option>
+                                <option value="poll">تصويت (Poll)</option>
+                                <option value="custom">نوع مخصص...</option>
+                            </select>
+                            <input type="text" id="customNoticeType" class="hidden w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none" placeholder="اكتب التصنيف هنا...">
+                        </div>
                     </div>
-                    <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">العنوان</label><input type="text" id="noticeTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none"></div>
-                    <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">التفاصيل</label><textarea id="noticeBody" rows="4" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none whitespace-pre-wrap font-semibold"></textarea></div>
+                    <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">عنوان الإعلان</label><input type="text" id="noticeTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none"></div>
+                    <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">التفاصيل الكاملة</label><textarea id="noticeBody" rows="4" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none whitespace-pre-wrap font-semibold"></textarea></div>
                     
                     <div id="pollOptionsContainer" class="hidden border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">خيارات التصويت</label>
@@ -833,7 +839,7 @@
                             <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="نعم">
                             <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="لا">
                         </div>
-                        <button type="button" onclick="window.addPollOption()" class="mt-2 text-xs bg-yellow-100 text-yellow-700 px-3 py-1 rounded hover:bg-yellow-200 font-bold"><i class="fa-solid fa-plus mx-1"></i> خيار إضافي</button>
+                        <button type="button" onclick="window.addPollOption()" class="mt-2 text-xs bg-yellow-100 text-yellow-700 px-3 py-2 rounded hover:bg-yellow-200 font-bold w-full md:w-auto"><i class="fa-solid fa-plus mx-1"></i> خيار إضافي</button>
                     </div>
 
                     <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
@@ -849,7 +855,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-lime-600 text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg">إضافة عميل جديد</h3>
-                <button onclick="window.closeModal('clientModal')" class="hover:text-lime-200"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('clientModal')" class="hover:text-lime-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="clientForm" class="p-4 md:p-6 space-y-4">
                 <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">اسم العميل / الشركة</label><input type="text" id="clientName" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none"></div>
@@ -874,7 +880,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-gray-700 text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg">إضافة ملاحظة للعميل</h3>
-                <button onclick="window.closeModal('noteModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('noteModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="noteForm" class="p-4 md:p-6 space-y-4">
                 <input type="hidden" id="noteClientId">
@@ -891,7 +897,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[80vh]">
             <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg" id="infoModalTitle">معلومات المجموعة</h3>
-                <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('groupInfoModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-4 md:p-6 overflow-y-auto flex-1">
                 
@@ -911,36 +917,11 @@
         </div>
     </div>
 
-    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-secondary text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg" data-i18n="إسناد مهمة جديدة">إسناد مهمة جديدة</h3>
-                <button onclick="window.closeModal('taskModal')" class="hover:text-red-300"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <form id="addTaskForm" class="p-4 md:p-6 space-y-4">
-                <div><label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="عنوان المهمة">عنوان المهمة</label><input type="text" id="taskTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold"></div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="وقت وتاريخ">وقت وتاريخ التسليم المطلوب</label>
-                    <input type="datetime-local" id="taskDeadline" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold">
-                </div>
-                <div><label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="التفاصيل">التفاصيل الكاملة</label><textarea id="taskDesc" rows="3" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none whitespace-pre-wrap"></textarea></div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-1" data-i18n="إسناد إلى">إسناد إلى الموظف</label>
-                    <select id="taskAssignee" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-secondary focus:outline-none font-bold"></select>
-                </div>
-                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('taskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base font-bold" data-i18n="إلغاء">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 transition-colors text-sm md:text-base font-bold" data-i18n="إرسال المهمة">تأكيد المهمة</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg" data-i18n="إنشاء مجموعة">إنشاء مجموعة دردشة</h3>
-                <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="createGroupForm" class="p-4 md:p-6 space-y-4">
                 <div>
@@ -952,8 +933,8 @@
                     <div id="groupMembersSelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700"></div>
                 </div>
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base" data-i18n="تأكيد">تأكيد الإنشاء</button>
+                    <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-primary transition-colors text-sm md:text-base">تأكيد الإنشاء</button>
                 </div>
             </form>
         </div>
@@ -963,7 +944,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg" data-i18n="تعديل بيانات">تعديل بيانات الموظف والصلاحيات</h3>
-                <button onclick="window.closeModal('editEmployeeModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('editEmployeeModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-4 md:p-6 overflow-y-auto flex-1">
                 <form id="editEmployeeForm" class="space-y-4">
@@ -1009,8 +990,8 @@
                     </div>
 
                     <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                        <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base" data-i18n="إلغاء">إلغاء</button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow font-bold" data-i18n="حفظ">حفظ التعديلات</button>
+                        <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow font-bold">حفظ التعديلات</button>
                     </div>
                 </form>
             </div>
@@ -1021,7 +1002,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-primary text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg">سحب تفاصيل النظام (كاملة)</h3>
-                <button onclick="window.closeModal('exportModal')" class="hover:text-gray-300"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="window.closeModal('exportModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <div class="p-6 text-center">
                 <i class="fa-solid fa-database text-4xl text-gray-400 mb-3"></i>
@@ -1177,7 +1158,6 @@
         let currentUserAuth = null;
         let currentUserData = null; 
         
-        // Fast Cache Loading
         let globalUsers = JSON.parse(localStorage.getItem('quill_users') || '[]');
         let globalTasks = JSON.parse(localStorage.getItem('quill_tasks') || '[]');
         let globalLogs = [];
@@ -1223,7 +1203,6 @@
             };
             let currentNotifs = currentUserData.notifications || [];
             currentNotifs.unshift(newNotif);
-            // keep only last 50
             if(currentNotifs.length > 50) currentNotifs = currentNotifs.slice(0, 50);
             
             updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
@@ -1368,6 +1347,7 @@
 
         window.selectGroup = (groupId) => {
             currentGroupId = groupId;
+            updateReadReceipt(groupId); 
             renderChatSidebarList();
             renderChat();
             if(window.innerWidth < 768) {
@@ -1515,7 +1495,6 @@
             window.closeModal('exportModal');
             window.logAction('تحميل تقرير', `قام المدير بسحب تفاصيل النظام الكاملة بصيغة ${format.toUpperCase()}`);
         };
-
 
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
@@ -1742,10 +1721,17 @@
         window.togglePollOptions = () => {
             const type = document.getElementById('noticeType').value;
             const container = document.getElementById('pollOptionsContainer');
+            const customInput = document.getElementById('customNoticeType');
+            
             if(type === 'poll') {
                 container.classList.remove('hidden');
+                customInput.classList.add('hidden');
+            } else if(type === 'custom') {
+                container.classList.add('hidden');
+                customInput.classList.remove('hidden');
             } else {
                 container.classList.add('hidden');
+                customInput.classList.add('hidden');
             }
         };
 
@@ -1768,10 +1754,16 @@
 
                 const title = document.getElementById('noticeTitle').value;
                 const body = document.getElementById('noticeBody').value;
-                const type = document.getElementById('noticeType').value;
+                const rawType = document.getElementById('noticeType').value;
+                
+                let finalType = rawType;
+                if(rawType === 'custom') {
+                    finalType = document.getElementById('customNoticeType').value.trim() || 'تعميم';
+                }
+                const isPoll = (rawType === 'poll');
                 
                 let options = [];
-                if(type === 'poll') {
+                if(isPoll) {
                     const inputs = document.querySelectorAll('.poll-option-input');
                     inputs.forEach(inp => {
                         if(inp.value.trim() !== '') options.push(inp.value.trim());
@@ -1783,7 +1775,8 @@
                     await addDoc(getColRef('notices'), {
                         title: title,
                         body: body,
-                        type: type,
+                        type: finalType,
+                        isPoll: isPoll,
                         options: options,
                         votes: {},
                         author: currentUserData.name,
@@ -1846,7 +1839,7 @@
                 const delBtn = (isCEO || canPost) ? `<button onclick="window.deleteNotice('${n.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '';
                 
                 let pollHtml = '';
-                if(n.type === 'poll') {
+                if(n.isPoll || n.type === 'poll') {
                     const votes = n.votes || {};
                     const totalVotes = Object.keys(votes).length;
                     const myVote = votes[currentUserData.uid];
@@ -1880,10 +1873,16 @@
                     pollHtml += `</div>`;
                 }
 
+                const badgeType = n.isPoll || n.type === 'poll' ? 'تصويت' : (n.type || 'تعميم إداري');
+                const badgeClass = n.isPoll || n.type === 'poll' ? 'bg-secondary' : 'bg-primary';
+
                 list.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 ${n.type==='poll'? 'border-secondary' : 'border-yellow-500'} dark:border-gray-700 relative">
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 ${n.isPoll || n.type==='poll'? 'border-secondary' : 'border-yellow-500'} dark:border-gray-700 relative">
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${n.title}</h3>
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${n.title}</h3>
+                                <span class="${badgeClass} text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-sm">${badgeType}</span>
+                            </div>
                             ${delBtn}
                         </div>
                         <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4 whitespace-pre-line leading-relaxed">${n.body}</p>
@@ -2023,6 +2022,7 @@
                 if(id === 'noticeModal') {
                     document.getElementById('noticeForm')?.reset();
                     document.getElementById('pollOptionsContainer').classList.add('hidden');
+                    document.getElementById('customNoticeType').classList.add('hidden');
                     document.getElementById('pollInputsList').innerHTML = `
                         <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="نعم">
                         <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="لا">
@@ -2165,13 +2165,26 @@
                     readReceipts: groupReadTimestamps
                 });
                 currentUserData.readReceipts = groupReadTimestamps; 
+                
+                let totalUnread = 0;
+                globalChat.forEach(msg => {
+                    const gId = msg.groupId || 'global';
+                    const lastRead = groupReadTimestamps[gId] || 0;
+                    if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
+                        if (globalGroups.some(g => g.id === gId)) totalUnread++;
+                    }
+                });
+                
                 renderChatSidebarList(); 
                 renderChat(); 
-                document.querySelectorAll('.external-chat-badge').forEach(b => b.classList.add('hidden'));
-                const homeBadge = document.getElementById('homeChatBadge');
-                if(homeBadge) homeBadge.classList.add('hidden');
-                const mobileBadge = document.getElementById('globalChatBadgeMobile');
-                if(mobileBadge) mobileBadge.classList.add('hidden');
+                
+                if(totalUnread === 0) {
+                    document.querySelectorAll('.external-chat-badge').forEach(b => b.classList.add('hidden'));
+                    const homeBadge = document.getElementById('homeChatBadge');
+                    if(homeBadge) homeBadge.classList.add('hidden');
+                    const mobileBadge = document.getElementById('globalChatBadgeMobile');
+                    if(mobileBadge) mobileBadge.classList.add('hidden');
+                }
             } catch(e) { console.error(e); }
         }
 
@@ -2677,7 +2690,7 @@
                 const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
                 const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
 
-                let selfAssignedHtml = (task.createdBy === task.assigneeId) ? `<span class="text-[9px] bg-blue-100 text-blue-600 rounded px-1 ml-1 mb-1">مهمة ذاتية</span>` : '';
+                let selfAssignedHtml = (task.createdBy === task.assigneeId) ? `<span class="text-[9px] bg-blue-100 text-blue-600 rounded px-1 ml-1 mb-1 shadow-sm">مهمة ذاتية <i class="fa-solid fa-crown ml-1"></i></span>` : '';
 
                 const card = `
                     <div class="bg-white dark:bg-gray-800 p-3 md:p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 rtl:border-r-4 ltr:border-l-4 ${task.status === 'completed' ? 'border-green-500 opacity-70' : (task.status === 'in-progress' ? 'border-secondary' : 'border-gray-400')}">
