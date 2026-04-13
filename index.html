@@ -3279,473 +3279,484 @@
                     if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                 } else {
                     const desc = document.getElementById('chatHeaderDesc');
-                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i>
+                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
+                    
                     if(isCEO) {
-                            if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
-                            if(deleteGroupBtn) deleteGroupBtn.classList.remove('hidden');
-                            
-                            if(!activeGroup.members.includes(currentUserData.uid)) {
-                                if(chatForm) chatForm.classList.add('hidden');
-                                if(readOnlyMsg) readOnlyMsg.classList.remove('hidden');
-                            } else {
-                                if(chatForm) chatForm.classList.remove('hidden');
-                                if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
-                            }
+                        if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.remove('hidden');
+                        
+                        if(!activeGroup.members.includes(currentUserData.uid)) {
+                            if(chatForm) chatForm.classList.add('hidden');
+                            if(readOnlyMsg) readOnlyMsg.classList.remove('hidden');
                         } else {
-                            if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
-                            if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
                             if(chatForm) chatForm.classList.remove('hidden');
                             if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                         }
+                    } else {
+                        if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
+                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
+                        if(chatForm) chatForm.classList.remove('hidden');
+                        if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                     }
                 }
             }
+        }
 
-            function listenForExternalBadges() {
-                onSnapshot(getColRef('meetings'), (snapshot) => {
-                    if(!currentUserData) return;
-                    let activeMeetingsCount = 0;
+        function listenForExternalBadges() {
+            onSnapshot(getColRef('meetings'), (snapshot) => {
+                if(!currentUserData) return;
+                let activeMeetingsCount = 0;
+                snapshot.forEach(doc => {
+                    const meeting = doc.data();
+                    const isInvited = meeting.invitedUsers && (meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO');
+                    if(isInvited && (meeting.status === 'scheduled' || meeting.status === 'active')) {
+                        activeMeetingsCount++;
+                    }
+                });
+                
+                const gridBadge = document.getElementById('gridMeetingsBadge');
+                const sidebarBadge = document.getElementById('sidebarMeetingsBadge');
+                
+                if(activeMeetingsCount > 0) {
+                    if(gridBadge) { gridBadge.innerText = activeMeetingsCount; gridBadge.classList.remove('hidden'); }
+                    if(sidebarBadge) { sidebarBadge.innerText = activeMeetingsCount; sidebarBadge.classList.remove('hidden'); }
+                } else {
+                    if(gridBadge) gridBadge.classList.add('hidden');
+                    if(sidebarBadge) sidebarBadge.classList.add('hidden');
+                }
+            }, (error) => { console.error(error); });
+
+            if (currentUserData && currentUserData.role === 'CEO') {
+                onSnapshot(getColRef('leaves'), (snapshot) => {
+                    let pendingLeavesCount = 0;
                     snapshot.forEach(doc => {
-                        const meeting = doc.data();
-                        const isInvited = meeting.invitedUsers && (meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO');
-                        if(isInvited && (meeting.status === 'scheduled' || meeting.status === 'active')) {
-                            activeMeetingsCount++;
-                        }
+                        if (doc.data().status === 'pending') pendingLeavesCount++;
                     });
                     
-                    const gridBadge = document.getElementById('gridMeetingsBadge');
-                    const sidebarBadge = document.getElementById('sidebarMeetingsBadge');
+                    const gridBadge = document.getElementById('gridLeavesBadge');
+                    const sidebarBadge = document.getElementById('sidebarLeavesBadge');
                     
-                    if(activeMeetingsCount > 0) {
-                        if(gridBadge) { gridBadge.innerText = activeMeetingsCount; gridBadge.classList.remove('hidden'); }
-                        if(sidebarBadge) { sidebarBadge.innerText = activeMeetingsCount; sidebarBadge.classList.remove('hidden'); }
+                    if(pendingLeavesCount > 0) {
+                        if(gridBadge) { gridBadge.innerText = pendingLeavesCount; gridBadge.classList.remove('hidden'); }
+                        if(sidebarBadge) { sidebarBadge.innerText = pendingLeavesCount; sidebarBadge.classList.remove('hidden'); }
                     } else {
                         if(gridBadge) gridBadge.classList.add('hidden');
                         if(sidebarBadge) sidebarBadge.classList.add('hidden');
                     }
                 }, (error) => { console.error(error); });
-
-                if (currentUserData && currentUserData.role === 'CEO') {
-                    onSnapshot(getColRef('leaves'), (snapshot) => {
-                        let pendingLeavesCount = 0;
-                        snapshot.forEach(doc => {
-                            if (doc.data().status === 'pending') pendingLeavesCount++;
-                        });
-                        
-                        const gridBadge = document.getElementById('gridLeavesBadge');
-                        const sidebarBadge = document.getElementById('sidebarLeavesBadge');
-                        
-                        if(pendingLeavesCount > 0) {
-                            if(gridBadge) { gridBadge.innerText = pendingLeavesCount; gridBadge.classList.remove('hidden'); }
-                            if(sidebarBadge) { sidebarBadge.innerText = pendingLeavesCount; sidebarBadge.classList.remove('hidden'); }
-                        } else {
-                            if(gridBadge) gridBadge.classList.add('hidden');
-                            if(sidebarBadge) sidebarBadge.classList.add('hidden');
-                        }
-                    }, (error) => { console.error(error); });
-                }
             }
+        }
 
-            function updateUIWithUserData() {
-                if(!currentUserData) return;
-                document.getElementById('userName').innerText = currentUserData.name;
-                document.getElementById('userRole').innerText = currentUserData.role;
-                document.getElementById('userAvatar').src = currentUserData.photoURL;
+        function updateUIWithUserData() {
+            if(!currentUserData) return;
+            document.getElementById('userName').innerText = currentUserData.name;
+            document.getElementById('userRole').innerText = currentUserData.role;
+            document.getElementById('userAvatar').src = currentUserData.photoURL;
 
-                // My Profile Setup
-                document.getElementById('myProfileName').innerText = currentUserData.name;
-                document.getElementById('myProfileRole').innerText = currentUserData.role;
-                document.getElementById('myProfileAvatar').src = currentUserData.photoURL;
-                document.getElementById('myProfileAssets').innerText = currentUserData.assets || 'لا توجد عهد مسجلة حالياً.';
+            // My Profile Setup
+            const myProfileName = document.getElementById('myProfileName');
+            if(myProfileName) myProfileName.innerText = currentUserData.name;
+            const myProfileRole = document.getElementById('myProfileRole');
+            if(myProfileRole) myProfileRole.innerText = currentUserData.role;
+            const myProfileAvatar = document.getElementById('myProfileAvatar');
+            if(myProfileAvatar) myProfileAvatar.src = currentUserData.photoURL;
+            const myProfileAssets = document.getElementById('myProfileAssets');
+            if(myProfileAssets) myProfileAssets.innerText = currentUserData.assets || 'لا توجد عهد مسجلة حالياً.';
 
-                document.getElementById('settingsAvatarPreview').src = currentUserData.photoURL;
-                document.getElementById('settingsName').value = currentUserData.name;
-                document.getElementById('settingsRole').value = currentUserData.role;
+            const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
+            if(settingsAvatarPreview) settingsAvatarPreview.src = currentUserData.photoURL;
+            const settingsName = document.getElementById('settingsName');
+            if(settingsName) settingsName.value = currentUserData.name;
+            const settingsRole = document.getElementById('settingsRole');
+            if(settingsRole) settingsRole.value = currentUserData.role;
+            
+            const layoutSelect = document.getElementById('settingsChatLayout');
+            if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
+
+            if (currentUserData.chatColor) {
+                selectedChatColor = currentUserData.chatColor;
+                const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+                if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
                 
-                const layoutSelect = document.getElementById('settingsChatLayout');
-                if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
-
-                if (currentUserData.chatColor) {
-                    selectedChatColor = currentUserData.chatColor;
-                    const sendBtn = document.querySelector('#chatForm button[type="submit"]');
-                    if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
-                    
-                    document.querySelectorAll('.color-btn').forEach(b => {
-                        b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
-                        b.classList.add('hover:scale-110');
-                        if(b.classList.contains(selectedChatColor)) {
-                            b.classList.remove('hover:scale-110');
-                            const ringClass = selectedChatColor.replace('bg-', 'ring-');
-                            b.className += ` ring-2 ring-offset-2 ${ringClass}`;
-                        }
-                    });
-                }
-
-                renderNotificationsDropdown(currentUserData.notifications || []);
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
+                    b.classList.add('hover:scale-110');
+                    if(b.classList.contains(selectedChatColor)) {
+                        b.classList.remove('hover:scale-110');
+                        const ringClass = selectedChatColor.replace('bg-', 'ring-');
+                        b.className += ` ring-2 ring-offset-2 ${ringClass}`;
+                    }
+                });
             }
 
-            function startDatabaseListeners() {
-                onSnapshot(getColRef('users'), (snapshot) => {
-                    globalUsers = [];
-                    snapshot.forEach(docSnap => {
-                        const uData = { id: docSnap.id, ...docSnap.data() };
-                        globalUsers.push(uData);
-                        if(currentUserData && uData.id === currentUserData.uid) {
-                            currentUserData = uData;
-                            groupReadTimestamps = currentUserData.readReceipts || {};
-                            updateUIWithUserData();
-                        }
-                    });
-                    localStorage.setItem('quill_users', JSON.stringify(globalUsers));
-                    renderEmployees();
-                    updateDashboardStats();
-                    
-                    if(!document.getElementById('groupInfoModal').classList.contains('hidden')) {
-                        window.openGroupInfoModal();
-                    }
-                }, (error) => { console.error(error); });
+            renderNotificationsDropdown(currentUserData.notifications || []);
+        }
 
-                if(currentUserData.role === 'CEO' || currentUserData.permissions?.canViewLogs) {
-                    // limit logs to 100 for speed
-                    const logsQuery = query(getColRef('logs'), orderBy('timestamp', 'desc'), limit(100));
-                    onSnapshot(logsQuery, (snapshot) => {
-                        globalLogs = [];
-                        snapshot.forEach(doc => {
-                            globalLogs.push({ id: doc.id, ...doc.data() });
-                        });
-                        renderLogs();
-                    }, (error) => { console.error(error); });
+        function startDatabaseListeners() {
+            onSnapshot(getColRef('users'), (snapshot) => {
+                globalUsers = [];
+                snapshot.forEach(docSnap => {
+                    const uData = { id: docSnap.id, ...docSnap.data() };
+                    globalUsers.push(uData);
+                    if(currentUserData && uData.id === currentUserData.uid) {
+                        currentUserData = uData;
+                        groupReadTimestamps = currentUserData.readReceipts || {};
+                        updateUIWithUserData();
+                    }
+                });
+                localStorage.setItem('quill_users', JSON.stringify(globalUsers));
+                renderEmployees();
+                updateDashboardStats();
+                
+                const groupInfoModal = document.getElementById('groupInfoModal');
+                if(groupInfoModal && !groupInfoModal.classList.contains('hidden')) {
+                    window.openGroupInfoModal();
+                }
+            }, (error) => { console.error(error); });
+
+            if(currentUserData.role === 'CEO' || currentUserData.permissions?.canViewLogs) {
+                const logsQuery = query(getColRef('logs'), orderBy('timestamp', 'desc'), limit(100));
+                onSnapshot(logsQuery, (snapshot) => {
+                    globalLogs = [];
+                    snapshot.forEach(doc => {
+                        globalLogs.push({ id: doc.id, ...doc.data() });
+                    });
+                    renderLogs();
+                }, (error) => { console.error(error); });
+            }
+
+            onSnapshot(getColRef('notices'), (snapshot) => {
+                globalNotices = [];
+                snapshot.forEach(doc => globalNotices.push({ id: doc.id, ...doc.data() }));
+                globalNotices.sort((a, b) => b.timestamp - a.timestamp);
+                localStorage.setItem('quill_notices', JSON.stringify(globalNotices));
+                renderNotices();
+
+                const lastRead = currentUserData.lastReadNotice || 0;
+                const unreadNoticesCount = globalNotices.filter(n => n.timestamp > lastRead).length;
+                const badge1 = document.getElementById('gridNoticesBadge');
+                const badge2 = document.getElementById('sidebarNoticesBadge');
+                
+                if(unreadNoticesCount > 0) {
+                    if(badge1) { badge1.innerText = unreadNoticesCount; badge1.classList.remove('hidden'); }
+                    if(badge2) { badge2.innerText = unreadNoticesCount; badge2.classList.remove('hidden'); }
+                } else {
+                    if(badge1) badge1.classList.add('hidden');
+                    if(badge2) badge2.classList.add('hidden');
                 }
 
-                onSnapshot(getColRef('notices'), (snapshot) => {
-                    globalNotices = [];
-                    snapshot.forEach(doc => globalNotices.push({ id: doc.id, ...doc.data() }));
-                    globalNotices.sort((a, b) => b.timestamp - a.timestamp);
-                    localStorage.setItem('quill_notices', JSON.stringify(globalNotices));
-                    renderNotices();
+            }, (error) => { console.error(error); });
 
-                    // Notices Badge Logic
-                    const lastRead = currentUserData.lastReadNotice || 0;
-                    const unreadNoticesCount = globalNotices.filter(n => n.timestamp > lastRead).length;
-                    const badge1 = document.getElementById('gridNoticesBadge');
-                    const badge2 = document.getElementById('sidebarNoticesBadge');
+            onSnapshot(getColRef('clients'), (snapshot) => {
+                globalCRM = [];
+                snapshot.forEach(doc => globalCRM.push({ id: doc.id, ...doc.data() }));
+                globalCRM.sort((a, b) => b.timestamp - a.timestamp);
+                localStorage.setItem('quill_crm', JSON.stringify(globalCRM));
+                renderCRM();
+            }, (error) => { console.error(error); });
+
+            onSnapshot(getColRef('tasks'), (snapshot) => {
+                globalTasks = [];
+                let hasNewAssignedTask = false;
+                let latestTaskName = "";
+                let pendingTasksForMe = 0;
+
+                snapshot.forEach(doc => {
+                    const taskData = { id: doc.id, ...doc.data() };
+                    globalTasks.push(taskData);
                     
-                    if(unreadNoticesCount > 0) {
-                        if(badge1) { badge1.innerText = unreadNoticesCount; badge1.classList.remove('hidden'); }
-                        if(badge2) { badge2.innerText = unreadNoticesCount; badge2.classList.remove('hidden'); }
+                    if (taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
+                        pendingTasksForMe++;
+                    }
+
+                    if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
+                        knownTaskIds.add(taskData.id);
+                        if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
+                            hasNewAssignedTask = true;
+                            latestTaskName = taskData.title;
+                        }
+                    } else if (initialTaskLoad) {
+                        knownTaskIds.add(taskData.id);
+                    }
+                });
+                
+                localStorage.setItem('quill_tasks', JSON.stringify(globalTasks));
+                
+                const externalTaskBadges = document.querySelectorAll('.external-task-badge');
+                externalTaskBadges.forEach(badge => {
+                    if (pendingTasksForMe > 0) {
+                        badge.innerText = pendingTasksForMe;
+                        badge.classList.remove('hidden');
                     } else {
-                        if(badge1) badge1.classList.add('hidden');
-                        if(badge2) badge2.classList.add('hidden');
+                        badge.classList.add('hidden');
                     }
+                });
 
-                }, (error) => { console.error(error); });
-
-                onSnapshot(getColRef('clients'), (snapshot) => {
-                    globalCRM = [];
-                    snapshot.forEach(doc => globalCRM.push({ id: doc.id, ...doc.data() }));
-                    globalCRM.sort((a, b) => b.timestamp - a.timestamp);
-                    localStorage.setItem('quill_crm', JSON.stringify(globalCRM));
-                    renderCRM();
-                }, (error) => { console.error(error); });
-
-                onSnapshot(getColRef('tasks'), (snapshot) => {
-                    globalTasks = [];
-                    let hasNewAssignedTask = false;
-                    let latestTaskName = "";
-                    let pendingTasksForMe = 0;
-
-                    snapshot.forEach(doc => {
-                        const taskData = { id: doc.id, ...doc.data() };
-                        globalTasks.push(taskData);
-                        
-                        if (taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
-                            pendingTasksForMe++;
-                        }
-
-                        if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
-                            knownTaskIds.add(taskData.id);
-                            if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
-                                hasNewAssignedTask = true;
-                                latestTaskName = taskData.title;
-                            }
-                        } else if (initialTaskLoad) {
-                            knownTaskIds.add(taskData.id);
-                        }
-                    });
-                    
-                    localStorage.setItem('quill_tasks', JSON.stringify(globalTasks));
-                    
-                    const externalTaskBadges = document.querySelectorAll('.external-task-badge');
-                    externalTaskBadges.forEach(badge => {
-                        if (pendingTasksForMe > 0) {
-                            badge.innerText = pendingTasksForMe;
-                            badge.classList.remove('hidden');
-                        } else {
-                            badge.classList.add('hidden');
-                        }
-                    });
-
-                    if(hasNewAssignedTask) {
-                        showToast(`${t('مهمة جديدة')}: ${latestTaskName}`, 'warning');
-                        sendPushNotification(t('مهمة جديدة'), `${t('إسناد مهمة جديدة')}: ${latestTaskName}`, 'tasks');
-                    }
-                    initialTaskLoad = false;
-                    renderTasks();
-                    updateDashboardStats();
-                    
-                    if(!document.getElementById('ceoReportsModal').classList.contains('hidden')) {
-                        const container = document.getElementById('ceoReportTasksDetails');
-                        if(container && container.innerHTML.includes('المهام المنجزة لـ:')) {
-                            const h4 = container.querySelector('h4');
-                            if(h4) {
-                                const empName = h4.innerText.split('لـ: ')[1];
-                                const emp = globalUsers.find(u => u.name === empName);
-                                if(emp) window.renderCeoEmployeeTasks(emp.id, emp.name);
-                            }
-                        }
-                    }
-                }, (error) => { console.error(error); });
-
-                onSnapshot(getColRef('groups'), (snapshot) => {
-                    globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
-                    let foundCurrentGroup = false;
-                    
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
-                            globalGroups.push({ id: doc.id, ...data });
-                            if (doc.id === currentGroupId) foundCurrentGroup = true;
-                        }
-                    });
-                    
-                    if(!foundCurrentGroup && currentGroupId !== 'global') {
-                        currentGroupId = 'global';
-                    }
-                    
-                    renderChatSidebarList();
-                    renderChat();
-                }, (error) => { console.error(error); });
-
-                const chatQuery = query(getColRef('chat'), orderBy('timestamp', 'desc'), limit(150));
-                onSnapshot(chatQuery, (snapshot) => {
-                    const oldChatCount = globalChat.length;
-                    globalChat = [];
-                    let hasUnreadChat = false;
-                    
-                    snapshot.forEach(doc => {
-                        const msg = { id: doc.id, ...doc.data() };
-                        globalChat.push(msg);
-                    });
-                    globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
-
-                    globalChat.forEach(msg => {
-                        const groupId = msg.groupId || 'global';
-                        const lastRead = groupReadTimestamps[groupId] || 0;
-                        if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
-                            const inMyGroup = globalGroups.some(g => g.id === groupId);
-                            if (inMyGroup) hasUnreadChat = true;
-                        }
-                    });
-
-                    const externalChatBadges = document.querySelectorAll('.external-chat-badge');
-                    externalChatBadges.forEach(badge => {
-                        if (hasUnreadChat) {
-                            badge.innerText = '!';
-                            badge.classList.remove('hidden');
-                        } else {
-                            badge.classList.add('hidden');
-                        }
-                    });
-                    
-                    if (!initialChatLoad && globalChat.length > oldChatCount) {
-                        const latestMsg = globalChat[globalChat.length - 1];
-                        if (latestMsg && latestMsg.uid !== currentUserData.uid) {
-                            const group = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'));
-                            
-                            if (group && (group.id === 'global' || group.members.includes(currentUserData.uid))) {
-                                const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
-                                const groupName = group.name || 'الشركة';
-                                
-                                if(!isMention) { // Mentions are handled by form submit
-                                    sendPushNotification(
-                                        `رسالة من ${latestMsg.senderName} في ${groupName}`,
-                                        latestMsg.text || 'أرسل مرفقاً',
-                                        'chat'
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                    if (!document.getElementById('chat').classList.contains('hidden')) {
-                        updateReadReceipt(currentGroupId);
-                    }
-
-                    initialChatLoad = false;
-                    renderChatSidebarList(); 
-                    renderChat();
-                }, (error) => { console.error(error); });
+                if(hasNewAssignedTask) {
+                    showToast(`${t('مهمة جديدة')}: ${latestTaskName}`, 'warning');
+                    sendPushNotification(t('مهمة جديدة'), `${t('إسناد مهمة جديدة')}: ${latestTaskName}`, 'tasks');
+                }
+                initialTaskLoad = false;
+                renderTasks();
+                updateDashboardStats();
                 
-                if(currentUserData && (currentUserData.role === 'CEO' || currentUserData.role === 'accountant' || currentUserData.permissions?.canExpenses)) {
-                    onSnapshot(getColRef('expenses'), (snapshot) => {
-                        globalExpenses = [];
-                        snapshot.forEach(doc => globalExpenses.push({id: doc.id, ...doc.data()}));
-                        globalExpenses.sort((a,b) => b.timestamp - a.timestamp);
-                    }, (error) => console.error(error));
+                const ceoReportsModal = document.getElementById('ceoReportsModal');
+                if(ceoReportsModal && !ceoReportsModal.classList.contains('hidden')) {
+                    const container = document.getElementById('ceoReportTasksDetails');
+                    if(container && container.innerHTML.includes('المهام المنجزة لـ:')) {
+                        const h4 = container.querySelector('h4');
+                        if(h4) {
+                            const empName = h4.innerText.split('لـ: ')[1];
+                            const emp = globalUsers.find(u => u.name === empName);
+                            if(emp) window.renderCeoEmployeeTasks(emp.id, emp.name);
+                        }
+                    }
+                }
+            }, (error) => { console.error(error); });
+
+            onSnapshot(getColRef('groups'), (snapshot) => {
+                globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
+                let foundCurrentGroup = false;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
+                        globalGroups.push({ id: doc.id, ...data });
+                        if (doc.id === currentGroupId) foundCurrentGroup = true;
+                    }
+                });
+                
+                if(!foundCurrentGroup && currentGroupId !== 'global') {
+                    currentGroupId = 'global';
                 }
                 
-                onSnapshot(getColRef('attendance'), (snapshot) => {
-                    globalAttendance = [];
-                    snapshot.forEach(d => globalAttendance.push({ id: d.id, ...d.data() }));
-                    
-                    if (currentUserData) {
-                        const today = getTodayDateString();
-                        const myTodayRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                renderChatSidebarList();
+                renderChat();
+            }, (error) => { console.error(error); });
+
+            const chatQuery = query(getColRef('chat'), orderBy('timestamp', 'desc'), limit(150));
+            onSnapshot(chatQuery, (snapshot) => {
+                const oldChatCount = globalChat.length;
+                globalChat = [];
+                let hasUnreadChat = false;
+                
+                snapshot.forEach(doc => {
+                    const msg = { id: doc.id, ...doc.data() };
+                    globalChat.push(msg);
+                });
+                globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                globalChat.forEach(msg => {
+                    const groupId = msg.groupId || 'global';
+                    const lastRead = groupReadTimestamps[groupId] || 0;
+                    if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
+                        const inMyGroup = globalGroups.some(g => g.id === groupId);
+                        if (inMyGroup) hasUnreadChat = true;
+                    }
+                });
+
+                const externalChatBadges = document.querySelectorAll('.external-chat-badge');
+                externalChatBadges.forEach(badge => {
+                    if (hasUnreadChat) {
+                        badge.innerText = '!';
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+                
+                if (!initialChatLoad && globalChat.length > oldChatCount) {
+                    const latestMsg = globalChat[globalChat.length - 1];
+                    if (latestMsg && latestMsg.uid !== currentUserData.uid) {
+                        const group = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'));
                         
-                        if (!myTodayRecord || myTodayRecord.status === 'completed') {
-                            hasPunchedInToday = false;
-                            lockNavigationIfNeeded();
-                        } else {
-                            hasPunchedInToday = true;
-                            unlockNavigation();
+                        if (group && (group.id === 'global' || group.members.includes(currentUserData.uid))) {
+                            const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
+                            const groupName = group.name || 'الشركة';
+                            
+                            if(!isMention) { // Mentions are handled by form submit
+                                sendPushNotification(
+                                    `رسالة من ${latestMsg.senderName} في ${groupName}`,
+                                    latestMsg.text || 'أرسل مرفقاً',
+                                    'chat'
+                                );
+                            }
                         }
                     }
+                }
+
+                const chatEl = document.getElementById('chat');
+                if (chatEl && !chatEl.classList.contains('hidden')) {
+                    updateReadReceipt(currentGroupId);
+                }
+
+                initialChatLoad = false;
+                renderChatSidebarList(); 
+                renderChat();
+            }, (error) => { console.error(error); });
+            
+            if(currentUserData && (currentUserData.role === 'CEO' || currentUserData.role === 'accountant' || currentUserData.permissions?.canExpenses)) {
+                onSnapshot(getColRef('expenses'), (snapshot) => {
+                    globalExpenses = [];
+                    snapshot.forEach(doc => globalExpenses.push({id: doc.id, ...doc.data()}));
+                    globalExpenses.sort((a,b) => b.timestamp - a.timestamp);
                 }, (error) => console.error(error));
             }
-
-            onAuthStateChanged(auth, async (user) => {
-                document.getElementById('loadingScreen').classList.add('hidden');
-                if (user) {
-                    document.getElementById('systemPasswordScreen').classList.add('hidden');
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    currentUserAuth = user;
-                    try {
-                        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid));
-                        if (docSnap.exists()) {
-                            currentUserData = docSnap.data();
-                            groupReadTimestamps = currentUserData.readReceipts || {};
-                            
-                            document.getElementById('setupProfileScreen').classList.add('hidden');
-                            finishLoginSetup();
-                        } else {
-                            document.getElementById('setupProfileScreen').classList.remove('hidden');
-                        }
-                    } catch(e) { 
-                        console.error("Error fetching user data:", e); 
-                        showToast('حدث خطأ في قراءة بياناتك، يرجى تحديث الصفحة', 'error');
-                    }
-                } else {
-                    localStorage.removeItem('quill_user_cache_main');
-                    document.getElementById('systemPasswordScreen').classList.remove('hidden');
-                }
-            });
-
-            document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-                try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
-            });
-
-            document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('setupName').value;
-                const role = document.getElementById('setupRole').value;
-                try {
-                    const newUserData = {
-                        name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
-                        photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                        readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now(),
-                        permissions: {
-                            canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false
-                        }
-                    };
-                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
-                    currentUserData = newUserData;
-                    document.getElementById('setupProfileScreen').classList.add('hidden');
-                    finishLoginSetup();
-                } catch(e) { console.error(e); }
-            });
-
-            function finishLoginSetup() {
-                localStorage.setItem('quill_user_cache_main', JSON.stringify(currentUserData));
+            
+            onSnapshot(getColRef('attendance'), (snapshot) => {
+                globalAttendance = [];
+                snapshot.forEach(d => globalAttendance.push({ id: d.id, ...d.data() }));
                 
-                updateUIWithUserData();
-
-                const isCEO = currentUserData.role === 'CEO';
-                const p = currentUserData.permissions || {};
-
-                if(isCEO) {
-                    document.getElementById('grid-employees').classList.remove('hidden');
-                    document.getElementById('grid-dashboard').classList.remove('hidden');
-                    document.getElementById('grid-logs').classList.remove('hidden');
+                if (currentUserData) {
+                    const today = getTodayDateString();
+                    const myTodayRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
                     
-                    document.getElementById('nav-employees-btn').classList.remove('hidden');
-                    document.getElementById('nav-dashboard-btn').classList.remove('hidden');
-                    document.getElementById('nav-logs-btn').classList.remove('hidden'); 
-                    
-                    document.getElementById('clearLogsBtn').classList.remove('hidden'); 
-                    document.getElementById('clearLogsBtn').style.display = 'flex';
-                    document.getElementById('viewReportsBtn').classList.remove('hidden');
-                    document.getElementById('viewReportsBtn').style.display = 'flex';
-                    document.getElementById('empActionHeader').classList.remove('hidden');
-                    document.getElementById('ceoExportSection').classList.remove('hidden');
-                } else {
-                    document.getElementById('grid-employees').classList.add('hidden');
-                    document.getElementById('grid-dashboard').classList.add('hidden');
-                    
-                    if(p.canViewLogs) {
-                        document.getElementById('grid-logs').classList.remove('hidden');
-                        document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                    if (!myTodayRecord || myTodayRecord.status === 'completed') {
+                        hasPunchedInToday = false;
+                        lockNavigationIfNeeded();
                     } else {
-                        document.getElementById('grid-logs').classList.add('hidden');
-                        document.getElementById('nav-logs-btn').classList.add('hidden'); 
+                        hasPunchedInToday = true;
+                        unlockNavigation();
                     }
+                }
+            }, (error) => console.error(error));
+        }
 
-                    document.getElementById('nav-employees-btn').classList.add('hidden');
-                    document.getElementById('nav-dashboard-btn').classList.add('hidden');
-                    
-                    document.getElementById('clearLogsBtn').classList.add('hidden');
-                    document.getElementById('viewReportsBtn').classList.add('hidden');
-                    
-                    document.getElementById('empActionHeader').classList.add('hidden');
-                    document.getElementById('ceoExportSection').classList.add('hidden');
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if(loadingScreen) loadingScreen.classList.add('hidden');
+            
+            if (user) {
+                document.getElementById('systemPasswordScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
+                currentUserAuth = user;
+                try {
+                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid));
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        groupReadTimestamps = currentUserData.readReceipts || {};
+                        
+                        document.getElementById('setupProfileScreen').classList.add('hidden');
+                        finishLoginSetup();
+                    } else {
+                        document.getElementById('setupProfileScreen').classList.remove('hidden');
+                    }
+                } catch(e) { 
+                    console.error("Error fetching user data:", e); 
+                    showToast('حدث خطأ في قراءة بياناتك، يرجى تحديث الصفحة', 'error');
                 }
-                
-                if(isCEO || p.canNotices) document.getElementById('addNoticeBtn').classList.remove('hidden');
-                else document.getElementById('addNoticeBtn').classList.add('hidden');
+            } else {
+                localStorage.removeItem('quill_user_cache_main');
+                document.getElementById('systemPasswordScreen').classList.remove('hidden');
+            }
+        });
 
-                if(isCEO || currentUserData.role === 'accountant' || p.canExpenses) {
-                    document.getElementById('nav-expenses-ext').classList.remove('hidden');
-                    document.getElementById('nav-expenses-ext').style.display = 'flex';
-                    document.getElementById('grid-expenses-ext').classList.remove('hidden');
-                }
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
+        });
+
+        document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('setupName').value;
+            const role = document.getElementById('setupRole').value;
+            try {
+                const newUserData = {
+                    name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
+                    photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
+                    readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now(),
+                    permissions: {
+                        canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false
+                    }
+                };
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
+                currentUserData = newUserData;
+                document.getElementById('setupProfileScreen').classList.add('hidden');
+                finishLoginSetup();
+            } catch(e) { console.error(e); }
+        });
+
+        function finishLoginSetup() {
+            localStorage.setItem('quill_user_cache_main', JSON.stringify(currentUserData));
+            
+            updateUIWithUserData();
+
+            const isCEO = currentUserData.role === 'CEO';
+            const p = currentUserData.permissions || {};
+
+            if(isCEO) {
+                document.getElementById('grid-employees').classList.remove('hidden');
+                document.getElementById('grid-dashboard').classList.remove('hidden');
+                document.getElementById('grid-logs').classList.remove('hidden');
                 
-                if (isCEO || p.canAssignTasks) {
-                    document.getElementById('addTaskBtn').classList.remove('hidden');
-                    document.getElementById('addTaskBtn').style.display = 'flex';
-                }
+                document.getElementById('nav-employees-btn').classList.remove('hidden');
+                document.getElementById('nav-dashboard-btn').classList.remove('hidden');
+                document.getElementById('nav-logs-btn').classList.remove('hidden'); 
                 
-                document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+                document.getElementById('clearLogsBtn').classList.remove('hidden'); 
+                document.getElementById('clearLogsBtn').style.display = 'flex';
+                document.getElementById('viewReportsBtn').classList.remove('hidden');
+                document.getElementById('viewReportsBtn').style.display = 'flex';
+                document.getElementById('empActionHeader').classList.remove('hidden');
+                document.getElementById('ceoExportSection').classList.remove('hidden');
+            } else {
+                document.getElementById('grid-employees').classList.add('hidden');
+                document.getElementById('grid-dashboard').classList.add('hidden');
                 
-                if(currentUserData.lastSystemExport) {
-                    const txt = document.getElementById('lastSystemExportTxt');
-                    if(txt) txt.innerText = 'آخر سحب: ' + new Date(currentUserData.lastSystemExport).toLocaleString('ar-EG');
+                if(p.canViewLogs) {
+                    document.getElementById('grid-logs').classList.remove('hidden');
+                    document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                } else {
+                    document.getElementById('grid-logs').classList.add('hidden');
+                    document.getElementById('nav-logs-btn').classList.add('hidden'); 
                 }
 
-                logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (المنصة الرئيسية)`);
-                startDatabaseListeners();
-                listenForExternalBadges(); 
-                handleHashChange();
+                document.getElementById('nav-employees-btn').classList.add('hidden');
+                document.getElementById('nav-dashboard-btn').classList.add('hidden');
                 
-                updateActivity();
-                setInterval(updateActivity, 60000);
-                setInterval(checkAndSendReminders, 300000);
+                document.getElementById('clearLogsBtn').classList.add('hidden');
+                document.getElementById('viewReportsBtn').classList.add('hidden');
+                
+                document.getElementById('empActionHeader').classList.add('hidden');
+                document.getElementById('ceoExportSection').classList.add('hidden');
             }
             
-            function updateActivity() {
-                if (!currentUserData) return;
-                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
-                    lastActive: Date.now()
-                }).catch(e => { console.error(e); });
+            if(isCEO || p.canNotices) document.getElementById('addNoticeBtn').classList.remove('hidden');
+            else document.getElementById('addNoticeBtn').classList.add('hidden');
+
+            if(isCEO || currentUserData.role === 'accountant' || p.canExpenses) {
+                document.getElementById('nav-expenses-ext').classList.remove('hidden');
+                document.getElementById('nav-expenses-ext').style.display = 'flex';
+                document.getElementById('grid-expenses-ext').classList.remove('hidden');
             }
+            
+            if (isCEO || p.canAssignTasks) {
+                document.getElementById('addTaskBtn').classList.remove('hidden');
+                document.getElementById('addTaskBtn').style.display = 'flex';
+            }
+            
+            document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+            
+            if(currentUserData.lastSystemExport) {
+                const txt = document.getElementById('lastSystemExportTxt');
+                if(txt) txt.innerText = 'آخر سحب: ' + new Date(currentUserData.lastSystemExport).toLocaleString('ar-EG');
+            }
+
+            logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (المنصة الرئيسية)`);
+            startDatabaseListeners();
+            listenForExternalBadges(); 
+            handleHashChange();
+            
+            updateActivity();
+            setInterval(updateActivity, 60000);
+            setInterval(checkAndSendReminders, 300000);
+        }
+        
+        function updateActivity() {
+            if (!currentUserData) return;
+            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                lastActive: Date.now()
+            }).catch(e => { console.error(e); });
+        }
     </script>
 </body>
 </html>
