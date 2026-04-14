@@ -33,7 +33,7 @@
     </script>
     <style>
         body { font-family: 'Cairo', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #00839b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #002d74; }
@@ -104,75 +104,10 @@
             0% { background-color: rgba(234, 179, 8, 0.4); }
             100% { background-color: transparent; }
         }
-
-        /* Task specific styles */
-        .task-input-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            border: none;
-            outline: none;
-            background: transparent;
-            width: 100%;
-            padding: 0.5rem 0;
-        }
-        .task-input-title::placeholder { color: #9ca3af; font-weight: normal; }
         
-        .task-input-desc {
-            font-size: 1rem;
-            border: none;
-            outline: none;
-            background: transparent;
-            width: 100%;
-            resize: none;
-            min-height: 60px;
-        }
-        .task-input-desc::placeholder { color: #9ca3af; }
-
-        .fire-icon {
-            color: #d1d5db;
-            transition: color 0.2s;
-            cursor: pointer;
-        }
-        .fire-icon.active {
-            color: #ef4444; /* Red/Orange flame */
-            filter: drop-shadow(0px 0px 4px rgba(239, 68, 68, 0.4));
-        }
-
-        /* Checkbox styling */
-        .custom-checkbox {
-            appearance: none;
-            background-color: transparent;
-            margin: 0;
-            font: inherit;
-            color: currentColor;
-            width: 1.15em;
-            height: 1.15em;
-            border: 2px solid #cbd5e1;
-            border-radius: 0.25em;
-            display: grid;
-            place-content: center;
-            cursor: pointer;
-        }
-        .custom-checkbox::before {
-            content: "";
-            width: 0.65em;
-            height: 0.65em;
-            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
-            transform: scale(0);
-            transform-origin: bottom left;
-            transition: 120ms transform ease-in-out;
-            box-shadow: inset 1em 1em white;
-            background-color: white;
-        }
-        .custom-checkbox:checked {
-            background-color: #00839b;
-            border-color: #00839b;
-        }
-        .custom-checkbox:checked::before {
-            transform: scale(1);
-        }
-        .dark .custom-checkbox { border-color: #4b5563; }
-        .dark .custom-checkbox:checked { border-color: #00839b; }
+        /* تأثيرات خاصة بجدول المهام الجديد */
+        .task-row:hover { background-color: #f8fafc; }
+        .dark .task-row:hover { background-color: #374151; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
@@ -267,21 +202,18 @@
                     <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
                 </button>
 
-                <!-- Notifications Bell -->
                 <div class="relative">
                     <button onclick="window.toggleNotificationsDropdown()" class="text-gray-400 hover:text-secondary p-2 rounded transition relative" title="الإشعارات">
                         <i class="fa-solid fa-bell"></i>
                         <span id="notificationsBadge" class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden pointer-events-none">0</span>
                     </button>
-                    <!-- Notifications Dropdown -->
                     <div id="notificationsDropdown" class="hidden absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl w-72 max-h-80 overflow-hidden flex flex-col z-50">
                         <div class="bg-gray-50 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
                             <span class="font-bold text-sm text-gray-700 dark:text-gray-200">الإشعارات</span>
                             <button onclick="window.clearAllNotifications()" class="text-xs text-red-500 hover:underline font-bold py-1 px-2">حذف الكل</button>
                         </div>
                         <div id="notificationsList" class="overflow-y-auto flex-1 p-2 space-y-2">
-                            <!-- Items go here -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -293,7 +225,7 @@
                 <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary dark:text-secondary hidden md:block" data-i18n="الرئيسية">الرئيسية - التطبيقات</h2>
             </div>
 
-            <div class="flex items-center flex-row-reverse z-10 font-bold text-2xl text-primary dark:text-white gap-2">
+            <div class="flex items-center flex-row-reverse z-10">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain block dark:hidden">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain hidden dark:block">
             </div>
@@ -389,7 +321,6 @@
 
         <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 dark:bg-gray-900 relative">
             
-            <!-- قسم الرئيسية -->
             <section id="home-grid" class="section-content animate-fade-in p-4 md:p-10 max-w-6xl mx-auto">
                 <div id="attendanceLockBanner" class="bg-red-500 text-white p-4 rounded-xl mb-6 text-center font-bold shadow-md hidden flex-col items-center justify-center gap-3">
                     <div>
@@ -527,7 +458,6 @@
                 </div>
             </section>
 
-            <!-- قسم ملفي والعهد -->
             <section id="my-profile" class="section-content animate-fade-in hidden p-4 md:p-0 max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">ملفي الشخصي والعهد</p>
@@ -611,80 +541,36 @@
                 </div>
             </section>
 
-            <!-- المهام: التصميم الجديد -->
-            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0 flex flex-col h-full">
-                <!-- شريط المهام العلوي (بدون خلفية كما في الصورة) -->
-                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3 bg-[#111827] p-2 md:p-4 rounded-xl text-white">
-                    <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto whitespace-nowrap pb-2 md:pb-0 hide-scrollbar">
-                        <span class="font-bold text-lg md:text-xl shrink-0"><i class="fa-solid fa-list-check ml-2 text-blue-400"></i>مهامي</span>
-                        <div class="h-6 w-px bg-gray-600 mx-2 hidden md:block"></div>
-                        <button onclick="window.openTaskModal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-1 shrink-0">
-                            <i class="fa-solid fa-plus"></i> إنشاء <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold text-xl flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-600"></i> مهامي</p>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button id="viewReportsBtn" onclick="window.openCeoReportsModal()" class="hidden bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center shadow-sm">
+                            <i class="fa-solid fa-folder-open mx-2"></i> <span>المهام المنجزة (التقارير)</span>
                         </button>
-                        
-                        <div class="relative w-full md:w-64 max-w-sm shrink-0">
-                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="searchTasksInput" oninput="renderTasks()" placeholder="عامل التصفية والبحث" class="w-full bg-[#1f2937] border border-gray-600 rounded-md px-8 py-1.5 text-sm focus:outline-none focus:border-blue-400 text-white">
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 text-sm shrink-0 w-full md:w-auto overflow-x-auto whitespace-nowrap pb-2 md:pb-0 hide-scrollbar">
-                        <button class="hover:text-blue-400 transition">وضع علامة مقروءة للكل</button>
-                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">التعليقات 1</span>
-                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">متأخرة 0</span>
-                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">دردشات المهمة 1</span>
-                        <div class="h-4 w-px bg-gray-600 mx-1"></div>
-                        <button class="hover:text-blue-400 transition">جانت</button>
-                        <button class="hover:text-blue-400 transition">التقويم</button>
-                        <button class="hover:text-blue-400 transition">المخطط</button>
-                        <button class="hover:text-blue-400 transition">الموعد النهائي</button>
-                        <button class="bg-blue-600 text-white px-3 py-1 rounded transition border border-blue-500">القائمة</button>
+                        <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center shadow-sm font-bold">
+                            <i class="fa-solid fa-plus mx-2"></i> <span data-i18n="إسناد مهمة جديدة">إنشاء <i class="fa-solid fa-chevron-down mr-1 text-xs"></i></span>
+                        </button>
                     </div>
                 </div>
-
-                <!-- جدول المهام (List View) -->
-                <div class="bg-white dark:bg-gray-800 rounded-t-xl shadow-sm border border-gray-200 dark:border-gray-700 flex-1 flex flex-col overflow-hidden">
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-right text-sm whitespace-nowrap">
-                            <thead class="text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-10">
-                                <tr>
-                                    <th class="p-3 font-normal min-w-[200px]"><input type="checkbox" class="ml-2 rounded border-gray-300"> <i class="fa-solid fa-gear text-gray-400 ml-1"></i> الاسم</th>
-                                    <th class="p-3 font-normal min-w-[120px]">نشط <i class="fa-solid fa-chevron-down text-[10px] mr-1"></i></th>
-                                    <th class="p-3 font-normal min-w-[150px]">الموعد النهائي</th>
-                                    <th class="p-3 font-normal min-w-[180px]">تم الإنشاء بواسطة</th>
-                                    <th class="p-3 font-normal min-w-[180px]">الشخص المسؤول</th>
-                                    <th class="p-3 font-normal min-w-[150px]">المشروع</th>
-                                    <th class="p-3 font-normal">العلامات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tasksTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
-                                <!-- سيتم تعبئة المهام هنا عبر الجافاسكربت -->
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden w-full overflow-x-auto">
+                    <table class="w-full text-right text-sm min-w-[900px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                            <tr>
+                                <th class="p-3 w-10 text-center"><i class="fa-regular fa-square-check"></i></th>
+                                <th class="p-3 font-semibold">الاسم</th>
+                                <th class="p-3 font-semibold">الحالة / نشط</th>
+                                <th class="p-3 font-semibold">الموعد النهائي</th>
+                                <th class="p-3 font-semibold hidden md:table-cell">تم الإنشاء بواسطة</th>
+                                <th class="p-3 font-semibold">الشخص المسؤول</th>
+                                <th class="p-3 font-semibold">المشروع</th>
+                                <th class="p-3 font-semibold text-center">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-table-body" class="divide-y divide-gray-100 dark:border-gray-700">
                             </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- تذييل الجدول (Pagination & Selection) -->
-                    <div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-3 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 shrink-0">
-                        <div class="flex items-center gap-3">
-                            <select class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-2 py-1 outline-none">
-                                <option>تحديد إجراء</option>
-                                <option value="delete">حذف المحدد</option>
-                            </select>
-                            <button class="bg-blue-200 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 px-4 py-1 rounded font-bold opacity-50 cursor-not-allowed">تطبيق</button>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="rounded border-gray-300"> للكل</label>
-                        </div>
-                        
-                        <div class="flex items-center gap-6">
-                            <span id="tasksTotalCountText">الإجمالي: 0</span>
-                            <span id="tasksPagesText">الصفحات: 1</span>
-                            <div class="flex items-center gap-1">
-                                <select class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-2 py-1 outline-none">
-                                    <option>50</option>
-                                </select>
-                                <span>:السجلات</span>
-                            </div>
-                        </div>
-                    </div>
+                    </table>
                 </div>
             </section>
 
@@ -874,110 +760,17 @@
         </div>
     </div>
 
-    <!-- نافذة إنشاء مهمة جديدة (التصميم الجديد) -->
-    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <!-- Header -->
-            <div class="p-4 flex justify-between items-start border-b border-gray-100 dark:border-gray-700">
-                <div class="flex-1 w-full pl-4">
-                    <input type="text" id="taskTitle" required placeholder="اسم المهمة" class="task-input-title dark:text-white">
-                </div>
-                <div class="flex items-center gap-4 shrink-0 mt-2">
-                    <button type="button" onclick="window.toggleTaskPriority()" class="fire-icon text-xl" id="taskPriorityBtn" title="تحديد كأولوية قصوى">
-                        <i class="fa-solid fa-fire"></i>
-                    </button>
-                    <button type="button" onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                        <i class="fa-solid fa-xmark text-xl"></i>
-                    </button>
-                </div>
+    <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
+                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
-            <!-- Body -->
-            <div class="p-4 md:p-6 overflow-y-auto flex-1 custom-scrollbar">
-                <form id="addTaskForm" class="space-y-6">
-                    <input type="hidden" id="taskIsPriority" value="false">
-                    
-                    <div>
-                        <textarea id="taskDesc" placeholder="الوصف..." class="task-input-desc dark:text-gray-300"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-400">
-                        <div class="flex flex-col gap-1">
-                            <span class="mb-1 text-xs font-bold">الشخص المسؤول:</span>
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-circle-user text-xl text-gray-400"></i>
-                                <select id="taskAssignee" required class="flex-1 bg-transparent border-none outline-none font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">
-                                    <!-- يتم تعبئتها عبر الجافاسكريبت -->
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-1">
-                            <span class="mb-1 text-xs font-bold">الموعد النهائي:</span>
-                            <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-calendar text-xl text-blue-500"></i>
-                                <input type="datetime-local" id="taskDeadline" required class="flex-1 bg-transparent border-none outline-none font-semibold text-gray-800 dark:text-gray-200 cursor-pointer" dir="ltr">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- قسم قوائم التحقق -->
-                    <div id="checklistsContainer" class="hidden border-t border-gray-100 dark:border-gray-700 pt-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="flex items-center gap-2 text-primary dark:text-blue-400 font-bold">
-                                <i class="fa-solid fa-list-check"></i> قائمة التحقق #1
-                            </div>
-                            <div class="text-xs text-gray-400 flex items-center gap-2">
-                                <span id="checklistProgressText">المكتمل: 0 من 0</span>
-                                <div class="w-20 h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
-                                    <div id="checklistProgressBar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="checklistItems" class="space-y-2 mb-3">
-                            <!-- بنود القائمة تضاف هنا -->
-                        </div>
-                        
-                        <button type="button" onclick="window.addChecklistItem()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-sm flex items-center gap-2 py-2 w-full transition">
-                            <i class="fa-solid fa-plus"></i> إضافة عنصر
-                        </button>
-                    </div>
-
-                    <!-- Footer Action Buttons & Submit -->
-                    <div class="border-t border-gray-100 dark:border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                        
-                        <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/50 p-1.5 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <!-- زر وهمي للمشروع للمطابقة مع الصورة -->
-                            <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
-                                <i class="fa-regular fa-folder"></i> المشروع
-                            </button>
-                            <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-                            <!-- زر إظهار قائمة التحقق -->
-                            <button type="button" onclick="window.toggleChecklistSection()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
-                                <i class="fa-solid fa-list-check"></i> قوائم التحقق
-                            </button>
-                            <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-                            <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
-                                <i class="fa-solid fa-paperclip"></i> الملفات
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
-                            <button type="button" onclick="window.closeModal('taskModal')" class="px-6 py-2 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition w-full md:w-auto text-sm">
-                                إلغاء
-                            </button>
-                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-bold shadow-md transition w-full md:w-auto text-sm">
-                                إنشاء
-                            </button>
-                        </div>
-                    </div>
-                </form>
+            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList">
             </div>
         </div>
     </div>
 
-    <!-- نافذة تقرير المهمة القديمة ستبقى للإنهاء -->
     <div id="taskReportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-green-600 text-white p-4 flex justify-between items-center">
@@ -1004,18 +797,6 @@
         </div>
     </div>
 
-    <!-- نافذة تفاصيل القراءة للمحادثات وغيرها تبقى كما هي -->
-    <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
-                <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
-                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList">
-            </div>
-        </div>
-    </div>
-
     <div id="ceoReportsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
             <div class="bg-gray-700 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1033,6 +814,98 @@
             </div>
         </div>
     </div>
+
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <form id="addTaskForm" class="flex flex-col h-full">
+                <div class="p-6 flex-1 overflow-y-auto space-y-6">
+                    <div class="flex justify-between items-start border-b dark:border-gray-700 pb-4">
+                        <input type="text" id="taskTitle" required placeholder="اسم المهمة" class="text-2xl font-bold border-none focus:ring-0 bg-transparent dark:text-white outline-none w-full placeholder-gray-400">
+                        <div class="flex items-center gap-3">
+                            <button type="button" id="priorityToggleBtn" onclick="window.togglePriority()" class="text-gray-400 hover:text-red-500 transition-colors bg-gray-100 dark:bg-gray-700 w-10 h-10 rounded-full flex items-center justify-center" title="أولوية قصوى">
+                                <i class="fa-solid fa-fire text-xl" id="priorityIcon"></i>
+                            </button>
+                            <input type="hidden" id="taskPriority" value="normal">
+                            <button type="button" onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                        </div>
+                    </div>
+
+                    <textarea id="taskDesc" rows="2" placeholder="الوصف" class="w-full border-none focus:ring-0 bg-transparent dark:text-gray-300 outline-none resize-none placeholder-gray-400"></textarea>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <label class="w-32 text-gray-500 font-bold text-sm">الشخص المسؤول:</label>
+                            <select id="taskAssignee" required class="flex-1 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:border-blue-500"></select>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <label class="w-32 text-gray-500 font-bold text-sm">الموعد النهائي:</label>
+                            <input type="datetime-local" id="taskDeadline" required class="flex-1 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                        </div>
+                         <div class="flex items-center gap-4">
+                            <label class="w-32 text-gray-500 font-bold text-sm">المشروع:</label>
+                            <input type="text" id="taskProject" placeholder="اسم المشروع (اختياري)" class="flex-1 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="border-t dark:border-gray-700 pt-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> قوائم التحقق</h4>
+                        </div>
+                        <div id="checklistContainer" class="space-y-2 mb-3"></div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="window.addChecklistItem()" class="text-sm font-bold text-gray-500 hover:text-gray-800 dark:hover:text-white flex items-center gap-1 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-lg transition"><i class="fa-solid fa-plus"></i> إضافة عنصر</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-gray-50 dark:bg-gray-900 border-t dark:border-gray-700 flex justify-between items-center flex-shrink-0">
+                    <button type="button" onclick="window.closeModal('taskModal')" class="font-bold text-gray-500 hover:text-gray-800 dark:hover:text-white px-4 py-2">إلغاء</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded-lg transition-colors shadow-md">إنشاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="taskDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b dark:border-gray-700 flex justify-between items-start">
+                <div>
+                    <h3 id="td-title" class="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">اسم المهمة</h3>
+                    <p id="td-desc" class="text-sm text-gray-500 dark:text-gray-400 mt-2 whitespace-pre-wrap leading-relaxed">الوصف</p>
+                </div>
+                <div class="flex gap-3">
+                    <i id="td-fire" class="fa-solid fa-fire text-2xl text-red-500 hidden animate-pulse drop-shadow-md" title="أولوية قصوى"></i>
+                    <button onclick="window.closeModal('taskDetailsModal')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-6">
+                <div class="flex items-center gap-4 text-sm">
+                    <span class="w-32 text-gray-500 font-bold">الشخص المسؤول:</span>
+                    <span id="td-assignee" class="flex items-center gap-2 font-bold text-gray-700 dark:text-gray-200"><i class="fa-solid fa-user-circle text-gray-400 text-lg"></i> <span></span></span>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <span class="w-32 text-gray-500 font-bold">الموعد النهائي:</span>
+                    <span id="td-deadline" class="text-gray-700 dark:text-gray-200 font-bold flex items-center gap-2"><i class="fa-regular fa-calendar text-blue-500"></i> <span></span></span>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <span class="w-32 text-gray-500 font-bold">المشروع:</span>
+                    <span id="td-project" class="bg-blue-50 dark:bg-gray-700 px-3 py-1 rounded-lg text-blue-700 dark:text-blue-300 font-bold flex items-center gap-2 border border-blue-100 dark:border-gray-600"><i class="fa-regular fa-folder-open"></i> <span></span></span>
+                </div>
+
+                <div id="td-checklist-container" class="border-t border-gray-100 dark:border-gray-700 pt-5 mt-5 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-gray-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500 text-lg"></i> قائمة التحقق</h4>
+                        <span id="td-checklist-counter" class="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-lg"></span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700 mb-4">
+                        <div id="td-checklist-progress" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div id="td-checklist-items" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div id="noticeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
@@ -1224,6 +1097,32 @@
         </div>
     </div>
 
+    <div id="exportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-primary text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg">سحب تفاصيل النظام (كاملة)</h3>
+                <button onclick="window.closeModal('exportModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6 text-center">
+                <i class="fa-solid fa-database text-4xl text-gray-400 mb-3"></i>
+                <p class="text-sm text-gray-600 dark:text-gray-300 font-bold mb-1">اختر الصيغة التي تريد تحميل البيانات بها</p>
+                <p id="lastSystemExportTxt" class="text-[10px] text-red-500 font-bold mb-6">آخر سحب: لم يتم السحب بعد</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="window.exportSystemData('excel')" class="flex flex-col items-center justify-center gap-2 p-4 bg-green-50 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-gray-600 border border-green-200 dark:border-gray-600 rounded-xl transition cursor-pointer">
+                        <i class="fa-solid fa-file-excel text-3xl text-green-600 dark:text-green-400"></i>
+                        <span class="font-bold text-gray-800 dark:text-white text-sm">ملف Excel</span>
+                    </button>
+                    
+                    <button onclick="window.exportSystemData('pdf')" class="flex flex-col items-center justify-center gap-2 p-4 bg-red-50 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-gray-600 border border-red-200 dark:border-gray-600 rounded-xl transition cursor-pointer">
+                        <i class="fa-solid fa-file-pdf text-3xl text-red-600 dark:text-red-400"></i>
+                        <span class="font-bold text-gray-800 dark:text-white text-sm">ملف PDF</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="printArea" class="hidden bg-white text-black p-8 text-right" dir="rtl"></div>
 
     <script>
@@ -1381,6 +1280,7 @@
         let selectedChatColor = 'bg-[#00839b]'; 
         
         let replyingToMsg = null;
+        let currentChecklist = []; // قائمة التحقق المؤقتة
 
         // ====== Notifications Logic ======
         window.toggleNotificationsDropdown = () => {
@@ -2208,55 +2108,581 @@
             });
         }
 
-        // ===============================================
-        // المهام - التصميم الجديد
-        // ===============================================
-
-        window.toggleTaskPriority = () => {
-            const btn = document.getElementById('taskPriorityBtn');
-            const isPriorityInput = document.getElementById('taskIsPriority');
-            if (btn.classList.contains('active')) {
-                btn.classList.remove('active');
-                isPriorityInput.value = "false";
-            } else {
-                btn.classList.add('active');
-                isPriorityInput.value = "true";
+        window.openModal = (id) => {
+            const el = document.getElementById(id);
+            if(el) el.classList.remove('hidden');
+        };
+        
+        window.closeModal = (id) => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.classList.add('hidden');
+                if(id === 'taskModal') document.getElementById('addTaskForm')?.reset();
+                if(id === 'createGroupModal') document.getElementById('createGroupForm')?.reset();
+                if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm')?.reset();
+                if(id === 'noticeModal') {
+                    document.getElementById('noticeForm')?.reset();
+                    document.getElementById('pollOptionsContainer').classList.add('hidden');
+                    document.getElementById('customNoticeType').classList.add('hidden');
+                    document.getElementById('pollInputsList').innerHTML = `
+                        <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="نعم">
+                        <input type="text" class="poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none" value="لا">
+                    `;
+                }
+                if(id === 'clientModal') document.getElementById('clientForm')?.reset();
+                if(id === 'noteModal') document.getElementById('noteForm')?.reset();
+                if(id === 'taskReportModal') document.getElementById('taskReportForm')?.reset();
             }
         };
 
-        window.toggleChecklistSection = () => {
-            const container = document.getElementById('checklistsContainer');
-            container.classList.toggle('hidden');
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('translate-x-full');
+            document.getElementById('mobileOverlay').classList.toggle('hidden');
+        };
+
+        function lockNavigationIfNeeded() {
+            if(currentUserData && currentUserData.role !== 'CEO' && !hasPunchedInToday) {
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('opacity-50', 'pointer-events-none'));
+                document.getElementById('homeGridContainer').classList.add('hidden');
+                document.getElementById('sidebarLockMessage').classList.remove('hidden');
+                document.getElementById('attendanceLockBanner').classList.remove('hidden');
+                
+                const punchOutBtn = document.getElementById('homePunchOutContainer');
+                if(punchOutBtn) punchOutBtn.classList.add('hidden');
+            }
+        }
+
+        function unlockNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('opacity-50', 'pointer-events-none'));
+            document.getElementById('homeGridContainer').classList.remove('hidden');
+            document.getElementById('sidebarLockMessage').classList.add('hidden');
+            document.getElementById('attendanceLockBanner').classList.add('hidden');
+            
+            const punchOutBtn = document.getElementById('homePunchOutContainer');
+            if(punchOutBtn) punchOutBtn.classList.remove('hidden');
+        }
+
+        window.openChatAndToggleMenu = () => {
+            window.selectGroup('global');
+            if (window.innerWidth < 768) {
+                window.toggleMobileChatMenu();
+            }
+        };
+
+        window.toggleMobileChatMenu = () => {
+            const menu = document.getElementById('chatSubMenuMobile');
+            const icon = document.getElementById('chatMenuIconMobile');
+            
+            if(menu.classList.contains('max-h-0')) {
+                menu.classList.remove('max-h-0', 'opacity-0', 'hidden');
+                menu.classList.add('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.add('rotate-180');
+            } else {
+                menu.classList.add('max-h-0', 'opacity-0');
+                menu.classList.remove('max-h-[500px]', 'opacity-100', 'mt-2', 'mb-2');
+                icon.classList.remove('rotate-180');
+            }
+        };
+
+        window.showSection = (sectionId) => {
+            if(window.location.hash !== `#${sectionId}`) {
+                window.history.pushState(null, null, `#${sectionId}`);
+            }
+
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            const targetSec = document.getElementById(sectionId);
+            if(targetSec) targetSec.classList.remove('hidden');
+            
+            if (sectionId === 'home-grid') {
+                document.getElementById('backToHomeBtn').classList.add('hidden');
+                document.getElementById('page-title').classList.remove('hidden');
+            } else {
+                document.getElementById('backToHomeBtn').classList.remove('hidden');
+                document.getElementById('page-title').classList.add('hidden');
+            }
+            
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                b.classList.remove('bg-secondary', 'text-white');
+                b.classList.add('text-gray-300');
+            });
+            
+            if(sectionId !== 'chat') {
+                const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
+                if(activeBtn) {
+                    activeBtn.classList.remove('text-gray-300');
+                    activeBtn.classList.add('bg-secondary', 'text-white');
+                }
+            }
+            
+            if(window.innerWidth < 768 && sectionId !== 'chat') {
+                document.getElementById('sidebar').classList.add('translate-x-full');
+                document.getElementById('mobileOverlay').classList.add('hidden');
+            }
+            
+            if(sectionId === 'chat') {
+                updateReadReceipt(currentGroupId);
+                const chatBox = document.getElementById('chatMessages');
+                if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+                
+                document.querySelectorAll('.external-chat-badge').forEach(b => b.classList.add('hidden'));
+                const homeBadge = document.getElementById('homeChatBadge');
+                if(homeBadge) homeBadge.classList.add('hidden');
+                const mobileBadge = document.getElementById('globalChatBadgeMobile');
+                if(mobileBadge) mobileBadge.classList.add('hidden');
+            }
+            
+            if(sectionId === 'notices' && currentUserData) {
+                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    lastReadNotice: Date.now()
+                }).catch(e => console.error(e));
+                document.getElementById('gridNoticesBadge').classList.add('hidden');
+                document.getElementById('sidebarNoticesBadge').classList.add('hidden');
+            }
+        };
+
+        function handleHashChange() {
+            if(!currentUserData) return; 
+            
+            const hash = window.location.hash.replace('#', '');
+            const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'settings', 'notices', 'crm', 'my-profile'];
+            
+            let targetSection = hash || 'home-grid';
+            
+            if (currentUserData.role !== 'CEO') {
+                if (['dashboard', 'employees', 'logs'].includes(targetSection)) {
+                    targetSection = 'home-grid';
+                }
+            }
+
+            window.showSection(validSections.includes(targetSection) ? targetSection : 'home-grid');
+        }
+        window.addEventListener('hashchange', handleHashChange);
+
+        async function updateReadReceipt(groupId) {
+            if(!currentUserData) return;
+            groupReadTimestamps[groupId] = Date.now() + 500; 
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    readReceipts: groupReadTimestamps
+                });
+                currentUserData.readReceipts = groupReadTimestamps; 
+                
+                renderChatSidebarList(); 
+            } catch(e) { console.error(e); }
+        }
+
+        window.filterChat = () => {
+            const query = document.getElementById('chatSearchInput').value.toLowerCase();
+            document.querySelectorAll('.chat-msg-item').forEach(el => {
+                const text = decodeURIComponent(el.getAttribute('data-text')).toLowerCase();
+                const sender = decodeURIComponent(el.getAttribute('data-sender')).toLowerCase();
+                if(text.includes(query) || sender.includes(query)) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        };
+
+        window.scrollToMsg = (id) => {
+            const el = document.getElementById(`msg-${id}`);
+            if(el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('highlight-msg');
+                setTimeout(() => el.classList.remove('highlight-msg'), 2000);
+            }
+        };
+
+        window.togglePinnedDropdown = () => {
+            const dropdown = document.getElementById('pinnedMessagesDropdown');
+            if(dropdown) dropdown.classList.toggle('hidden');
+        };
+
+        window.togglePinMsg = async (msgId, currentState) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', msgId), { isPinned: !currentState });
+                showToast(currentState ? 'تم إلغاء التثبيت' : 'تم تثبيت الرسالة', 'success');
+                document.getElementById(`msg-menu-${msgId}`).classList.add('hidden');
+            } catch(e) { console.error(e); }
+        }
+
+        window.toggleMsgMenu = (id) => {
+            document.querySelectorAll('.msg-dropdown-menu').forEach(el => {
+                if (el.id !== `msg-menu-${id}`) el.classList.add('hidden');
+            });
+            const menu = document.getElementById(`msg-menu-${id}`);
+            if (menu) menu.classList.toggle('hidden');
+        };
+
+        window.copyMsgText = (text, id) => {
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('تم نسخ النص', 'success');
+                document.getElementById(`msg-menu-${id}`).classList.add('hidden');
+            }).catch(() => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('تم نسخ النص', 'success');
+                } catch (err) {
+                    showToast('لم يتم النسخ', 'warning');
+                }
+                document.body.removeChild(textArea);
+                document.getElementById(`msg-menu-${id}`).classList.add('hidden');
+            });
+        };
+
+        window.deleteSingleMsg = async (id) => {
+            if (confirm('هل أنت متأكد من حذف هذه الرسالة؟')) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', id));
+                    showToast('تم الحذف', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.replyToMsg = (id, text, senderName) => {
+            replyingToMsg = { id, text: text || 'مرفق', senderName };
+            document.getElementById(`msg-menu-${id}`).classList.add('hidden');
+            
+            const previewBar = document.getElementById('chatReplyPreview');
+            document.getElementById('replyTargetName').innerText = senderName;
+            document.getElementById('replyTargetText').innerText = text || 'مرفق';
+            previewBar.classList.remove('hidden');
+            previewBar.classList.add('flex');
+            
+            document.getElementById('chatInput').focus();
+        };
+
+        window.cancelReply = () => {
+            replyingToMsg = null;
+            const previewBar = document.getElementById('chatReplyPreview');
+            previewBar.classList.add('hidden');
+            previewBar.classList.remove('flex');
+        };
+
+        window.openGroupInfoModal = () => {
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(!activeGroup) return;
+
+            document.getElementById('infoModalTitle').innerText = `${t('معلومات المجموعة')}: ${activeGroup.name}`;
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
+            
+            const addMemberSection = document.getElementById('addMemberSection');
+            if (isCEO && activeGroup.id !== 'global') {
+                addMemberSection.classList.remove('hidden');
+                const select = document.getElementById('newMemberSelect');
+                select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
+                globalUsers.forEach(u => {
+                    if (!activeGroup.members.includes(u.id)) {
+                        select.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+                    }
+                });
+            } else {
+                addMemberSection.classList.add('hidden');
+            }
+
+            const list = document.getElementById('groupInfoMembersList');
+            list.innerHTML = '';
+            let membersToShow = activeGroup.id === 'global' ? globalUsers : globalUsers.filter(u => activeGroup.members.includes(u.id));
+            
+            if(activeGroup.id !== 'global' && isCEO && !activeGroup.members.includes(currentUserData.uid)) {
+                const ceoViewer = globalUsers.find(u => u.uid === currentUserData.uid);
+                if(ceoViewer) membersToShow.unshift({...ceoViewer, isViewer: true});
+            }
+
+            membersToShow.forEach(u => {
+                let removeBtn = '';
+                if (isCEO && activeGroup.id !== 'global' && u.id !== currentUserData.uid && !u.isViewer) {
+                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-gray-700 p-1.5 rounded transition text-xs font-bold" title="${t('حذف من المجموعة')}"><i class="fa-solid fa-user-minus"></i> ${t('حذف')}</button>`;
+                }
+                let badge = u.role === 'CEO' ? `<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مدير')}</span>` : '';
+                if(u.isViewer) badge = `<span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مراقب')}</span>`;
+
+                list.innerHTML += `
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent hover:border-gray-100 dark:hover:border-gray-600 rounded-lg transition">
+                        <div class="flex items-center gap-2">
+                            <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${u.name} ${badge}</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">${u.role}</p>
+                            </div>
+                        </div>
+                        ${removeBtn}
+                    </div>
+                `;
+            });
+            window.openModal('groupInfoModal');
+        };
+
+        window.removeGroupMember = async (userId, userName) => {
+            if (currentUserData.role !== 'CEO') return;
+            if(confirm(`هل تريد بالتأكيد إزالة ${userName} من المجموعة؟`)) {
+                const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                if(!activeGroup || activeGroup.id === 'global') return;
+                try {
+                    const newMembers = activeGroup.members.filter(id => id !== userId);
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
+                    showToast(`تمت إزالة ${userName} بنجاح`, 'success');
+                    window.openGroupInfoModal(); 
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.addGroupMember = async () => {
+            if (currentUserData.role !== 'CEO') return;
+            const select = document.getElementById('newMemberSelect');
+            const userId = select.value;
+            const userName = select.options[select.selectedIndex]?.text.split(' (')[0];
+            if(!userId) { showToast('يرجى اختيار موظف أولاً', 'warning'); return; }
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(!activeGroup || activeGroup.id === 'global') return;
+            try {
+                const newMembers = [...activeGroup.members, userId];
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
+                showToast(`تم إضافة ${userName} بنجاح`, 'success');
+                window.openGroupInfoModal(); 
+            } catch(e) { console.error(e); }
+        };
+
+        window.openCreateGroupModal = () => {
+            const container = document.getElementById('groupMembersSelection');
+            container.innerHTML = '';
+            globalUsers.forEach(emp => {
+                if(emp.id !== currentUserData.uid) {
+                    container.innerHTML += `
+                        <label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-500 transition">
+                            <input type="checkbox" value="${emp.id}" class="group-member-checkbox w-4 h-4 text-secondary rounded border-gray-300 focus:ring-secondary">
+                            <img src="${emp.photoURL}" class="w-6 h-6 rounded-full object-cover">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
+                        </label>
+                    `;
+                }
+            });
+            window.openModal('createGroupModal');
+        };
+
+        window.updateDashboardStats = () => {
+            const statEmp = document.getElementById('stat-employees');
+            if(statEmp) statEmp.innerText = globalUsers.length;
+            
+            const statTasks = document.getElementById('stat-tasks');
+            if(statTasks) statTasks.innerText = globalTasks.length;
+            
+            const statComp = document.getElementById('stat-completed');
+            if(statComp) statComp.innerText = globalTasks.filter(t => t.status === 'completed').length;
+        };
+
+        window.openEditEmployeeModal = (id, name, role) => {
+            document.getElementById('editEmpId').value = id;
+            document.getElementById('editEmpName').value = name;
+            const selectRole = document.getElementById('editEmpRole');
+            if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
+                selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
+            }
+            selectRole.value = role;
+
+            const targetUser = globalUsers.find(u => u.id === id);
+            const perms = targetUser?.permissions || {};
+            
+            document.getElementById('permAssignTasks').checked = !!perms.canAssignTasks;
+            document.getElementById('permExpenses').checked = !!perms.canExpenses;
+            document.getElementById('permCRM').checked = !!perms.canCRM;
+            document.getElementById('permNotices').checked = !!perms.canNotices;
+            document.getElementById('editEmpAssets').value = targetUser?.assets || '';
+
+            window.openModal('editEmployeeModal');
+        };
+
+        const editEmployeeForm = document.getElementById('editEmployeeForm');
+        if (editEmployeeForm) {
+            editEmployeeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentUserData.role !== 'CEO') return;
+
+                const id = document.getElementById('editEmpId').value;
+                const newName = document.getElementById('editEmpName').value;
+                const newRole = document.getElementById('editEmpRole').value;
+                const newAssets = document.getElementById('editEmpAssets').value;
+
+                const permissions = {
+                    canAssignTasks: document.getElementById('permAssignTasks').checked,
+                    canExpenses: document.getElementById('permExpenses').checked,
+                    canCRM: document.getElementById('permCRM').checked,
+                    canNotices: document.getElementById('permNotices').checked
+                };
+
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
+                        name: newName, 
+                        role: newRole,
+                        assets: newAssets,
+                        permissions: permissions
+                    });
+                    window.closeModal('editEmployeeModal');
+                    showToast('تم تحديث بيانات وصلاحيات الموظف بنجاح', 'success');
+                    logAction('تعديل موظف', `تم تعديل بيانات وصلاحيات الموظف: ${newName}`);
+                } catch(error) { console.error(error); }
+            });
+        }
+
+        function renderEmployees() {
+            const list = document.getElementById('employeesList');
+            if(!list) return;
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
+            list.innerHTML = '';
+            
+            globalUsers.forEach(emp => {
+                let actionsHtml = '';
+                if(isCEO && emp.id !== currentUserData.uid) { 
+                    actionsHtml = `
+                        <td class="p-3 md:p-4 whitespace-nowrap rtl:text-left ltr:text-right">
+                            <button onclick="window.openEditEmployeeModal('${emp.id}', '${emp.name}', '${emp.role}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-gray-700 p-2 rounded mx-1 transition" title="تعديل الصلاحيات والممتلكات"><i class="fa-solid fa-user-shield"></i></button>
+                            <button onclick="window.deleteEmployee('${emp.id}', '${emp.name}')" class="text-red-500 hover:text-red-700 bg-red-50 dark:bg-gray-700 p-2 rounded transition" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                } else if(isCEO) {
+                    actionsHtml = `<td class="p-3 md:p-4 rtl:text-left ltr:text-right"><span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2 py-1 rounded">${t('أنت (المدير)')}</span></td>`;
+                }
+
+                list.innerHTML += `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        <td class="p-3 md:p-4 flex items-center">
+                            <img src="${emp.photoURL}" class="w-8 h-8 rounded-full mx-3 object-cover">
+                            <span class="font-medium text-gray-800 dark:text-gray-200 text-sm">${emp.name}</span>
+                        </td>
+                        <td class="p-3 md:p-4 text-gray-600 dark:text-gray-300 font-bold text-xs md:text-sm">${emp.role}</td>
+                        ${actionsHtml}
+                    </tr>
+                `;
+            });
+        }
+
+        window.openCeoReportsModal = () => {
+            window.openModal('ceoReportsModal');
+            const list = document.getElementById('ceoReportEmployeesList');
+            const container = document.getElementById('ceoReportTasksDetails');
+            list.innerHTML = '';
+            container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400"><i class="fa-solid fa-clipboard-list text-4xl mb-3"></i><p>اختر موظفاً من القائمة لعرض تقاريره</p></div>`;
+            
+            globalUsers.forEach(u => {
+                if(u.role !== 'CEO') {
+                    list.innerHTML += `
+                        <div id="ceo-emp-item-${u.id}" onclick="window.renderCeoEmployeeTasks('${u.id}', '${u.name.replace(/'/g, "\\'")}')" class="ceo-emp-item p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 transition">
+                            <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200">${u.name}</h4>
+                                <p class="text-xs text-gray-500">${u.role}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        };
+
+        window.renderCeoEmployeeTasks = (empId, empName) => {
+            document.querySelectorAll('.ceo-emp-item').forEach(el => el.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'border-r-4', 'border-primary'));
+            const activeItem = document.getElementById(`ceo-emp-item-${empId}`);
+            if(activeItem) activeItem.classList.add('bg-gray-200', 'dark:bg-gray-700', 'border-r-4', 'border-primary');
+
+            const container = document.getElementById('ceoReportTasksDetails');
+            const empTasks = globalTasks.filter(t => t.assigneeId === empId && t.status === 'completed').sort((a,b) => (b.completedAt || 0) - (a.completedAt || 0));
+            
+            if(empTasks.length === 0) {
+                container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-400"><i class="fa-solid fa-folder-open text-4xl mb-3"></i><p>لا توجد مهام منجزة لهذا الموظف</p></div>`;
+                return;
+            }
+
+            let html = `<h4 class="font-bold text-primary dark:text-secondary mb-4 border-b dark:border-gray-700 pb-2">المهام المنجزة لـ: ${empName}</h4><div class="space-y-4">`;
+            empTasks.forEach(t => {
+                const dateStr = t.completedAt ? new Date(t.completedAt).toLocaleString('ar-EG') : 'غير محدد';
+                const startStr = t.startedAt ? new Date(t.startedAt).toLocaleString('ar-EG') : 'لم يتم تسجيل وقت البدء';
+                
+                let fileHtml = '';
+                if(t.reportFileData) {
+                    if(t.reportFileType && t.reportFileType.startsWith('image/')) {
+                        fileHtml = `<img src="${t.reportFileData}" class="mt-3 rounded-lg max-w-[200px] cursor-pointer border dark:border-gray-600 shadow-sm" onclick="window.openMedia('${t.reportFileData}', '${t.reportFileType}')">`;
+                    } else {
+                        fileHtml = `<a href="${t.reportFileData}" download="مرفق_مهمة" class="inline-block mt-3 bg-secondary text-white text-xs px-3 py-1.5 rounded transition hover:bg-primary"><i class="fa-solid fa-download mx-1"></i> تحميل المرفق</a>`;
+                    }
+                }
+                html += `
+                    <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="font-bold text-gray-800 dark:text-gray-100">${t.title}</h5>
+                            <span class="text-[10px] text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">${dateStr}</span>
+                        </div>
+                        
+                        <div class="flex flex-col gap-1 mt-2 mb-3 bg-white dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-600 text-[10px] md:text-xs">
+                            <span class="text-blue-600 dark:text-blue-400 font-bold"><i class="fa-solid fa-play mx-1"></i> وقت البدء: ${startStr}</span>
+                            <span class="text-green-600 dark:text-green-400 font-bold"><i class="fa-solid fa-stop mx-1"></i> وقت الانتهاء: ${dateStr}</span>
+                        </div>
+
+                        <p class="text-xs text-gray-600 dark:text-gray-400 mb-3 bg-white dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-600 whitespace-pre-wrap">وصف المهمة: ${t.desc}</p>
+                        <div class="border-t border-gray-200 dark:border-gray-600 pt-3">
+                            <h6 class="text-xs font-bold text-green-600 dark:text-green-400 mb-1"><i class="fa-solid fa-comment-dots mx-1"></i> تقرير الموظف:</h6>
+                            <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">${t.reportText || 'لا يوجد نص تقرير'}</p>
+                            ${fileHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        };
+
+        // --- دوال مساعدة لقائمة التحقق وإنشاء المهام ---
+        window.togglePriority = () => {
+            const prioInput = document.getElementById('taskPriority');
+            const prioIcon = document.getElementById('priorityIcon');
+            if(prioInput.value === 'normal') {
+                prioInput.value = 'high';
+                prioIcon.classList.add('text-red-500');
+                prioIcon.classList.remove('text-gray-400');
+            } else {
+                prioInput.value = 'normal';
+                prioIcon.classList.add('text-gray-400');
+                prioIcon.classList.remove('text-red-500');
+            }
         };
 
         window.addChecklistItem = () => {
-            const container = document.getElementById('checklistItems');
-            const id = 'chk_' + Date.now();
-            const html = `
-                <div class="flex items-center gap-3 animate-fade-in" id="row_${id}">
-                    <input type="checkbox" class="custom-checkbox shrink-0" onchange="window.updateChecklistProgress()">
-                    <input type="text" placeholder="نص العنصر" class="flex-1 border-b border-gray-200 dark:border-gray-600 bg-transparent text-sm focus:outline-none focus:border-blue-500 dark:text-gray-200 py-1">
-                    <button type="button" onclick="document.getElementById('row_${id}').remove(); window.updateChecklistProgress()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', html);
-            window.updateChecklistProgress();
+            currentChecklist.push({ text: '', isDone: false });
+            window.renderChecklistBuilder();
         };
 
-        window.updateChecklistProgress = () => {
-            const container = document.getElementById('checklistItems');
-            const total = container.querySelectorAll('input[type="checkbox"]').length;
-            const checked = container.querySelectorAll('input[type="checkbox"]:checked').length;
-            
-            document.getElementById('checklistProgressText').innerText = `المكتمل: ${checked} من ${total}`;
-            const percentage = total > 0 ? (checked / total) * 100 : 0;
-            document.getElementById('checklistProgressBar').style.width = `${percentage}%`;
+        window.updateChecklistItemText = (index, text) => {
+            currentChecklist[index].text = text;
+        };
+
+        window.removeChecklistItem = (index) => {
+            currentChecklist.splice(index, 1);
+            window.renderChecklistBuilder();
+        };
+
+        window.renderChecklistBuilder = () => {
+            const container = document.getElementById('checklistContainer');
+            container.innerHTML = currentChecklist.map((item, i) => `
+                <div class="flex items-center gap-2 group animate-fade-in bg-gray-50 dark:bg-gray-700/50 p-2 rounded border border-gray-100 dark:border-gray-600">
+                    <input type="checkbox" disabled class="w-4 h-4 rounded text-blue-600 cursor-not-allowed">
+                    <input type="text" value="${item.text}" onchange="window.updateChecklistItemText(${i}, this.value)" placeholder="اكتب نص العنصر هنا..." class="flex-1 border-none bg-transparent focus:ring-0 outline-none px-2 py-1 text-sm dark:text-white placeholder-gray-400">
+                    <button type="button" onclick="window.removeChecklistItem(${i})" class="text-gray-400 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
         };
 
         window.openTaskModal = () => {
+            currentChecklist = [];
+            window.renderChecklistBuilder();
+            document.getElementById('taskPriority').value = 'normal';
+            document.getElementById('priorityIcon').className = 'fa-solid fa-fire text-xl text-gray-400';
+            document.getElementById('taskProject').value = '';
+            
             const select = document.getElementById('taskAssignee');
             select.innerHTML = '';
-            
             const isCEO = currentUserData.role === 'CEO';
             const canAssign = currentUserData.permissions?.canAssignTasks;
 
@@ -2270,17 +2696,10 @@
                 select.innerHTML = `<option value="${currentUserData.uid}" selected>${currentUserData.name} (${t('أنت')})</option>`;
                 select.disabled = true;
             }
-
-            // Reset custom fields
-            document.getElementById('taskPriorityBtn').classList.remove('active');
-            document.getElementById('taskIsPriority').value = "false";
-            document.getElementById('checklistsContainer').classList.add('hidden');
-            document.getElementById('checklistItems').innerHTML = '';
-            window.updateChecklistProgress();
-
             window.openModal('taskModal');
         };
 
+        // تحديث نموذج الإرسال ليشمل المشروع والأولوية وقائمة التحقق
         const addTaskForm = document.getElementById('addTaskForm');
         if (addTaskForm) {
             addTaskForm.addEventListener('submit', async (e) => {
@@ -2294,15 +2713,10 @@
                 const desc = document.getElementById('taskDesc').value;
                 const deadlineVal = document.getElementById('taskDeadline').value;
                 const deadlineTime = new Date(deadlineVal).getTime();
-                const isPriority = document.getElementById('taskIsPriority').value === "true";
                 
-                // جمع بيانات قائمة التحقق
-                const checklistItems = [];
-                document.querySelectorAll('#checklistItems > div').forEach(row => {
-                    const isChecked = row.querySelector('input[type="checkbox"]').checked;
-                    const text = row.querySelector('input[type="text"]').value.trim();
-                    if(text) checklistItems.push({ text, isCompleted: isChecked });
-                });
+                const project = document.getElementById('taskProject').value || '';
+                const priority = document.getElementById('taskPriority').value;
+                const validChecklist = currentChecklist.filter(c => c.text.trim() !== '');
 
                 try {
                     await addDoc(getColRef('tasks'), {
@@ -2311,15 +2725,13 @@
                         assigneeId: assigneeId,
                         assigneeName: assigneeName,
                         createdBy: currentUserData.uid,
-                        creatorName: currentUserData.name,
                         deadline: deadlineTime,
-                        isPriority: isPriority,
-                        checklists: checklistItems,
-                        project: 'MENA', // افتراضي بناءً على الصورة
-                        status: 'pending', // (نشط)
+                        project: project,
+                        priority: priority,
+                        checklist: validChecklist,
+                        status: 'pending',
                         timestamp: Date.now()
                     });
-                    
                     window.closeModal('taskModal');
                     
                     const assignedUser = globalUsers.find(u => u.id === assigneeId);
@@ -2335,120 +2747,63 @@
                         : `قام الموظف ${currentUserData.name} بإسناد مهمة "${title}" لنفسه`;
                         
                     logAction('إسناد مهمة', actionText);
-                    showToast('تم حفظ المهمة بنجاح', 'success');
+                    showToast('تم إنشاء المهمة بنجاح', 'success');
                 } catch(e) { console.error(e); }
             });
         }
 
-        window.renderTasks = () => {
-            const tableBody = document.getElementById('tasksTableBody');
-            const searchInput = document.getElementById('searchTasksInput');
-            if(!tableBody) return;
-            
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-            tableBody.innerHTML = '';
+        const taskReportForm = document.getElementById('taskReportForm');
+        if (taskReportForm) {
+            taskReportForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('reportTaskId').value;
+                const title = document.getElementById('reportTaskTitle').value;
+                const reportText = document.getElementById('reportText').value;
+                const fileInput = document.getElementById('reportFileInput');
+                const file = fileInput.files[0];
 
-            const isCEO = currentUserData.role === 'CEO';
-            let taskCount = 0;
+                const completeTask = async (fileData, fileType) => {
+                    try {
+                        const updateData = {
+                            status: 'completed',
+                            reportText: reportText,
+                            completedAt: Date.now()
+                        };
+                        if(fileData) {
+                            updateData.reportFileData = fileData;
+                            updateData.reportFileType = fileType || '';
+                        }
 
-            const tasksToRender = globalTasks.filter(task => {
-                const isMyTask = task.assigneeId === currentUserData.uid || task.createdBy === currentUserData.uid;
-                if (!isCEO && !isMyTask) return false;
-                
-                if(searchTerm) {
-                    return task.title.toLowerCase().includes(searchTerm) || 
-                           task.assigneeName.toLowerCase().includes(searchTerm) ||
-                           (task.creatorName && task.creatorName.toLowerCase().includes(searchTerm));
-                }
-                return true;
-            }).sort((a, b) => b.timestamp - a.timestamp);
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
+                        logAction('إنجاز مهمة', `تم إنجاز المهمة "${title}" بواسطة ${currentUserData.name} مع إرفاق تقرير`);
+                        window.closeModal('taskReportModal');
+                        showToast('أحسنت! تم إنجاز المهمة وإرسال التقرير للمدير.', 'success');
+                        
+                        const ceoUser = globalUsers.find(u => u.role === 'CEO');
+                        if (ceoUser && ceoUser.email && EMAILJS_TEMPLATE_TASK_COMPLETED !== 'YOUR_COMPLETED_TEMPLATE_ID') {
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_COMPLETED, {
+                                ceo_email: ceoUser.email,
+                                ceo_name: ceoUser.name,
+                                employee_name: currentUserData.name,
+                                task_title: title,
+                                task_link: taskLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
+                        }
+                    } catch(e) { console.error(e); }
+                };
 
-            document.getElementById('tasksTotalCountText').innerText = `الإجمالي: ${tasksToRender.length}`;
-
-            tasksToRender.forEach(task => {
-                const isMyTask = task.assigneeId === currentUserData.uid;
-                const deadlineDate = task.deadline ? new Date(task.deadline) : null;
-                
-                // Formating Deadline
-                let deadlineHtml = '-';
-                if(deadlineDate) {
-                    const now = new Date();
-                    const isToday = deadlineDate.getDate() === now.getDate() && deadlineDate.getMonth() === now.getMonth() && deadlineDate.getFullYear() === now.getFullYear();
-                    
-                    const timeStr = deadlineDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase();
-                    const dateStr = deadlineDate.toLocaleDateString('ar-EG', {month: 'short', day: 'numeric'});
-                    
-                    if(isToday) {
-                        deadlineHtml = `<span class="bg-yellow-400 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">${timeStr} اليوم,</span>`;
-                    } else {
-                        deadlineHtml = `<span>${timeStr} ${dateStr}</span>`;
-                    }
-                }
-
-                // Fire Icon Priority
-                const priorityHtml = task.isPriority ? `<i class="fa-solid fa-fire text-red-500 mr-2" title="أولوية عالية"></i>` : '';
-
-                // Checklist count
-                let checklistHtml = '';
-                if(task.checklists && task.checklists.length > 0) {
-                    const total = task.checklists.length;
-                    const completed = task.checklists.filter(c => c.isCompleted).length;
-                    checklistHtml = `<span class="text-[10px] text-gray-500 border border-gray-200 dark:border-gray-600 px-1 rounded flex items-center gap-1 mt-1 w-max"><i class="fa-regular fa-square-check"></i> ${completed}/${total}</span>`;
-                }
-
-                // Status formatting
-                let statusHtml = '';
-                if (task.status === 'completed') {
-                    statusHtml = `<span class="flex items-center gap-1"><i class="fa-solid fa-circle-check text-green-500"></i> مكتمل</span>`;
+                if(file) {
+                    if(file.size > 1024 * 1024) { showToast('الملف كبير جداً! الحد الأقصى 1MB', 'warning'); return; }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => completeTask(ev.target.result, file.type);
+                    reader.readAsDataURL(file);
                 } else {
-                    statusHtml = `<span class="flex items-center gap-1"><i class="fa-solid fa-circle text-green-400 text-[8px]"></i> نشط</span>`;
+                    completeTask(null, null);
                 }
-
-                // Avatars
-                const creatorAvatar = `<i class="fa-solid fa-user-circle text-gray-400 text-lg ml-1"></i>`;
-                const assigneeAvatar = `<i class="fa-solid fa-user-circle text-gray-400 text-lg ml-1"></i>`;
-                
-                // Action logic
-                let completeBtn = '';
-                if(isMyTask && task.status !== 'completed') {
-                    completeBtn = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title.replace(/'/g, "\\'")}')" class="text-[10px] text-blue-500 hover:underline mr-2">إنجاز</button>`;
-                }
-                const deleteBtn = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-red-500 hover:underline mr-2">حذف</button>` : '';
-
-                const rowHtml = `
-                    <tr class="hover:bg-blue-50/50 dark:hover:bg-gray-700 transition group border-b border-gray-100 dark:border-gray-700">
-                        <td class="p-3">
-                            <div class="flex items-start gap-2">
-                                <input type="checkbox" class="mt-1 rounded border-gray-300">
-                                <i class="fa-solid fa-bars text-gray-300 mt-1 cursor-grab hover:text-gray-500"></i>
-                                <div class="flex flex-col">
-                                    <span class="font-bold text-gray-700 dark:text-gray-200 flex items-center ${task.status === 'completed' ? 'line-through text-gray-400' : ''}">
-                                        ${task.title} ${priorityHtml}
-                                    </span>
-                                    ${checklistHtml}
-                                    <div class="opacity-0 group-hover:opacity-100 transition mt-1">
-                                        ${completeBtn} ${deleteBtn}
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-3">${statusHtml}</td>
-                        <td class="p-3" dir="ltr"><div class="text-right w-full">${deadlineHtml}</div></td>
-                        <td class="p-3 text-gray-500 dark:text-gray-400 flex items-center mt-1">${creatorAvatar} ${task.creatorName || '-'}</td>
-                        <td class="p-3 text-gray-500 dark:text-gray-400">${assigneeAvatar} ${task.assigneeName || '-'}</td>
-                        <td class="p-3 text-blue-600 dark:text-blue-400 font-semibold"><i class="fa-regular fa-folder ml-1"></i> ${task.project || 'MENA'}</td>
-                        <td class="p-3 text-gray-500">MENA</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += rowHtml;
-                taskCount++;
             });
-
-            if(taskCount === 0) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">لا توجد مهام حالياً</td></tr>`;
-            }
-        };
-
+        }
 
         window.updateTaskStatus = async (id, newStatus, taskTitle) => {
             if(newStatus === 'completed') {
@@ -2459,21 +2814,672 @@
                 window.openModal('taskReportModal');
                 return; 
             }
-            // Fallback for direct updates
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
+                let updateData = { status: newStatus };
+                if (newStatus === 'in-progress') {
+                    updateData.startedAt = Date.now();
+                }
+                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), updateData);
+                logAction('بدء مهمة', `بدأ ${currentUserData.name} بتنفيذ المهمة "${taskTitle}"`);
             } catch(e) { console.error(e); }
         };
 
         window.deleteTask = async (id) => {
             if(currentUserData.role !== 'CEO') return;
-            if(confirm('حذف هذه المهمة بشكل نهائي؟')) {
+            if(confirm('هل أنت متأكد من حذف هذه المهمة نهائياً؟')) {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)).catch(e => console.error(e));
+                window.closeModal('taskDetailsModal');
             }
         };
 
-        // ===============================================
+        // --- عرض المهام الجديد (نمط الجدول) ---
+        function renderTasks() {
+            const tbody = document.getElementById('tasks-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            
+            const isCEO = currentUserData.role === 'CEO';
+            const slicedTasks = globalTasks.slice(-200).sort((a,b) => b.timestamp - a.timestamp); 
 
-    </script>
-</body>
+            if(slicedTasks.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-gray-500 font-bold">لا توجد مهام حالياً.</td></tr>`;
+                return;
+            }
+
+            slicedTasks.forEach(task => {
+                const isMyTask = task.assigneeId === currentUserData.uid;
+                if (!isCEO && !isMyTask) return;
+
+                const creatorUser = globalUsers.find(u => u.uid === task.createdBy);
+                const creatorName = creatorUser ? creatorUser.name : 'مجهول';
+                
+                const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : 'غير محدد';
+                const isOverdue = task.deadline && Date.now() > task.deadline && task.status !== 'completed';
+
+                let statusBadge = '';
+                if(task.status === 'completed') statusBadge = '<span class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fa-solid fa-check"></i> مكتمل</span>';
+                else if(task.status === 'in-progress') statusBadge = '<span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm"><i class="fa-solid fa-spinner fa-spin"></i> نشط (قيد التنفيذ)</span>';
+                else statusBadge = '<span class="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm">قيد الانتظار</span>';
+
+                let fireIcon = task.priority === 'high' ? '<i class="fa-solid fa-fire text-red-500 mr-2 drop-shadow-md animate-pulse" title="أولوية قصوى"></i>' : '';
+                
+                let checklistInfo = '';
+                if(task.checklist && task.checklist.length > 0) {
+                    const doneCount = task.checklist.filter(c => c.isDone).length;
+                    checklistInfo = `<span class="text-[10px] text-gray-500 bg-gray-100 dark:bg-gray-700 border dark:border-gray-600 rounded px-1.5 py-0.5 flex items-center gap-1 w-max mt-1.5 font-bold"><i class="fa-solid fa-list-check text-blue-500"></i> ${doneCount}/${task.checklist.length}</span>`;
+                }
+
+                let isChecked = task.status === 'completed' ? 'checked' : '';
+                
+                let actionsHtml = '';
+                if (isMyTask && task.status !== 'completed') {
+                    if(task.status === 'pending') {
+                         actionsHtml += `<button onclick="window.updateTaskStatus('${task.id}', 'in-progress', '${task.title.replace(/'/g, "\\'")}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg mx-1 transition text-xs font-bold shadow-sm" title="البدء">بدء التنفيذ</button>`;
+                    }
+                    actionsHtml += `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title.replace(/'/g, "\\'")}')" class="text-green-500 hover:text-green-700 bg-green-50 dark:bg-gray-700 px-3 py-1.5 rounded-lg mx-1 transition text-xs font-bold shadow-sm" title="إنجاز">إنجاز <i class="fa-solid fa-check"></i></button>`;
+                }
+                
+                if(isCEO) {
+                     actionsHtml += `<button onclick="window.deleteTask('${task.id}')" class="text-red-500 hover:text-white hover:bg-red-500 bg-red-50 dark:bg-gray-700 px-2 py-1.5 rounded-lg mx-1 transition text-xs" title="حذف"><i class="fa-solid fa-trash"></i></button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = `task-row border-b dark:border-gray-700 transition-colors ${task.status === 'completed' ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : ''}`;
+                tr.innerHTML = `
+                    <td class="p-3 md:p-4 w-10 text-center border-l dark:border-gray-700/50">
+                        <input type="checkbox" ${isChecked} disabled class="w-4 h-4 rounded text-blue-600 cursor-not-allowed">
+                    </td>
+                    <td class="p-3 md:p-4 cursor-pointer" onclick="window.viewTaskDetails('${task.id}')">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm text-gray-800 dark:text-gray-200 ${task.status === 'completed' ? 'line-through text-gray-400' : ''} hover:text-blue-600 transition-colors">${task.title} ${fireIcon}</span>
+                            ${checklistInfo}
+                        </div>
+                    </td>
+                    <td class="p-3 md:p-4">${statusBadge}</td>
+                    <td class="p-3 md:p-4 text-xs font-bold ${isOverdue ? 'text-red-500' : 'text-gray-600 dark:text-gray-400'}">${deadlineStr}</td>
+                    <td class="p-3 md:p-4 hidden md:table-cell text-xs text-gray-500 dark:text-gray-400 font-bold"><i class="fa-solid fa-user-circle text-gray-300 dark:text-gray-600 mx-1"></i> ${creatorName}</td>
+                    <td class="p-3 md:p-4 text-xs font-bold text-gray-700 dark:text-gray-300"><i class="fa-solid fa-user-tie text-blue-400 mx-1 text-sm"></i> ${task.assigneeName}</td>
+                    <td class="p-3 md:p-4 text-xs font-bold text-gray-600 dark:text-gray-400">${task.project ? `<span class="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"><i class="fa-regular fa-folder text-blue-500 mx-1"></i> ${task.project}</span>` : '-'}</td>
+                    <td class="p-3 md:p-4 text-center whitespace-nowrap">
+                        ${actionsHtml}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- دالة عرض تفاصيل المهمة وتحديث قائمة التحقق ---
+        window.viewTaskDetails = (taskId) => {
+            const task = globalTasks.find(t => t.id === taskId);
+            if(!task) return;
+
+            document.getElementById('td-title').innerText = task.title;
+            document.getElementById('td-desc').innerText = task.desc || 'لا يوجد وصف مضاف.';
+            
+            const fireIcon = document.getElementById('td-fire');
+            if(task.priority === 'high') fireIcon.classList.remove('hidden');
+            else fireIcon.classList.add('hidden');
+
+            document.getElementById('td-assignee').querySelector('span').innerText = task.assigneeName;
+            document.getElementById('td-deadline').querySelector('span').innerText = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
+            document.getElementById('td-project').querySelector('span').innerText = task.project || 'لا يوجد مشروع محدد';
+
+            const checklistContainer = document.getElementById('td-checklist-container');
+            const itemsContainer = document.getElementById('td-checklist-items');
+            
+            if(task.checklist && task.checklist.length > 0) {
+                checklistContainer.classList.remove('hidden');
+                
+                const updateChecklistUI = () => {
+                    const doneCount = task.checklist.filter(c => c.isDone).length;
+                    const totalCount = task.checklist.length;
+                    const percent = Math.round((doneCount / totalCount) * 100);
+                    
+                    document.getElementById('td-checklist-counter').innerText = `المكتمل: ${doneCount} من ${totalCount}`;
+                    document.getElementById('td-checklist-progress').style.width = `${percent}%`;
+                    
+                    const isMyTask = task.assigneeId === currentUserData.uid;
+                    const canEdit = isMyTask && task.status !== 'completed';
+
+                    itemsContainer.innerHTML = task.checklist.map((item, index) => `
+                        <label class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600 transition ${canEdit ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600' : 'cursor-not-allowed opacity-80'}">
+                            <input type="checkbox" ${item.isDone ? 'checked' : ''} ${!canEdit ? 'disabled' : ''} onchange="window.toggleTaskChecklistItem('${task.id}', ${index})" class="w-5 h-5 rounded text-blue-600 focus:ring-blue-500">
+                            <span class="text-sm font-bold ${item.isDone ? 'text-gray-400 line-through' : 'text-gray-700 dark:text-gray-200'}">${item.text}</span>
+                        </label>
+                    `).join('');
+                };
+                
+                updateChecklistUI();
+            } else {
+                checklistContainer.classList.add('hidden');
+            }
+
+            window.openModal('taskDetailsModal');
+        };
+
+        window.toggleTaskChecklistItem = async (taskId, itemIndex) => {
+            const task = globalTasks.find(t => t.id === taskId);
+            if(!task || !task.checklist) return;
+            
+            task.checklist[itemIndex].isDone = !task.checklist[itemIndex].isDone;
+            
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), { 
+                    checklist: task.checklist 
+                });
+                // Snapshot listener will catch this and re-render Tasks automatically.
+                // We re-render the modal content to show the immediate UI update.
+                window.viewTaskDetails(taskId);
+            } catch(e) { console.error("Error updating checklist", e); }
+        };
+
+        window.toggleMentions = () => {
+            const list = document.getElementById('mentionsList');
+            list.classList.toggle('hidden');
+            if(!list.classList.contains('hidden')) {
+                let availableUsers = globalUsers;
+                const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                if(activeGroup && activeGroup.id !== 'global') {
+                    availableUsers = globalUsers.filter(u => activeGroup.members.includes(u.id));
+                }
+
+                let html = `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-bold text-red-500" onclick="window.selectMention('الجميع')">
+                    <i class="fa-solid fa-users mx-1 text-red-400"></i> الجميع
+                </div>`;
+
+                html += availableUsers.map(u => 
+                    `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-semibold text-primary dark:text-gray-200" onclick="window.selectMention('${u.name}')">
+                        <i class="fa-solid fa-user-circle mx-1 text-gray-400"></i> ${u.name}
+                    </div>`
+                ).join('');
+                
+                list.innerHTML = html;
+            }
+        };
+
+        window.selectMention = (name) => {
+            const input = document.getElementById('chatInput');
+            input.value += `@${name} `;
+            document.getElementById('mentionsList').classList.add('hidden');
+            input.focus();
+        };
+
+        window.deleteEmployee = async (id, name) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من حذف هذا الموظف؟')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)).catch(e => console.error(e));
+                logAction('حذف موظف', `تم حذف الموظف: ${name}`);
+            }
+        };
+
+        function listenForExternalBadges() {
+            onSnapshot(getColRef('meetings'), (snapshot) => {
+                if(!currentUserData) return;
+                let activeMeetingsCount = 0;
+                snapshot.forEach(doc => {
+                    const meeting = doc.data();
+                    const isInvited = meeting.invitedUsers && (meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO');
+                    if(isInvited && (meeting.status === 'scheduled' || meeting.status === 'active')) {
+                        activeMeetingsCount++;
+                    }
+                });
+                
+                const gridBadge = document.getElementById('gridMeetingsBadge');
+                const sidebarBadge = document.getElementById('sidebarMeetingsBadge');
+                
+                if(activeMeetingsCount > 0) {
+                    if(gridBadge) { gridBadge.innerText = activeMeetingsCount; gridBadge.classList.remove('hidden'); }
+                    if(sidebarBadge) { sidebarBadge.innerText = activeMeetingsCount; sidebarBadge.classList.remove('hidden'); }
+                } else {
+                        if(gridBadge) gridBadge.classList.add('hidden');
+                        if(sidebarBadge) sidebarBadge.classList.add('hidden');
+                    }
+                }, (error) => { console.error(error); });
+
+                if (currentUserData && currentUserData.role === 'CEO') {
+                    onSnapshot(getColRef('leaves'), (snapshot) => {
+                        let pendingLeavesCount = 0;
+                        snapshot.forEach(doc => {
+                            if (doc.data().status === 'pending') pendingLeavesCount++;
+                        });
+                        
+                        const gridBadge = document.getElementById('gridLeavesBadge');
+                        const sidebarBadge = document.getElementById('sidebarLeavesBadge');
+                        
+                        if(pendingLeavesCount > 0) {
+                            if(gridBadge) { gridBadge.innerText = pendingLeavesCount; gridBadge.classList.remove('hidden'); }
+                            if(sidebarBadge) { sidebarBadge.innerText = pendingLeavesCount; sidebarBadge.classList.remove('hidden'); }
+                        } else {
+                            if(gridBadge) gridBadge.classList.add('hidden');
+                            if(sidebarBadge) sidebarBadge.classList.add('hidden');
+                        }
+                    }, (error) => { console.error(error); });
+                }
+            }
+
+            function updateUIWithUserData() {
+                if(!currentUserData) return;
+                document.getElementById('userName').innerText = currentUserData.name;
+                document.getElementById('userRole').innerText = currentUserData.role;
+                document.getElementById('userAvatar').src = currentUserData.photoURL;
+
+                // My Profile Setup
+                const myProfileName = document.getElementById('myProfileName');
+                if(myProfileName) myProfileName.innerText = currentUserData.name;
+                const myProfileRole = document.getElementById('myProfileRole');
+                if(myProfileRole) myProfileRole.innerText = currentUserData.role;
+                const myProfileAvatar = document.getElementById('myProfileAvatar');
+                if(myProfileAvatar) myProfileAvatar.src = currentUserData.photoURL;
+                const myProfileAssets = document.getElementById('myProfileAssets');
+                if(myProfileAssets) myProfileAssets.innerText = currentUserData.assets || 'لا توجد عهد مسجلة حالياً.';
+
+                const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
+                if(settingsAvatarPreview) settingsAvatarPreview.src = currentUserData.photoURL;
+                const settingsName = document.getElementById('settingsName');
+                if(settingsName) settingsName.value = currentUserData.name;
+                const settingsRole = document.getElementById('settingsRole');
+                if(settingsRole) settingsRole.value = currentUserData.role;
+                
+                const layoutSelect = document.getElementById('settingsChatLayout');
+                if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
+
+                if (currentUserData.chatColor) {
+                    selectedChatColor = currentUserData.chatColor;
+                    const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+                    if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
+                    
+                    document.querySelectorAll('.color-btn').forEach(b => {
+                        b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
+                        b.classList.add('hover:scale-110');
+                        if(b.classList.contains(selectedChatColor)) {
+                            b.classList.remove('hover:scale-110');
+                            const ringClass = selectedChatColor.replace('bg-', 'ring-');
+                            b.className += ` ring-2 ring-offset-2 ${ringClass}`;
+                        }
+                    });
+                }
+
+                renderNotificationsDropdown(currentUserData.notifications || []);
+            }
+
+            function startDatabaseListeners() {
+                onSnapshot(getColRef('users'), (snapshot) => {
+                    globalUsers = [];
+                    snapshot.forEach(docSnap => {
+                        const uData = { id: docSnap.id, ...docSnap.data() };
+                        globalUsers.push(uData);
+                        if(currentUserData && uData.id === currentUserData.uid) {
+                            currentUserData = uData;
+                            groupReadTimestamps = currentUserData.readReceipts || {};
+                            updateUIWithUserData();
+                        }
+                    });
+                    localStorage.setItem('quill_users', JSON.stringify(globalUsers));
+                    renderEmployees();
+                    updateDashboardStats();
+                    
+                    const groupInfoModal = document.getElementById('groupInfoModal');
+                    if(groupInfoModal && !groupInfoModal.classList.contains('hidden')) {
+                        window.openGroupInfoModal();
+                    }
+                }, (error) => { console.error(error); });
+
+                if(currentUserData.role === 'CEO' || currentUserData.permissions?.canViewLogs) {
+                    const logsQuery = query(getColRef('logs'), orderBy('timestamp', 'desc'), limit(100));
+                    onSnapshot(logsQuery, (snapshot) => {
+                        globalLogs = [];
+                        snapshot.forEach(doc => {
+                            globalLogs.push({ id: doc.id, ...doc.data() });
+                        });
+                        renderLogs();
+                    }, (error) => { console.error(error); });
+                }
+
+                onSnapshot(getColRef('notices'), (snapshot) => {
+                    globalNotices = [];
+                    snapshot.forEach(doc => globalNotices.push({ id: doc.id, ...doc.data() }));
+                    globalNotices.sort((a, b) => b.timestamp - a.timestamp);
+                    localStorage.setItem('quill_notices', JSON.stringify(globalNotices));
+                    renderNotices();
+
+                    const lastRead = currentUserData.lastReadNotice || 0;
+                    const unreadNoticesCount = globalNotices.filter(n => n.timestamp > lastRead).length;
+                    const badge1 = document.getElementById('gridNoticesBadge');
+                    const badge2 = document.getElementById('sidebarNoticesBadge');
+                    
+                    if(unreadNoticesCount > 0) {
+                        if(badge1) { badge1.innerText = unreadNoticesCount; badge1.classList.remove('hidden');
+                                    }
+                        if(badge2) { badge2.innerText = unreadNoticesCount; badge2.classList.remove('hidden'); }
+                    } else {
+                        if(badge1) badge1.classList.add('hidden');
+                        if(badge2) badge2.classList.add('hidden');
+                    }
+
+                }, (error) => { console.error(error); });
+
+                onSnapshot(getColRef('clients'), (snapshot) => {
+                    globalCRM = [];
+                    snapshot.forEach(doc => globalCRM.push({ id: doc.id, ...doc.data() }));
+                    globalCRM.sort((a, b) => b.timestamp - a.timestamp);
+                    localStorage.setItem('quill_crm', JSON.stringify(globalCRM));
+                    renderCRM();
+                }, (error) => { console.error(error); });
+
+                onSnapshot(getColRef('tasks'), (snapshot) => {
+                    globalTasks = [];
+                    let hasNewAssignedTask = false;
+                    let latestTaskName = "";
+                    let pendingTasksForMe = 0;
+
+                    snapshot.forEach(doc => {
+                        const taskData = { id: doc.id, ...doc.data() };
+                        globalTasks.push(taskData);
+                        
+                        if (taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
+                            pendingTasksForMe++;
+                        }
+
+                        if (!initialTaskLoad && !knownTaskIds.has(taskData.id)) {
+                            knownTaskIds.add(taskData.id);
+                            if(taskData.assigneeId === currentUserData.uid && taskData.status === 'pending') {
+                                hasNewAssignedTask = true;
+                                latestTaskName = taskData.title;
+                            }
+                        } else if (initialTaskLoad) {
+                            knownTaskIds.add(taskData.id);
+                        }
+                    });
+                    
+                    localStorage.setItem('quill_tasks', JSON.stringify(globalTasks));
+                    
+                    const externalTaskBadges = document.querySelectorAll('.external-task-badge');
+                    externalTaskBadges.forEach(badge => {
+                        if (pendingTasksForMe > 0) {
+                            badge.innerText = pendingTasksForMe;
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    });
+
+                    if(hasNewAssignedTask) {
+                        showToast(`${t('مهمة جديدة')}: ${latestTaskName}`, 'warning');
+                        sendPushNotification(t('مهمة جديدة'), `${t('إسناد مهمة جديدة')}: ${latestTaskName}`, 'tasks');
+                    }
+                    initialTaskLoad = false;
+                    renderTasks();
+                    updateDashboardStats();
+                    
+                    // تحديث نافذة تفاصيل المهمة إذا كانت مفتوحة (خاصة عند التفاعل مع قائمة التحقق)
+                    const taskDetailsModal = document.getElementById('taskDetailsModal');
+                    if(taskDetailsModal && !taskDetailsModal.classList.contains('hidden')) {
+                        const activeTaskTitle = document.getElementById('td-title').innerText;
+                        const activeTask = globalTasks.find(t => t.title === activeTaskTitle);
+                        if(activeTask) {
+                            // إعادة رسم محتوى النافذة
+                            window.viewTaskDetails(activeTask.id);
+                        }
+                    }
+
+                    const ceoReportsModal = document.getElementById('ceoReportsModal');
+                    if(ceoReportsModal && !ceoReportsModal.classList.contains('hidden')) {
+                        const container = document.getElementById('ceoReportTasksDetails');
+                        if(container && container.innerHTML.includes('المهام المنجزة لـ:')) {
+                            const h4 = container.querySelector('h4');
+                            if(h4) {
+                                const empName = h4.innerText.split('لـ: ')[1];
+                                const emp = globalUsers.find(u => u.name === empName);
+                                if(emp) window.renderCeoEmployeeTasks(emp.id, emp.name);
+                            }
+                        }
+                    }
+                }, (error) => { console.error(error); });
+
+                onSnapshot(getColRef('groups'), (snapshot) => {
+                    globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
+                    let foundCurrentGroup = false;
+                    
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
+                            globalGroups.push({ id: doc.id, ...data });
+                            if (doc.id === currentGroupId) foundCurrentGroup = true;
+                        }
+                    });
+                    
+                    if(!foundCurrentGroup && currentGroupId !== 'global') {
+                        currentGroupId = 'global';
+                    }
+                    
+                    renderChatSidebarList();
+                    renderChat();
+                }, (error) => { console.error(error); });
+
+                const chatQuery = query(getColRef('chat'), orderBy('timestamp', 'desc'), limit(150));
+                onSnapshot(chatQuery, (snapshot) => {
+                    const oldChatCount = globalChat.length;
+                    globalChat = [];
+                    let hasUnreadChat = false;
+                    
+                    snapshot.forEach(doc => {
+                        const msg = { id: doc.id, ...doc.data() };
+                        globalChat.push(msg);
+                    });
+                    globalChat.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+                    globalChat.forEach(msg => {
+                        const groupId = msg.groupId || 'global';
+                        const lastRead = groupReadTimestamps[groupId] || 0;
+                        if (msg.uid !== currentUserData.uid && msg.timestamp > lastRead) {
+                            const inMyGroup = globalGroups.some(g => g.id === groupId);
+                            if (inMyGroup) hasUnreadChat = true;
+                        }
+                    });
+
+                    const externalChatBadges = document.querySelectorAll('.external-chat-badge');
+                    externalChatBadges.forEach(badge => {
+                        if (hasUnreadChat) {
+                            badge.innerText = '!';
+                            badge.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    });
+                    
+                    if (!initialChatLoad && globalChat.length > oldChatCount) {
+                        const latestMsg = globalChat[globalChat.length - 1];
+                        if (latestMsg && latestMsg.uid !== currentUserData.uid) {
+                            const group = globalGroups.find(g => g.id === (latestMsg.groupId || 'global'));
+                            
+                            if (group && (group.id === 'global' || group.members.includes(currentUserData.uid))) {
+                                const isMention = latestMsg.text && (latestMsg.text.includes(`@${currentUserData.name}`) || latestMsg.text.includes(`@الجميع`));
+                                const groupName = group.name || 'الشركة';
+                                
+                                if(!isMention) { // Mentions are handled by form submit
+                                    sendPushNotification(
+                                        `رسالة من ${latestMsg.senderName} في ${groupName}`,
+                                        latestMsg.text || 'أرسل مرفقاً',
+                                        'chat'
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    const chatEl = document.getElementById('chat');
+                    if (chatEl && !chatEl.classList.contains('hidden')) {
+                        updateReadReceipt(currentGroupId);
+                    }
+
+                    initialChatLoad = false;
+                    renderChatSidebarList(); 
+                    renderChat();
+                }, (error) => { console.error(error); });
+                
+                if(currentUserData && (currentUserData.role === 'CEO' || currentUserData.role === 'accountant' || currentUserData.permissions?.canExpenses)) {
+                    onSnapshot(getColRef('expenses'), (snapshot) => {
+                        globalExpenses = [];
+                        snapshot.forEach(doc => globalExpenses.push({id: doc.id, ...doc.data()}));
+                        globalExpenses.sort((a,b) => b.timestamp - a.timestamp);
+                    }, (error) => console.error(error));
+                }
+                
+                onSnapshot(getColRef('attendance'), (snapshot) => {
+                    globalAttendance = [];
+                    snapshot.forEach(d => globalAttendance.push({ id: d.id, ...d.data() }));
+                    
+                    if (currentUserData) {
+                        const today = getTodayDateString();
+                        const myTodayRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                        
+                        if (!myTodayRecord || myTodayRecord.status === 'completed') {
+                            hasPunchedInToday = false;
+                            lockNavigationIfNeeded();
+                        } else {
+                            hasPunchedInToday = true;
+                            unlockNavigation();
+                        }
+                    }
+                }, (error) => console.error(error));
+            }
+
+            onAuthStateChanged(auth, async (user) => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if(loadingScreen) loadingScreen.classList.add('hidden');
+                
+                if (user) {
+                    document.getElementById('systemPasswordScreen').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    currentUserAuth = user;
+                    try {
+                        const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid));
+                        if (docSnap.exists()) {
+                            currentUserData = docSnap.data();
+                            groupReadTimestamps = currentUserData.readReceipts || {};
+                            
+                            document.getElementById('setupProfileScreen').classList.add('hidden');
+                            finishLoginSetup();
+                        } else {
+                            document.getElementById('setupProfileScreen').classList.remove('hidden');
+                        }
+                    } catch(e) { 
+                        console.error("Error fetching user data:", e); 
+                        showToast('حدث خطأ في قراءة بياناتك، يرجى تحديث الصفحة', 'error');
+                    }
+                } else {
+                    localStorage.removeItem('quill_user_cache_main');
+                    document.getElementById('systemPasswordScreen').classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+                try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
+            });
+
+            document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('setupName').value;
+                const role = document.getElementById('setupRole').value;
+                try {
+                    const newUserData = {
+                        name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
+                        photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
+                        readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now(),
+                        permissions: {
+                            canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false
+                        }
+                    };
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
+                    currentUserData = newUserData;
+                    document.getElementById('setupProfileScreen').classList.add('hidden');
+                    finishLoginSetup();
+                } catch(e) { console.error(e); }
+            });
+
+            function finishLoginSetup() {
+                localStorage.setItem('quill_user_cache_main', JSON.stringify(currentUserData));
+                
+                updateUIWithUserData();
+
+                const isCEO = currentUserData.role === 'CEO';
+                const p = currentUserData.permissions || {};
+
+                if(isCEO) {
+                    document.getElementById('grid-employees').classList.remove('hidden');
+                    document.getElementById('grid-dashboard').classList.remove('hidden');
+                    document.getElementById('grid-logs').classList.remove('hidden');
+                    
+                    document.getElementById('nav-employees-btn').classList.remove('hidden');
+                    document.getElementById('nav-dashboard-btn').classList.remove('hidden');
+                    document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                    
+                    document.getElementById('clearLogsBtn').classList.remove('hidden'); 
+                    document.getElementById('clearLogsBtn').style.display = 'flex';
+                    document.getElementById('viewReportsBtn').classList.remove('hidden');
+                    document.getElementById('viewReportsBtn').style.display = 'flex';
+                    document.getElementById('empActionHeader').classList.remove('hidden');
+                    document.getElementById('ceoExportSection').classList.remove('hidden');
+                } else {
+                    document.getElementById('grid-employees').classList.add('hidden');
+                    document.getElementById('grid-dashboard').classList.add('hidden');
+                    
+                    if(p.canViewLogs) {
+                        document.getElementById('grid-logs').classList.remove('hidden');
+                        document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+                    } else {
+                        document.getElementById('grid-logs').classList.add('hidden');
+                        document.getElementById('nav-logs-btn').classList.add('hidden'); 
+                    }
+
+                    document.getElementById('nav-employees-btn').classList.add('hidden');
+                    document.getElementById('nav-dashboard-btn').classList.add('hidden');
+                    
+                    document.getElementById('clearLogsBtn').classList.add('hidden');
+                    document.getElementById('viewReportsBtn').classList.add('hidden');
+                    
+                    document.getElementById('empActionHeader').classList.add('hidden');
+                    document.getElementById('ceoExportSection').classList.add('hidden');
+                }
+                
+                if(isCEO || p.canNotices) document.getElementById('addNoticeBtn').classList.remove('hidden');
+                else document.getElementById('addNoticeBtn').classList.add('hidden');
+
+                if(isCEO || currentUserData.role === 'accountant' || p.canExpenses) {
+                    document.getElementById('nav-expenses-ext').classList.remove('hidden');
+                    document.getElementById('nav-expenses-ext').style.display = 'flex';
+                    document.getElementById('grid-expenses-ext').classList.remove('hidden');
+                }
+                
+                if (isCEO || p.canAssignTasks) {
+                    document.getElementById('addTaskBtn').classList.remove('hidden');
+                    document.getElementById('addTaskBtn').style.display = 'flex';
+                }
+                
+                document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+                
+                if(currentUserData.lastSystemExport) {
+                    const txt = document.getElementById('lastSystemExportTxt');
+                    if(txt) txt.innerText = 'آخر سحب: ' + new Date(currentUserData.lastSystemExport).toLocaleString('ar-EG');
+                }
+
+                logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام (المنصة الرئيسية)`);
+                startDatabaseListeners();
+                listenForExternalBadges(); 
+                handleHashChange();
+                
+                updateActivity();
+                setInterval(updateActivity, 60000);
+                setInterval(checkAndSendReminders, 300000);
+            }
+            
+            function updateActivity() {
+                if (!currentUserData) return;
+                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    lastActive: Date.now()
+                }).catch(e => { console.error(e); });
+            }
+        </script>
+    </body>
 </html>
