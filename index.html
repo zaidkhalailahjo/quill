@@ -33,11 +33,10 @@
     </script>
     <style>
         body { font-family: 'Cairo', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .dark ::-webkit-scrollbar-thumb { background: #4b5563; }
+        ::-webkit-scrollbar-thumb { background: #00839b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #002d74; }
         
         .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -93,44 +92,91 @@
             font-size: 1.5rem;
         }
 
-        /* Checkbox Custom Styling for Tasks */
-        .task-checkbox {
-            appearance: none;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid #cbd5e1;
-            border-radius: 0.25rem;
+        textarea::-webkit-scrollbar { width: 4px; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .dark textarea::-webkit-scrollbar-thumb { background: #4b5563; }
+        
+        .msg-options-btn { opacity: 0; transition: opacity 0.2s; }
+        .group:hover .msg-options-btn { opacity: 1; }
+        
+        .highlight-msg { animation: highlightAnim 2s ease-out; }
+        @keyframes highlightAnim {
+            0% { background-color: rgba(234, 179, 8, 0.4); }
+            100% { background-color: transparent; }
+        }
+
+        /* Task specific styles */
+        .task-input-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
             outline: none;
+            background: transparent;
+            width: 100%;
+            padding: 0.5rem 0;
+        }
+        .task-input-title::placeholder { color: #9ca3af; font-weight: normal; }
+        
+        .task-input-desc {
+            font-size: 1rem;
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            resize: none;
+            min-height: 60px;
+        }
+        .task-input-desc::placeholder { color: #9ca3af; }
+
+        .fire-icon {
+            color: #d1d5db;
+            transition: color 0.2s;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-        .task-checkbox:checked {
-            background-color: #10b981;
-            border-color: #10b981;
+        .fire-icon.active {
+            color: #ef4444; /* Red/Orange flame */
+            filter: drop-shadow(0px 0px 4px rgba(239, 68, 68, 0.4));
         }
-        .task-checkbox:checked::after {
-            content: '\f00c';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            color: white;
-            font-size: 0.75rem;
+
+        /* Checkbox styling */
+        .custom-checkbox {
+            appearance: none;
+            background-color: transparent;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
         }
-        .dark .task-checkbox {
-            border-color: #4b5563;
-            background-color: #374151;
+        .custom-checkbox::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+            transform: scale(0);
+            transform-origin: bottom left;
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            background-color: white;
         }
-        .dark .task-checkbox:checked {
-            background-color: #10b981;
-            border-color: #10b981;
+        .custom-checkbox:checked {
+            background-color: #00839b;
+            border-color: #00839b;
         }
+        .custom-checkbox:checked::before {
+            transform: scale(1);
+        }
+        .dark .custom-checkbox { border-color: #4b5563; }
+        .dark .custom-checkbox:checked { border-color: #00839b; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
 
-    <!-- شاشات التحميل وتسجيل الدخول (نفسها بدون تغيير) -->
     <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
         <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام...</p>
@@ -140,6 +186,7 @@
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain hidden dark:block">
+            
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4">رمز الدخول للنظام</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm">يرجى إدخال رمز المرور الخاص بالشركة للمتابعة</p>
             <input type="password" id="sysPasswordInput" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-3 focus:outline-none focus:border-secondary mb-4 text-center" placeholder="اكتب كلمة السر">
@@ -152,6 +199,7 @@
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain hidden dark:block">
+            
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4" data-i18n="مرحباً بك">مرحباً بك في نظام شركة quill</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm" data-i18n="يجب تسجيل الدخول">يجب تسجيل الدخول للوصول إلى النظام وإدارة مهامك</p>
             <button id="googleLoginBtn" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-bold py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm">
@@ -165,8 +213,10 @@
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain hidden dark:block">
+            
             <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2 text-center" data-i18n="إكمال بيانات الملف الشخصي">إكمال بيانات الملف الشخصي</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm text-center">مرحباً بك! يرجى إدخال اسمك وتحديد وظيفتك في الشركة للبدء</p>
+            
             <form id="setupProfileForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1" data-i18n="الاسم الكامل">الاسم الكامل</label>
@@ -192,14 +242,13 @@
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden w-full relative">
         
-        <!-- الهيدر (بدون تغيير) -->
         <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center z-10 flex-shrink-0 relative transition-colors">
             <div class="flex items-center space-x-2 md:space-x-4 space-x-reverse z-10">
                 <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary ml-2">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div class="flex items-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition" onclick="window.location.hash='settings'">
-                    <img id="userAvatar" src="" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-secondary object-cover">
                     <div class="mr-2 md:mr-3 hidden sm:block text-right">
                         <p id="userName" class="text-xs md:text-sm font-semibold text-gray-800 dark:text-white">جاري التحميل...</p>
                         <p id="userRole" class="text-[10px] md:text-xs text-secondary font-bold"></p>
@@ -209,24 +258,30 @@
                 <button id="installAppBtn" class="hidden text-gray-400 hover:text-secondary p-2 rounded transition font-bold" title="تثبيت التطبيق على الجهاز">
                     <i class="fa-solid fa-download text-lg"></i>
                 </button>
+
                 <button onclick="window.toggleLanguage()" class="text-gray-400 hover:text-secondary p-2 rounded transition font-bold" title="تبديل اللغة">
                     <span id="langIconTxt">EN</span>
                 </button>
+                
                 <button onclick="window.toggleTheme()" class="text-gray-400 hover:text-secondary p-2 rounded transition" title="الوضع الليلي/النهاري">
                     <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
                 </button>
-                <!-- جرس الإشعارات -->
+
+                <!-- Notifications Bell -->
                 <div class="relative">
                     <button onclick="window.toggleNotificationsDropdown()" class="text-gray-400 hover:text-secondary p-2 rounded transition relative" title="الإشعارات">
                         <i class="fa-solid fa-bell"></i>
                         <span id="notificationsBadge" class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden pointer-events-none">0</span>
                     </button>
+                    <!-- Notifications Dropdown -->
                     <div id="notificationsDropdown" class="hidden absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl w-72 max-h-80 overflow-hidden flex flex-col z-50">
                         <div class="bg-gray-50 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
                             <span class="font-bold text-sm text-gray-700 dark:text-gray-200">الإشعارات</span>
                             <button onclick="window.clearAllNotifications()" class="text-xs text-red-500 hover:underline font-bold py-1 px-2">حذف الكل</button>
                         </div>
-                        <div id="notificationsList" class="overflow-y-auto flex-1 p-2 space-y-2"></div>
+                        <div id="notificationsList" class="overflow-y-auto flex-1 p-2 space-y-2">
+                            <!-- Items go here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,13 +293,12 @@
                 <h2 id="page-title" class="text-lg md:text-xl font-bold text-primary dark:text-secondary hidden md:block" data-i18n="الرئيسية">الرئيسية - التطبيقات</h2>
             </div>
 
-            <div class="flex items-center flex-row-reverse z-10">
+            <div class="flex items-center flex-row-reverse z-10 font-bold text-2xl text-primary dark:text-white gap-2">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-8 md:h-10 object-contain block dark:hidden">
                 <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png" alt="Logo" class="h-8 md:h-10 object-contain hidden dark:block">
             </div>
         </header>
 
-        <!-- القائمة الجانبية للموبايل (بدون تغيير) -->
         <div id="mobileOverlay" class="fixed inset-0 bg-black/50 z-20 hidden md:hidden transition-opacity" onclick="window.toggleSidebar()"></div>
         <aside id="sidebar" class="fixed inset-y-0 right-0 transform translate-x-full transition duration-300 ease-in-out w-64 bg-primary dark:bg-gray-800 text-white flex flex-col shadow-xl z-30 flex-shrink-0 md:hidden">
             <div class="p-6 flex items-center justify-between border-b border-white/10 dark:border-gray-700">
@@ -281,6 +335,7 @@
 
                 <div class="mt-4 pt-4 border-t border-white/10 dark:border-gray-700">
                     <p class="text-[10px] text-gray-400 mb-2 px-2" data-i18n="تطبيقات خارجية">تطبيقات النظام الأخرى</p>
+                    
                     <a href="https://tasks.farah-snacks.store/#attendance" class="w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors">
                         <i class="fa-solid fa-clock w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="الحضور والانصراف">الحضور والانصراف</span>
                     </a>
@@ -332,9 +387,9 @@
             </div>
         </aside>
 
-        <!-- منطقة المحتوى -->
         <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 dark:bg-gray-900 relative">
             
+            <!-- قسم الرئيسية -->
             <section id="home-grid" class="section-content animate-fade-in p-4 md:p-10 max-w-6xl mx-auto">
                 <div id="attendanceLockBanner" class="bg-red-500 text-white p-4 rounded-xl mb-6 text-center font-bold shadow-md hidden flex-col items-center justify-center gap-3">
                     <div>
@@ -364,6 +419,7 @@
                 </div>
                 
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="homeGridContainer">
+                    
                     <div onclick="window.location.hash='tasks'" class="app-card hover:border-emerald-200 group relative">
                         <div class="app-icon-container bg-emerald-50 text-emerald-500 group-hover:scale-110 transition-transform">
                             <i class="fa-solid fa-list-check"></i>
@@ -467,14 +523,16 @@
                         </div>
                         <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="سجل النظام">سجل النظام</span>
                     </div>
+
                 </div>
             </section>
 
-            <!-- بقية الأقسام الأساسية (My Profile, Dashboard, Employees, Notices, CRM) بدون تغيير كبير هنا -->
+            <!-- قسم ملفي والعهد -->
             <section id="my-profile" class="section-content animate-fade-in hidden p-4 md:p-0 max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">ملفي الشخصي والعهد</p>
                 </div>
+                
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                     <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
                         <img id="myProfileAvatar" src="" class="w-20 h-20 rounded-full object-cover border-2 border-secondary">
@@ -483,6 +541,7 @@
                             <p id="myProfileRole" class="text-secondary font-semibold text-sm"></p>
                         </div>
                     </div>
+                    
                     <div class="mb-4">
                         <h4 class="font-bold text-primary dark:text-blue-400 mb-2 flex items-center gap-2">
                             <i class="fa-solid fa-boxes-stacked"></i> العهد والأصول المستلمة:
@@ -490,6 +549,7 @@
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[100px]">
                             <p id="myProfileAssets" class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap font-semibold leading-relaxed">لا توجد عهد مسجلة حالياً.</p>
                         </div>
+                        <p class="text-[10px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info"></i> هذه التفاصيل خاصة بك، ولا يمكن تعديلها إلا من قبل المدير.</p>
                     </div>
                 </div>
             </section>
@@ -536,7 +596,8 @@
                         <i class="fa-solid fa-bullhorn mx-2"></i> إضافة إعلان جديد
                     </button>
                 </div>
-                <div id="noticesList" class="space-y-4"></div>
+                <div id="noticesList" class="space-y-4">
+                </div>
             </section>
 
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
@@ -546,103 +607,90 @@
                         <i class="fa-solid fa-user-plus mx-2"></i> إضافة عميل جديد
                     </button>
                 </div>
-                <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
             </section>
 
-
-            <!-- ========================================== -->
-            <!-- === قسم إدارة المهام الجديد (القائمة) ==== -->
-            <!-- ========================================== -->
-            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-6 w-full">
-                
-                <!-- شريط المهام العلوي (البحث والتصفية والأزرار) -->
-                <div class="bg-[#002d74] dark:bg-gray-800 rounded-t-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 text-white w-full">
-                    <div class="flex items-center gap-3 w-full md:w-auto">
-                        <div class="bg-white/20 px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-pointer border border-white/30 text-sm">
-                            <span class="w-4 h-4 bg-orange-500 text-white text-xs flex items-center justify-center rounded-full">1</span> كل الأدوار <i class="fa-solid fa-chevron-down text-xs"></i>
-                        </div>
-                        <div class="relative flex-1 md:w-64">
-                            <input type="text" placeholder="عامل التصفية والبحث" class="w-full bg-white/10 border border-white/20 rounded-lg px-8 py-1.5 text-sm text-white placeholder-white/70 focus:outline-none focus:bg-white/20 transition-colors">
-                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-white/70 text-xs"></i>
+            <!-- المهام: التصميم الجديد -->
+            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0 flex flex-col h-full">
+                <!-- شريط المهام العلوي (بدون خلفية كما في الصورة) -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-3 bg-[#111827] p-2 md:p-4 rounded-xl text-white">
+                    <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto whitespace-nowrap pb-2 md:pb-0 hide-scrollbar">
+                        <span class="font-bold text-lg md:text-xl shrink-0"><i class="fa-solid fa-list-check ml-2 text-blue-400"></i>مهامي</span>
+                        <div class="h-6 w-px bg-gray-600 mx-2 hidden md:block"></div>
+                        <button onclick="window.openTaskModal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded-md text-sm font-bold transition flex items-center gap-1 shrink-0">
+                            <i class="fa-solid fa-plus"></i> إنشاء <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                        </button>
+                        
+                        <div class="relative w-full md:w-64 max-w-sm shrink-0">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="searchTasksInput" oninput="renderTasks()" placeholder="عامل التصفية والبحث" class="w-full bg-[#1f2937] border border-gray-600 rounded-md px-8 py-1.5 text-sm focus:outline-none focus:border-blue-400 text-white">
                         </div>
                     </div>
                     
-                    <div class="flex gap-2 w-full md:w-auto justify-end">
-                        <button id="viewReportsBtn" onclick="window.openCeoReportsModal()" class="hidden bg-white/20 hover:bg-white/30 text-white px-4 py-1.5 rounded-lg transition-colors items-center text-sm shadow-sm border border-white/20">
-                            <i class="fa-solid fa-folder-open mx-1"></i> المهام المنجزة
-                        </button>
-                        <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-[#10b981] hover:bg-[#059669] text-white px-4 py-1.5 rounded-lg transition-colors items-center text-sm shadow-sm font-bold">
-                            <i class="fa-solid fa-plus mx-1"></i> <span data-i18n="إنشاء">إنشاء</span> <i class="fa-solid fa-chevron-down text-xs ml-1 mr-2 opacity-70"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- شريط التبويبات الفرعي -->
-                <div class="bg-[#002d74]/90 dark:bg-gray-800/90 text-white px-4 py-2 flex flex-wrap gap-4 text-xs md:text-sm border-t border-white/10 w-full overflow-x-auto whitespace-nowrap">
-                    <button class="font-bold border-b-2 border-white pb-1 px-1">القائمة</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1">الموعد النهائي</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1">المخطط</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1">التقويم</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1">جانت</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1"><span class="bg-[#10b981] text-white px-1.5 rounded-full text-[10px] mx-1">1</span> دردشات المهمة</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1"><span class="bg-gray-500 text-white px-1.5 rounded-full text-[10px] mx-1">0</span> متأخرة</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1"><span class="bg-[#10b981] text-white px-1.5 rounded-full text-[10px] mx-1">1</span> التعليقات</button>
-                    <button class="opacity-70 hover:opacity-100 transition px-1 mr-auto">وضع علامة مقروءة للكل</button>
-                    <div class="flex items-center gap-2">
-                        <button class="bg-white/10 border border-white/20 rounded px-2 py-1 text-xs"><i class="fa-solid fa-cog"></i> قواعد الأتمتة</button>
-                        <button class="bg-white/10 border border-white/20 rounded px-2 py-1 text-xs">الملفات <i class="fa-solid fa-chevron-down text-[10px]"></i></button>
+                    <div class="flex items-center gap-2 text-sm shrink-0 w-full md:w-auto overflow-x-auto whitespace-nowrap pb-2 md:pb-0 hide-scrollbar">
+                        <button class="hover:text-blue-400 transition">وضع علامة مقروءة للكل</button>
+                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">التعليقات 1</span>
+                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">متأخرة 0</span>
+                        <span class="bg-gray-700 px-2 py-0.5 rounded-full text-xs">دردشات المهمة 1</span>
+                        <div class="h-4 w-px bg-gray-600 mx-1"></div>
+                        <button class="hover:text-blue-400 transition">جانت</button>
+                        <button class="hover:text-blue-400 transition">التقويم</button>
+                        <button class="hover:text-blue-400 transition">المخطط</button>
+                        <button class="hover:text-blue-400 transition">الموعد النهائي</button>
+                        <button class="bg-blue-600 text-white px-3 py-1 rounded transition border border-blue-500">القائمة</button>
                     </div>
                 </div>
 
-                <!-- جدول المهام -->
-                <div class="bg-white dark:bg-gray-800 rounded-b-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden overflow-x-auto w-full">
-                    <table class="w-full text-right min-w-[850px]">
-                        <thead class="border-b border-gray-200 dark:border-gray-700">
-                            <tr>
-                                <th class="p-3 w-10 text-center"><input type="checkbox" class="task-checkbox"></th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 w-8"><i class="fa-solid fa-cog"></i></th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400 w-1/4">الاسم</th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">نشط <i class="fa-solid fa-chevron-down text-[10px]"></i></th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">الموعد النهائي</th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">تم الإنشاء بواسطة</th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">الشخص المسؤول</th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">المشروع</th>
-                                <th class="p-3 text-sm font-semibold text-gray-500 dark:text-gray-400">العلامات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tasksTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
-                            <!-- سيتم حقن المهام هنا -->
-                        </tbody>
-                    </table>
+                <!-- جدول المهام (List View) -->
+                <div class="bg-white dark:bg-gray-800 rounded-t-xl shadow-sm border border-gray-200 dark:border-gray-700 flex-1 flex flex-col overflow-hidden">
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-right text-sm whitespace-nowrap">
+                            <thead class="text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-0 z-10">
+                                <tr>
+                                    <th class="p-3 font-normal min-w-[200px]"><input type="checkbox" class="ml-2 rounded border-gray-300"> <i class="fa-solid fa-gear text-gray-400 ml-1"></i> الاسم</th>
+                                    <th class="p-3 font-normal min-w-[120px]">نشط <i class="fa-solid fa-chevron-down text-[10px] mr-1"></i></th>
+                                    <th class="p-3 font-normal min-w-[150px]">الموعد النهائي</th>
+                                    <th class="p-3 font-normal min-w-[180px]">تم الإنشاء بواسطة</th>
+                                    <th class="p-3 font-normal min-w-[180px]">الشخص المسؤول</th>
+                                    <th class="p-3 font-normal min-w-[150px]">المشروع</th>
+                                    <th class="p-3 font-normal">العلامات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasksTableBody" class="divide-y divide-gray-100 dark:divide-gray-700">
+                                <!-- سيتم تعبئة المهام هنا عبر الجافاسكربت -->
+                            </tbody>
+                        </table>
+                    </div>
                     
-                    <!-- شريط أدوات الجدول السفلي -->
-                    <div class="p-4 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+                    <!-- تذييل الجدول (Pagination & Selection) -->
+                    <div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-3 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 shrink-0">
                         <div class="flex items-center gap-3">
-                            <select class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 outline-none bg-white dark:bg-gray-700">
+                            <select class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-2 py-1 outline-none">
                                 <option>تحديد إجراء</option>
+                                <option value="delete">حذف المحدد</option>
                             </select>
-                            <button class="bg-[#a5f3fc] text-[#0369a1] px-4 py-1 rounded opacity-50 cursor-not-allowed">تطبيق</button>
-                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="rounded"> للكل</label>
+                            <button class="bg-blue-200 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400 px-4 py-1 rounded font-bold opacity-50 cursor-not-allowed">تطبيق</button>
+                            <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" class="rounded border-gray-300"> للكل</label>
                         </div>
-                        <div class="flex items-center gap-6 font-bold">
-                            <span>الإجمالي: <span id="totalTasksCount" class="text-primary dark:text-secondary">0</span></span>
-                            <span>التحقق: 0 / <span id="totalChecklistCount">0</span></span>
-                            <span>الصفحات: 1</span>
+                        
+                        <div class="flex items-center gap-6">
+                            <span id="tasksTotalCountText">الإجمالي: 0</span>
+                            <span id="tasksPagesText">الصفحات: 1</span>
                             <div class="flex items-center gap-1">
-                                السجلات: <select class="border border-gray-300 dark:border-gray-600 rounded px-1 outline-none bg-white dark:bg-gray-700"><option>50</option></select>
+                                <select class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded px-2 py-1 outline-none">
+                                    <option>50</option>
+                                </select>
+                                <span>:السجلات</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </section>
-            <!-- ========================================== -->
 
-
-            <!-- بقية الأقسام (Chat, Settings, Logs) -->
             <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
-                <!-- كود الدردشة بقي كما هو تماماً لعدم التخريب -->
                 <div class="flex h-full bg-white dark:bg-gray-800 md:rounded-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden relative">
+                    
                     <div class="w-64 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex-col hidden md:flex flex-shrink-0 z-10">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 h-[68px]">
                             <span class="font-bold text-gray-700 dark:text-gray-200 text-sm"><i class="fa-solid fa-list-ul mx-2 text-gray-400"></i><span data-i18n="القنوات والمجموعات">القنوات والمجموعات</span></span>
@@ -656,21 +704,32 @@
                     <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 relative">
                         <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-3 md:p-4 flex flex-col md:flex-row justify-between md:items-center z-10 shadow-sm flex-shrink-0 min-h-[68px] gap-3 relative">
                             <div class="flex items-center gap-3 min-w-0 overflow-hidden">
-                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary"><i class="fa-solid fa-bars text-xl"></i></button>
-                                <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner"><i class="fa-solid fa-comments"></i></div>
+                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary">
+                                    <i class="fa-solid fa-bars text-xl"></i>
+                                </button>
+
+                                <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner">
+                                    <i class="fa-solid fa-comments"></i>
+                                </div>
                                 <div class="flex flex-col min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition" onclick="window.openGroupInfoModal()" title="عرض معلومات وأعضاء المجموعة">
                                     <h3 id="chatHeaderTitle" class="font-bold text-primary dark:text-secondary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
-                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span></p>
+                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate flex items-center gap-1">
+                                        <i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span>
+                                    </p>
                                 </div>
                             </div>
+                            
                             <div class="flex items-center gap-2 flex-shrink-0" id="chatHeaderActions">
                                 <button onclick="window.togglePinnedDropdown()" class="relative text-gray-500 hover:text-yellow-500 transition p-2" title="الرسائل المثبتة">
-                                    <i class="fa-solid fa-thumbtack text-lg"></i><span id="pinnedCountBadge" class="absolute top-0 right-0 bg-yellow-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                                    <i class="fa-solid fa-thumbtack text-lg"></i>
+                                    <span id="pinnedCountBadge" class="absolute top-0 right-0 bg-yellow-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
                                 </button>
+                                
                                 <div class="relative w-full md:w-auto ml-2">
                                     <input type="text" id="chatSearchInput" onkeyup="window.filterChat()" placeholder="البحث في الرسائل..." class="bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full px-8 py-1.5 text-sm focus:outline-none focus:border-secondary w-full md:w-48 transition-colors text-gray-700 dark:text-gray-200">
                                     <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 </div>
+                                
                                 <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-gray-600 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-gray-600 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1">
                                     <i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline" data-i18n="مسح الرسائل">مسح الرسائل</span>
                                 </button>
@@ -678,15 +737,20 @@
                                     <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline" data-i18n="حذف المجموعة">حذف المجموعة</span>
                                 </button>
                             </div>
-                            <div id="pinnedMessagesDropdown" class="hidden absolute top-full left-4 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-lg w-72 max-h-64 overflow-y-auto z-40 p-2 space-y-2"></div>
+                            
+                            <div id="pinnedMessagesDropdown" class="hidden absolute top-full left-4 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-lg w-72 max-h-64 overflow-y-auto z-40 p-2 space-y-2">
+                            </div>
                         </div>
 
                         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
 
                         <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between flex-shrink-0">
-                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold"><i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span></div>
+                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold">
+                                <i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز للإرسال</span>
+                            </div>
                             <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700 font-bold"><i class="fa-solid fa-xmark"></i> إزالة</button>
                         </div>
+
                         <div id="chatReplyPreview" class="hidden px-4 py-2 bg-gray-100 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 items-center justify-between flex-shrink-0 text-sm">
                             <div class="flex flex-col truncate border-r-4 border-secondary pr-2">
                                 <span class="font-bold text-primary dark:text-secondary text-xs flex items-center gap-1"><i class="fa-solid fa-reply"></i> الرد على: <span id="replyTargetName" class="text-gray-800 dark:text-gray-200"></span></span>
@@ -697,6 +761,7 @@
                         
                         <div class="p-3 md:p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 relative z-10 flex-shrink-0">
                             <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
+
                             <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg p-3 flex gap-2 z-20">
                                 <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي (افتراضي)"></button>
                                 <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
@@ -705,9 +770,11 @@
                                 <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
                                 <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
                             </div>
+
                             <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
                                 <i class="fa-solid fa-eye mx-1"></i> <span data-i18n="أنت تشاهد كمراقب">أنت تشاهد هذه المجموعة بصفة مراقب ولا يمكنك الكتابة فيها.</span>
                             </div>
+
                             <form id="chatForm" class="flex items-center bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl pr-4 pl-1 py-1 w-full relative shadow-sm">
                                 <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors font-bold self-end mb-2" title="ذكر شخص">@</button>
                                 <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
@@ -717,7 +784,9 @@
                                 <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors self-end mb-2" title="تغيير لون الرسالة">
                                     <i class="fa-solid fa-palette"></i>
                                 </button>
+                                
                                 <textarea id="chatInput" rows="1" placeholder="اكتب رسالتك... (Shift+Enter لسطر جديد)" class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-3 px-2 text-gray-700 dark:text-gray-200 resize-none overflow-y-auto min-h-[44px] max-h-[120px]"></textarea>
+                                
                                 <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow self-end mb-1">
                                     <i class="fa-regular fa-paper-plane transform -scale-x-100" id="sendIconDir"></i>
                                 </button>
@@ -731,11 +800,13 @@
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إعدادات الحساب">إعدادات الحساب والملف الشخصي</p>
                 </div>
+                
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 max-w-xl mx-auto md:mx-0">
                     <h3 class="font-bold text-primary dark:text-secondary mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 text-lg"><i class="fa-solid fa-user-gear mx-2"></i><span data-i18n="معلومات الحساب">معلومات الحساب الأساسية</span></h3>
+                    
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-right">
                         <div class="relative group">
-                            <img id="settingsAvatarPreview" src="" class="w-24 h-24 rounded-full border-4 border-gray-50 dark:border-gray-700 object-cover shadow-md">
+                            <img id="settingsAvatarPreview" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-24 h-24 rounded-full border-4 border-gray-50 dark:border-gray-700 object-cover shadow-md">
                             <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onclick="document.getElementById('profilePicInput').click()">
                                 <i class="fa-solid fa-camera text-white text-xl"></i>
                             </div>
@@ -749,6 +820,7 @@
                             </button>
                         </div>
                     </div>
+
                     <div class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الاسم الكامل">الاسم الكامل</span> <span class="text-[10px] text-red-400 font-normal mx-1" data-i18n="(لا يمكن تعديله)">(لا يمكن تعديله إلا من قبل المدير)</span></label>
@@ -802,17 +874,110 @@
         </div>
     </div>
 
-    <!-- النوافذ المنبثقة الأساسية -->
-    <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
-                <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
-                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- نافذة إنشاء مهمة جديدة (التصميم الجديد) -->
+    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="p-4 flex justify-between items-start border-b border-gray-100 dark:border-gray-700">
+                <div class="flex-1 w-full pl-4">
+                    <input type="text" id="taskTitle" required placeholder="اسم المهمة" class="task-input-title dark:text-white">
+                </div>
+                <div class="flex items-center gap-4 shrink-0 mt-2">
+                    <button type="button" onclick="window.toggleTaskPriority()" class="fire-icon text-xl" id="taskPriorityBtn" title="تحديد كأولوية قصوى">
+                        <i class="fa-solid fa-fire"></i>
+                    </button>
+                    <button type="button" onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
             </div>
-            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList"></div>
+
+            <!-- Body -->
+            <div class="p-4 md:p-6 overflow-y-auto flex-1 custom-scrollbar">
+                <form id="addTaskForm" class="space-y-6">
+                    <input type="hidden" id="taskIsPriority" value="false">
+                    
+                    <div>
+                        <textarea id="taskDesc" placeholder="الوصف..." class="task-input-desc dark:text-gray-300"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600 dark:text-gray-400">
+                        <div class="flex flex-col gap-1">
+                            <span class="mb-1 text-xs font-bold">الشخص المسؤول:</span>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-circle-user text-xl text-gray-400"></i>
+                                <select id="taskAssignee" required class="flex-1 bg-transparent border-none outline-none font-semibold text-gray-800 dark:text-gray-200 cursor-pointer">
+                                    <!-- يتم تعبئتها عبر الجافاسكريبت -->
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <span class="mb-1 text-xs font-bold">الموعد النهائي:</span>
+                            <div class="flex items-center gap-2">
+                                <i class="fa-regular fa-calendar text-xl text-blue-500"></i>
+                                <input type="datetime-local" id="taskDeadline" required class="flex-1 bg-transparent border-none outline-none font-semibold text-gray-800 dark:text-gray-200 cursor-pointer" dir="ltr">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- قسم قوائم التحقق -->
+                    <div id="checklistsContainer" class="hidden border-t border-gray-100 dark:border-gray-700 pt-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2 text-primary dark:text-blue-400 font-bold">
+                                <i class="fa-solid fa-list-check"></i> قائمة التحقق #1
+                            </div>
+                            <div class="text-xs text-gray-400 flex items-center gap-2">
+                                <span id="checklistProgressText">المكتمل: 0 من 0</span>
+                                <div class="w-20 h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                                    <div id="checklistProgressBar" class="bg-blue-500 h-full w-0 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="checklistItems" class="space-y-2 mb-3">
+                            <!-- بنود القائمة تضاف هنا -->
+                        </div>
+                        
+                        <button type="button" onclick="window.addChecklistItem()" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-sm flex items-center gap-2 py-2 w-full transition">
+                            <i class="fa-solid fa-plus"></i> إضافة عنصر
+                        </button>
+                    </div>
+
+                    <!-- Footer Action Buttons & Submit -->
+                    <div class="border-t border-gray-100 dark:border-gray-700 pt-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        
+                        <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700/50 p-1.5 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <!-- زر وهمي للمشروع للمطابقة مع الصورة -->
+                            <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
+                                <i class="fa-regular fa-folder"></i> المشروع
+                            </button>
+                            <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                            <!-- زر إظهار قائمة التحقق -->
+                            <button type="button" onclick="window.toggleChecklistSection()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
+                                <i class="fa-solid fa-list-check"></i> قوائم التحقق
+                            </button>
+                            <div class="w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+                            <button type="button" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-1.5 rounded flex items-center gap-2 text-xs font-bold transition">
+                                <i class="fa-solid fa-paperclip"></i> الملفات
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0">
+                            <button type="button" onclick="window.closeModal('taskModal')" class="px-6 py-2 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition w-full md:w-auto text-sm">
+                                إلغاء
+                            </button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 rounded-lg font-bold shadow-md transition w-full md:w-auto text-sm">
+                                إنشاء
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
+    <!-- نافذة تقرير المهمة القديمة ستبقى للإنهاء -->
     <div id="taskReportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-green-600 text-white p-4 flex justify-between items-center">
@@ -839,99 +1004,18 @@
         </div>
     </div>
 
-    <!-- نافذة إنشاء مهمة جديدة (المطابقة للصور) -->
-    <div id="taskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[95vh]">
-            <form id="addTaskForm" class="flex flex-col h-full">
-                
-                <!-- رأس النافذة مطابق للصورة الثانية -->
-                <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col gap-2 relative">
-                    <div class="flex justify-between items-start w-full">
-                        <input type="text" id="taskTitle" required placeholder="اسم المهمة" class="text-2xl font-bold text-gray-800 dark:text-white bg-transparent border-none outline-none w-full placeholder-gray-400">
-                        <div class="flex items-center gap-3">
-                            <button type="button" id="priorityToggleBtn" onclick="window.togglePriority()" class="text-gray-300 hover:text-orange-500 transition text-xl"><i class="fa-solid fa-fire"></i></button>
-                            <button type="button" onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 transition text-xl"><i class="fa-solid fa-xmark"></i></button>
-                        </div>
-                    </div>
-                    <textarea id="taskDesc" placeholder="الوصف" rows="2" class="w-full text-sm text-gray-500 dark:text-gray-400 bg-transparent border-none outline-none resize-none mt-2 placeholder-gray-400"></textarea>
-                </div>
-
-                <div class="p-6 overflow-y-auto flex-1 space-y-5">
-                    <!-- حقل المسؤول -->
-                    <div class="flex items-center gap-4 text-sm">
-                        <span class="w-24 text-gray-500 font-semibold">الشخص المسؤول:</span>
-                        <div class="flex items-center gap-2 flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg p-2 border border-gray-100 dark:border-gray-600">
-                            <i class="fa-solid fa-user-circle text-gray-400 text-lg"></i>
-                            <select id="taskAssignee" required class="bg-transparent border-none outline-none w-full text-gray-700 dark:text-gray-200 cursor-pointer">
-                                <!-- سيتم تعبئتها ديناميكياً -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- حقل الموعد النهائي -->
-                    <div class="flex items-center gap-4 text-sm">
-                        <span class="w-24 text-gray-500 font-semibold">الموعد النهائي:</span>
-                        <div class="flex items-center gap-2 flex-1 bg-gray-50 dark:bg-gray-700 rounded-lg p-2 border border-gray-100 dark:border-gray-600">
-                            <i class="fa-regular fa-calendar text-blue-500 text-lg"></i>
-                            <input type="datetime-local" id="taskDeadline" class="bg-transparent border-none outline-none w-full text-gray-700 dark:text-gray-200 cursor-pointer" required>
-                        </div>
-                    </div>
-                    
-                    <hr class="border-gray-100 dark:border-gray-700 my-4">
-
-                    <!-- أزرار الخيارات السفلية -->
-                    <div class="flex items-center gap-3">
-                        <button type="button" class="border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                            <i class="fa-regular fa-folder text-gray-400"></i> المشروع
-                        </button>
-                        <button type="button" onclick="window.toggleChecklistSection()" class="border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-gray-400"></i> قوائم التحقق
-                        </button>
-                        <button type="button" class="border border-gray-200 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
-                            <i class="fa-solid fa-paperclip text-gray-400"></i> الملفات
-                        </button>
-                    </div>
-
-                    <!-- قسم قائمة التحقق (الصورة الثالثة) -->
-                    <div id="checklistSection" class="hidden mt-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-list-check text-blue-500"></i> قائمة التحقق #1</h4>
-                            <div class="flex gap-2 text-gray-400">
-                                <button type="button"><i class="fa-solid fa-fire hover:text-orange-500"></i></button>
-                                <button type="button"><i class="fa-solid fa-paperclip hover:text-gray-600"></i></button>
-                                <button type="button" onclick="window.toggleChecklistSection()"><i class="fa-solid fa-trash hover:text-red-500"></i></button>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-2 text-xs text-gray-500 mb-3">
-                            <span id="checklistProgressText">المكتمل: 0 من 0</span>
-                            <div class="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div id="checklistProgressBar" class="h-full bg-[#10b981] w-0 transition-all"></div>
-                            </div>
-                        </div>
-
-                        <div id="checklistItemsContainer" class="space-y-2 mb-3">
-                            <!-- سيتم إضافة عناصر القائمة هنا -->
-                        </div>
-
-                        <div class="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-600">
-                            <i class="fa-solid fa-plus text-gray-400"></i>
-                            <input type="text" id="newChecklistItemInput" placeholder="إضافة عنصر" class="bg-transparent border-none outline-none text-sm w-full" onkeypress="if(event.key === 'Enter'){ event.preventDefault(); window.addChecklistItem(); }">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
-                    <div class="flex gap-2">
-                        <button type="submit" class="bg-[#007bff] hover:bg-[#0056b3] text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors shadow-sm">إنشاء</button>
-                        <button type="button" onclick="window.closeModal('taskModal')" class="text-gray-500 hover:bg-gray-200 px-4 py-2 rounded-lg font-bold text-sm transition-colors">إلغاء</button>
-                    </div>
-                </div>
-            </form>
+    <!-- نافذة تفاصيل القراءة للمحادثات وغيرها تبقى كما هي -->
+    <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
+                <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
+                <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList">
+            </div>
         </div>
     </div>
 
-    <!-- بقية النوافذ المنبثقة الأخرى بدون تغيير -->
     <div id="ceoReportsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
             <div class="bg-gray-700 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1140,32 +1224,6 @@
         </div>
     </div>
 
-    <div id="exportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-primary text-white p-4 flex justify-between items-center">
-                <h3 class="font-bold text-base md:text-lg">سحب تفاصيل النظام (كاملة)</h3>
-                <button onclick="window.closeModal('exportModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-6 text-center">
-                <i class="fa-solid fa-database text-4xl text-gray-400 mb-3"></i>
-                <p class="text-sm text-gray-600 dark:text-gray-300 font-bold mb-1">اختر الصيغة التي تريد تحميل البيانات بها</p>
-                <p id="lastSystemExportTxt" class="text-[10px] text-red-500 font-bold mb-6">آخر سحب: لم يتم السحب بعد</p>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="window.exportSystemData('excel')" class="flex flex-col items-center justify-center gap-2 p-4 bg-green-50 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-gray-600 border border-green-200 dark:border-gray-600 rounded-xl transition cursor-pointer">
-                        <i class="fa-solid fa-file-excel text-3xl text-green-600 dark:text-green-400"></i>
-                        <span class="font-bold text-gray-800 dark:text-white text-sm">ملف Excel</span>
-                    </button>
-                    
-                    <button onclick="window.exportSystemData('pdf')" class="flex flex-col items-center justify-center gap-2 p-4 bg-red-50 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-gray-600 border border-red-200 dark:border-gray-600 rounded-xl transition cursor-pointer">
-                        <i class="fa-solid fa-file-pdf text-3xl text-red-600 dark:text-red-400"></i>
-                        <span class="font-bold text-gray-800 dark:text-white text-sm">ملف PDF</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="printArea" class="hidden bg-white text-black p-8 text-right" dir="rtl"></div>
 
     <script>
@@ -1197,7 +1255,6 @@
         const db = getFirestore(app);
         const appId = 'quill-world-system';
 
-        // Email JS Constants
         const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
         const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
         const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
@@ -1214,20 +1271,43 @@
 
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
 
-        // Dictionary and Language Logic (مخفي للاختصار وموجود بالكامل في الكود الأصلي)
         const i18nDict = {
-            "التطبيقات": "Applications", "اختر التطبيق الذي تود العمل عليه": "Choose an application to work on",
-            "لوحات البيانات": "Dashboards", "الموظفون": "Employees", "المهام": "Tasks", "التعميمات": "Notice Board",
-            "العملاء": "CRM", "المناقشة": "Chat", "سجل النظام": "System Logs", "الإعدادات": "Settings",
-            "الرئيسية": "Home", "جاري التحميل...": "Loading...", "مرحباً بك": "Welcome",
-            "يجب تسجيل الدخول": "Please login to access the system", "تسجيل الدخول باستخدام Google": "Login with Google",
-            "إكمال بيانات الملف الشخصي": "Complete Profile Setup", "الاسم الكامل": "Full Name",
-            "الوظيفة (الدور)": "Role", "الدخول للنظام": "Enter System", "الموظفين المسجلين": "Registered Employees",
-            "إجمالي المهام": "Total Tasks", "مهام مكتملة": "Completed Tasks", "فريق العمل المسجل": "Registered Team Members",
-            "الاسم": "Name", "الوظيفة": "Job Role", "الإجراءات": "Actions", "إدارة المهام": "Task Management",
-            "إسناد مهمة جديدة": "Assign New Task", "قيد الانتظار": "Pending ⏳", "قيد التنفيذ": "In Progress 🛠️",
-            "مكتمل": "Completed ✅", "تطبيقات خارجية": "Other Apps", "الحضور والانصراف": "Attendance",
-            "الإجازات": "Leaves", "المستندات": "Documents", "الاجتماعات": "Meetings", "إنشاء": "Create"
+            "التطبيقات": "Applications",
+            "اختر التطبيق الذي تود العمل عليه": "Choose an application to work on",
+            "لوحات البيانات": "Dashboards",
+            "الموظفون": "Employees",
+            "المهام": "Tasks",
+            "التعميمات": "Notice Board",
+            "العملاء": "CRM",
+            "المناقشة": "Chat",
+            "سجل النظام": "System Logs",
+            "الإعدادات": "Settings",
+            "الرئيسية": "Home",
+            "جاري التحميل...": "Loading...",
+            "مرحباً بك": "Welcome",
+            "يجب تسجيل الدخول": "Please login to access the system",
+            "تسجيل الدخول باستخدام Google": "Login with Google",
+            "إكمال بيانات الملف الشخصي": "Complete Profile Setup",
+            "الاسم الكامل": "Full Name",
+            "الوظيفة (الدور)": "Role",
+            "الدخول للنظام": "Enter System",
+            "الموظفين المسجلين": "Registered Employees",
+            "إجمالي المهام": "Total Tasks",
+            "مهام مكتملة": "Completed Tasks",
+            "فريق العمل المسجل": "Registered Team Members",
+            "الاسم": "Name",
+            "الوظيفة": "Job Role",
+            "الإجراءات": "Actions",
+            "إدارة المهام": "Task Management",
+            "إسناد مهمة جديدة": "Assign New Task",
+            "قيد الانتظار": "Pending ⏳",
+            "قيد التنفيذ": "In Progress 🛠️",
+            "مكتمل": "Completed ✅",
+            "تطبيقات خارجية": "Other Apps",
+            "الحضور والانصراف": "Attendance",
+            "الإجازات": "Leaves",
+            "المستندات": "Documents",
+            "الاجتماعات": "Meetings"
         };
 
         window.currentLang = localStorage.getItem('appLang') || 'ar';
@@ -1296,9 +1376,100 @@
         let groupReadTimestamps = {}; 
         let hasPunchedInToday = true;
         
-        // المتغيرات الجديدة الخاصة بالمهام
-        let isTaskHighPriority = false;
-        let currentTaskChecklist = [];
+        let pendingChatFileData = null;
+        let pendingChatFileType = null;
+        let selectedChatColor = 'bg-[#00839b]'; 
+        
+        let replyingToMsg = null;
+
+        // ====== Notifications Logic ======
+        window.toggleNotificationsDropdown = () => {
+            const dropdown = document.getElementById('notificationsDropdown');
+            dropdown.classList.toggle('hidden');
+            if(!dropdown.classList.contains('hidden') && currentUserData) {
+                document.getElementById('notificationsBadge').classList.add('hidden');
+                document.getElementById('notificationsBadge').innerText = '0';
+            }
+        };
+
+        function addNotificationToDB(title, body, link) {
+            if(!currentUserData) return;
+            const newNotif = {
+                id: Date.now().toString(),
+                title: title,
+                body: body,
+                link: link || 'home-grid',
+                timestamp: Date.now()
+            };
+            let currentNotifs = currentUserData.notifications || [];
+            currentNotifs.unshift(newNotif);
+            if(currentNotifs.length > 50) currentNotifs = currentNotifs.slice(0, 50);
+            
+            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                notifications: currentNotifs
+            }).catch(e => console.error(e));
+        }
+
+        window.clearAllNotifications = async () => {
+            if(!currentUserData) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    notifications: []
+                });
+                renderNotificationsDropdown([]);
+            } catch(e) { console.error(e); }
+        };
+
+        window.deleteNotification = async (notifId) => {
+            if(!currentUserData) return;
+            try {
+                let currentNotifs = currentUserData.notifications || [];
+                currentNotifs = currentNotifs.filter(n => n.id !== notifId);
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    notifications: currentNotifs
+                });
+            } catch(e) { console.error(e); }
+        };
+
+        function renderNotificationsDropdown(notifsArray) {
+            const list = document.getElementById('notificationsList');
+            list.innerHTML = '';
+            if(!notifsArray || notifsArray.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 text-sm py-4">لا يوجد إشعارات</p>';
+                return;
+            }
+            notifsArray.forEach(n => {
+                const time = new Date(n.timestamp).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+                list.innerHTML += `
+                    <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-600 relative group transition hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer" onclick="window.handleNotificationClick('${n.link || 'home-grid'}', '${n.id}')">
+                        <h4 class="font-bold text-sm text-primary dark:text-secondary mb-1">${n.title}</h4>
+                        <p class="text-xs text-gray-600 dark:text-gray-300 mb-2">${n.body}</p>
+                        <p class="text-[10px] text-gray-400">${time}</p>
+                        <button onclick="event.stopPropagation(); window.deleteNotification('${n.id}')" class="absolute top-2 left-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-2"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        window.handleNotificationClick = (link, id) => {
+            window.location.hash = link;
+            window.toggleNotificationsDropdown(); 
+        };
+
+        function sendPushNotification(title, body, link) {
+            addNotificationToDB(title, body, link);
+            if ("Notification" in window && Notification.permission === "granted") {
+                const notif = new Notification(title, { 
+                    body: body, 
+                    icon: document.documentElement.classList.contains('dark') ? 'https://quill.world/wp-content/uploads/2022/01/New-Project-10-1.png' : 'https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png'
+                });
+                notif.onclick = function() {
+                    window.focus();
+                    window.location.hash = link || 'home-grid';
+                };
+            }
+        }
+        // =================================
 
         window.checkSystemPassword = () => {
             const pass = document.getElementById('sysPasswordInput').value;
@@ -1326,196 +1497,765 @@
             }, 4000);
         }
 
-        function getColRef(colName) { return collection(db, 'artifacts', appId, 'public', 'data', colName); }
+        function getColRef(colName) {
+            return collection(db, 'artifacts', appId, 'public', 'data', colName);
+        }
         
         window.logAction = async (action, details) => {
             if(!currentUserData) return;
             try {
                 await addDoc(getColRef('logs'), {
-                    action: action, details: details, userName: currentUserData.name, uid: currentUserData.uid, timestamp: Date.now()
+                    action: action,
+                    details: details,
+                    userName: currentUserData.name,
+                    uid: currentUserData.uid,
+                    timestamp: Date.now()
                 });
-            } catch(e) {}
+            } catch(e) { console.error("Error logging action", e); }
         };
 
-        // --- منطق قوائم التحقق والأولوية للمهام الجديدة ---
-        window.togglePriority = () => {
-            isTaskHighPriority = !isTaskHighPriority;
-            const btn = document.getElementById('priorityToggleBtn');
-            if(isTaskHighPriority) {
-                btn.classList.add('text-orange-500');
-                btn.classList.remove('text-gray-300');
+        window.clearSystemLogs = async () => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من مسح جميع السجلات؟')) {
+                try {
+                    globalLogs.forEach(async (log) => {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', log.id));
+                    });
+                    showToast('تمت عملية المسح بنجاح', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.clearOrDeleteGroup = async (action) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(currentGroupId === 'global' && action === 'delete') return;
+
+            if(confirm(action === 'clear' ? 'هل أنت متأكد من مسح جميع الرسائل في هذه المجموعة؟' : 'هل أنت متأكد من حذف هذه المجموعة نهائياً؟')) {
+                try {
+                    const msgs = globalChat.filter(m => (m.groupId || 'global') === currentGroupId);
+                    msgs.forEach(async (m) => await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'chat', m.id)));
+
+                    if(action === 'delete') {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', currentGroupId));
+                        currentGroupId = 'global';
+                        window.showSection('home-grid');
+                    }
+                    showToast('تم تنفيذ الإجراء بنجاح', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.selectGroup = (groupId) => {
+            currentGroupId = groupId;
+            updateReadReceipt(groupId); 
+            renderChatSidebarList();
+            renderChat();
+            if(window.innerWidth < 768) {
+               document.getElementById('chatSubMenuMobile').classList.add('max-h-0', 'opacity-0');
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const submitBtn = document.querySelector('#chatForm button[type="submit"]');
+                        if (submitBtn) submitBtn.click();
+                    }
+                });
+                
+                chatInput.addEventListener('input', function() {
+                    this.style.height = '44px'; 
+                    if(this.value.trim() !== '') {
+                        this.style.height = (this.scrollHeight) + 'px';
+                    }
+                });
+            }
+        });
+
+        function getTodayDateString() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+        
+        window.punchIn = async () => {
+            if(!currentUserData) return;
+            const today = getTodayDateString();
+            const docId = `${currentUserData.uid}_${today}`;
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), {
+                    uid: currentUserData.uid, name: currentUserData.name, date: today, punchIn: Date.now(), breaks: [], punchOut: null, status: 'active'
+                });
+                showToast('تم تسجيل الدخول بنجاح', 'success');
+                window.logAction('حضور', 'قام الموظف بتسجيل الدخول للدوام من المنصة الرئيسية');
+                hasPunchedInToday = true;
+                unlockNavigation();
+            } catch(e) { console.error(e); }
+        };
+
+        window.punchOutFromMain = async () => {
+            if(!confirm('هل أنت متأكد من تسجيل الانصراف وإنهاء الدوام لهذا اليوم؟')) return;
+            if(!currentUserData) return;
+            const today = getTodayDateString();
+            const docId = `${currentUserData.uid}_${today}`;
+            try {
+                const record = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                if(record) {
+                    let breaks = record.breaks || [];
+                    if(breaks.length > 0 && breaks[breaks.length - 1].end === null) {
+                        breaks[breaks.length - 1].end = Date.now();
+                    }
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'attendance', docId), { breaks: breaks, punchOut: Date.now(), status: 'completed' });
+                    showToast('تم تسجيل الانصراف بنجاح.', 'success');
+                    window.logAction('انصراف', 'قام الموظف بتسجيل الانصراف من المنصة الرئيسية');
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        window.exportSystemData = (format) => {
+            if(!currentUserData || currentUserData.role !== 'CEO') return;
+
+            showToast('جاري تجهيز البيانات، سيتم التحميل خلال لحظات...', 'info');
+
+            const now = new Date();
+            let content = "";
+            let htmlContent = "";
+
+            if (format === 'excel') {
+                content = "\uFEFF"; 
+                content += `تقرير نظام شركة Quill الشامل (كامل السجل)\nتاريخ السحب: ${now.toLocaleString('ar-EG')}\n\n`;
+
+                content += "--- الموظفون ---\nالاسم,الوظيفة,تاريخ الانضمام\n";
+                globalUsers.forEach(u => { content += `"${u.name}","${u.role}","${new Date(u.timestamp||0).toLocaleDateString('ar-EG')}"\n`; });
+                
+                content += "\n--- الحضور والانصراف (السجل الكامل) ---\nالموظف,التاريخ,تسجيل الدخول,تسجيل الانصراف,الحالة\n";
+                globalAttendance.forEach(a => {
+                    const pIn = a.punchIn ? new Date(a.punchIn).toLocaleTimeString('ar-EG') : '-';
+                    const pOut = a.punchOut ? new Date(a.punchOut).toLocaleTimeString('ar-EG') : '-';
+                    content += `"${a.name}","${a.date}","${pIn}","${pOut}","${a.status}"\n`;
+                });
+
+                content += "\n--- الإجازات والمغادرات (السجل الكامل) ---\nالموظف,النوع,من,إلى,السبب,الحالة\n";
+                globalLeaves.forEach(l => {
+                    const fromStr = new Date(l.from).toLocaleString('ar-EG');
+                    const toStr = new Date(l.to).toLocaleString('ar-EG');
+                    const reasonStr = l.reason ? l.reason.replace(/"/g, '""').replace(/\n/g, ' ') : '-';
+                    content += `"${l.name}","${l.type}","${fromStr}","${toStr}","${reasonStr}","${l.status}"\n`;
+                });
+
+                content += "\n--- المهام (السجل الكامل) ---\nالعنوان,المسؤول,تاريخ الإنشاء,وقت التسليم,الحالة\n";
+                globalTasks.forEach(t => {
+                    const createdStr = new Date(t.timestamp).toLocaleString('ar-EG');
+                    const deadlineStr = t.deadline ? new Date(t.deadline).toLocaleString('ar-EG') : '-';
+                    content += `"${t.title.replace(/"/g, '""')}","${t.assigneeName}","${createdStr}","${deadlineStr}","${t.status}"\n`;
+                });
+
+                if(globalExpenses && globalExpenses.length > 0) {
+                    content += "\n--- المصاريف والنثريات (السجل الكامل) ---\nالتاريخ,البيان,المبلغ,بواسطة\n";
+                    globalExpenses.forEach(e => { content += `"${e.date}","${e.desc.replace(/"/g, '""')}","${e.amount}","${e.addedBy}"\n`; });
+                }
+
+                const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.setAttribute("href", url);
+                link.setAttribute("download", `Quill_System_Export_${now.getTime()}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+            } else if (format === 'pdf') {
+                htmlContent = `
+                    <div style="font-family: 'Cairo', sans-serif; padding: 20px;">
+                        <h1 style="color: #002d74; border-bottom: 2px solid #00839b; padding-bottom: 10px;">تقرير نظام شركة Quill الشامل</h1>
+                        <p style="color: gray;">تاريخ سحب التقرير: ${now.toLocaleString('ar-EG')}</p>
+                        
+                        <h3 style="color: #00839b; margin-top: 30px;">إحصائيات النظام:</h3>
+                        <ul>
+                            <li>عدد الموظفين المسجلين: ${globalUsers.length}</li>
+                            <li>إجمالي المهام في النظام: ${globalTasks.length}</li>
+                            <li>إجمالي طلبات الإجازات والمغادرات: ${globalLeaves.length}</li>
+                            <li>إجمالي عدد المصاريف المسجلة: ${globalExpenses ? globalExpenses.length : 0}</li>
+                        </ul>
+                        <p style="margin-top: 50px; text-align: center; color: gray; font-size: 12px;">نهاية التقرير.</p>
+                    </div>
+                `;
+                const printDiv = document.getElementById('printArea');
+                printDiv.innerHTML = htmlContent;
+                window.print();
+            }
+
+            const exportTime = Date.now();
+            updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { lastSystemExport: exportTime }).catch(e=>console.log(e));
+            const txt = document.getElementById('lastSystemExportTxt');
+            if(txt) txt.innerText = 'آخر سحب: ' + new Date(exportTime).toLocaleString('ar-EG');
+            
+            window.closeModal('exportModal');
+            window.logAction('تحميل تقرير', `قام المدير بسحب تفاصيل النظام الكاملة بصيغة ${format.toUpperCase()}`);
+        };
+
+        async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
+            try {
+                const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, {
+                    to_email: toEmail,
+                    to_name: assigneeName,
+                    task_title: taskTitle,
+                    task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
+                    task_link: taskLink, 
+                    company_name: 'نظام شركتي'
+                }, EMAILJS_PUBLIC_KEY_1);
+                
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
+                    lastReminder: Date.now()
+                });
+            } catch (error) { console.error(error); }
+        }
+
+        function checkAndSendReminders() {
+            if(globalTasks.length === 0 || globalUsers.length === 0) return;
+            const now = Date.now();
+            const THIRTY_SIX_HOURS = 36 * 60 * 60 * 1000; 
+            const ceoUser = globalUsers.find(u => u.role === 'CEO');
+
+            globalTasks.forEach(task => {
+                if(task.status !== 'completed') {
+                    const lastTimeChecked = task.lastReminder || task.timestamp;
+                    const timePassed = now - lastTimeChecked;
+
+                    if(timePassed >= THIRTY_SIX_HOURS) {
+                        
+                        updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id), {
+                            lastReminder: Date.now()
+                        }).catch(e => console.error(e));
+
+                        const assignedUser = globalUsers.find(u => u.id === task.assigneeId);
+                        if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_REMINDER, {
+                                to_email: assignedUser.email,
+                                to_name: task.assigneeName,
+                                task_title: task.title,
+                                task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
+                                task_link: taskLink, 
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_1).catch(e => console.error(e));
+                        }
+
+                        if (ceoUser && ceoUser.email) {
+                            const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                            const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
+                            
+                            emailjs.send(EMAILJS_SERVICE_ID_3, EMAILJS_TEMPLATE_TASK_DELAYED, {
+                                ceo_email: ceoUser.email,
+                                ceo_name: ceoUser.name,
+                                employee_name: task.assigneeName,
+                                task_title: task.title,
+                                task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
+                                task_deadline: deadlineStr,
+                                task_link: taskLink,
+                                company_name: 'نظام شركتي'
+                            }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
+                        }
+                    }
+                }
+            });
+        }
+
+        async function sendEmailNotification(toEmail, assigneeName, taskTitle, taskDesc) {
+            try {
+                const taskLink = window.location.origin + window.location.pathname + '#tasks';
+                await emailjs.send(EMAILJS_SERVICE_ID_1, EMAILJS_TEMPLATE_NEW_TASK, {
+                    to_email: toEmail,
+                    to_name: assigneeName,
+                    task_title: taskTitle,
+                    task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
+                    task_link: taskLink, 
+                    company_name: 'نظام شركتي'
+                }, EMAILJS_PUBLIC_KEY_1);
+            } catch (error) { console.error(error); }
+        }
+
+        window.handleProfilePicChange = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            if(file.size > 500 * 1024) { showToast('الصورة كبيرة جداً، الحد الأقصى 500KB', 'warning'); return; }
+
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                        photoURL: ev.target.result
+                    });
+                    showToast('تم تحديث صورتك الشخصية بنجاح!', 'success');
+                } catch(e) { console.error(e); }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.updateChatLayoutPref = async (value) => {
+            if(!currentUserData) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                    chatLayout: value
+                });
+                currentUserData.chatLayout = value; 
+                showToast('تم حفظ تفضيلات الدردشة بنجاح', 'success');
+                renderChat(); 
+            } catch(e) { console.error(e); }
+        };
+
+        window.toggleChatColorPicker = () => {
+            document.getElementById('chatColorPicker').classList.toggle('hidden');
+        };
+
+        window.setChatColor = async (colorClass, btnElement) => {
+            selectedChatColor = colorClass;
+            document.getElementById('chatColorPicker').classList.add('hidden');
+            
+            const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+            if (sendBtn) sendBtn.className = `${colorClass} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow hover:opacity-80`;
+            
+            if (btnElement) {
+                document.querySelectorAll('.color-btn').forEach(b => {
+                    b.className = b.className.replace(/ring-2 ring-offset-2 ring-\S+/g, '').trim();
+                    b.classList.add('hover:scale-110');
+                });
+                btnElement.classList.remove('hover:scale-110');
+                const ringClass = colorClass.replace('bg-', 'ring-');
+                btnElement.className += ` ring-2 ring-offset-2 ${ringClass}`;
+            }
+
+            if (currentUserData) {
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {
+                        chatColor: colorClass
+                    });
+                    currentUserData.chatColor = colorClass;
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        window.showMsgReadDetails = (msgId) => {
+            const msg = globalChat.find(m => m.id === msgId);
+            if(!msg) return;
+            const groupId = msg.groupId || 'global';
+            const group = globalGroups.find(g => g.id === groupId);
+            if(!group) return;
+            
+            let membersToCheck = [];
+            if(groupId === 'global') membersToCheck = globalUsers.map(u => u.uid).filter(uid => uid !== currentUserData.uid);
+            else membersToCheck = group.members.filter(uid => uid !== currentUserData.uid);
+            
+            let html = '<h4 class="font-bold text-gray-700 dark:text-gray-300 text-xs mb-3">تمت المشاهدة من قبل:</h4><ul class="space-y-3">';
+            let readCount = 0;
+            
+            membersToCheck.forEach(uid => {
+                const u = globalUsers.find(user => user.uid === uid);
+                if(u && u.readReceipts && u.readReceipts[groupId] >= msg.timestamp) {
+                    readCount++;
+                    html += `<li class="flex items-center gap-3 text-sm text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-gray-700 p-2 rounded-lg border border-green-100 dark:border-green-900"><img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover"> ${u.name} <i class="fa-solid fa-check-double text-sm mr-auto"></i></li>`;
+                }
+            });
+            
+            if(readCount === 0) html += '<li class="text-xs text-gray-500 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">لم يشاهدها أحد بعد.</li>';
+            html += '</ul>';
+            
+            document.getElementById('msgReadersList').innerHTML = html;
+            window.openModal('msgReadDetailsModal');
+            document.getElementById(`msg-menu-${msgId}`).classList.add('hidden');
+        };
+
+        document.addEventListener('click', (e) => {
+            const picker = document.getElementById('chatColorPicker');
+            const toggleBtn = document.querySelector('button[onclick="window.toggleChatColorPicker()"]');
+            if(picker && !picker.classList.contains('hidden') && e.target !== picker && !picker.contains(e.target) && e.target !== toggleBtn && !toggleBtn.contains(e.target)) {
+                picker.classList.add('hidden');
+            }
+            
+            if (!e.target.closest('.msg-dropdown-menu') && !e.target.closest('button[onclick^="window.toggleMsgMenu"]')) {
+                document.querySelectorAll('.msg-dropdown-menu').forEach(el => el.classList.add('hidden'));
+            }
+
+            const pinDropdown = document.getElementById('pinnedMessagesDropdown');
+            const pinToggleBtn = document.querySelector('button[onclick="window.togglePinnedDropdown()"]');
+            if(pinDropdown && !pinDropdown.classList.contains('hidden') && !pinDropdown.contains(e.target) && (!pinToggleBtn || !pinToggleBtn.contains(e.target))) {
+                pinDropdown.classList.add('hidden');
+            }
+            
+            const notifDropdown = document.getElementById('notificationsDropdown');
+            const notifBtn = document.querySelector('button[onclick="window.toggleNotificationsDropdown()"]');
+            if(notifDropdown && !notifDropdown.classList.contains('hidden') && !notifDropdown.contains(e.target) && (!notifBtn || !notifBtn.contains(e.target))) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+
+        const MAX_FILE_SIZE = 500 * 1024; 
+
+        window.handleChatAttachment = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            if(file.size > MAX_FILE_SIZE) { showToast('حجم الملف كبير جداً! الحد الأقصى 500KB.', 'warning'); e.target.value = ''; return; }
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                pendingChatFileData = ev.target.result;
+                pendingChatFileType = file.type || 'unknown';
+                document.getElementById('attachmentFileName').innerText = file.name;
+                document.getElementById('chatAttachmentPreview').classList.remove('hidden');
+                document.getElementById('chatInput').focus();
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.clearChatAttachment = () => {
+            pendingChatFileData = null;
+            pendingChatFileType = null;
+            document.getElementById('chatFileInput').value = '';
+            document.getElementById('chatAttachmentPreview').classList.add('hidden');
+        };
+
+        // تعميمات و تصويت
+        window.togglePollOptions = () => {
+            const type = document.getElementById('noticeType').value;
+            const container = document.getElementById('pollOptionsContainer');
+            const customInput = document.getElementById('customNoticeType');
+            
+            if(type === 'poll') {
+                container.classList.remove('hidden');
+                customInput.classList.add('hidden');
+            } else if(type === 'custom') {
+                container.classList.add('hidden');
+                customInput.classList.remove('hidden');
             } else {
-                btn.classList.remove('text-orange-500');
-                btn.classList.add('text-gray-300');
+                container.classList.add('hidden');
+                customInput.classList.add('hidden');
+            }
+        };
+
+        window.addPollOption = () => {
+            const list = document.getElementById('pollInputsList');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'poll-option-input w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-500 outline-none mt-2 animate-fade-in';
+            input.placeholder = 'أدخل خياراً جديداً';
+            list.appendChild(input);
+        };
+
+        const noticeForm = document.getElementById('noticeForm');
+        if(noticeForm) {
+            noticeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const isCEO = currentUserData.role === 'CEO';
+                const canPost = currentUserData.permissions?.canNotices;
+                if(!isCEO && !canPost) return;
+
+                const title = document.getElementById('noticeTitle').value;
+                const body = document.getElementById('noticeBody').value;
+                const rawType = document.getElementById('noticeType').value;
+                
+                let finalType = rawType;
+                if(rawType === 'custom') {
+                    finalType = document.getElementById('customNoticeType').value.trim() || 'تعميم عادي';
+                }
+                const isPoll = (rawType === 'poll');
+                
+                let options = [];
+                if(isPoll) {
+                    const inputs = document.querySelectorAll('.poll-option-input');
+                    inputs.forEach(inp => {
+                        if(inp.value.trim() !== '') options.push(inp.value.trim());
+                    });
+                    if(options.length < 2) { showToast('يجب إضافة خيارين على الأقل للتصويت', 'warning'); return; }
+                }
+
+                try {
+                    await addDoc(getColRef('notices'), {
+                        title: title,
+                        body: body,
+                        type: finalType,
+                        isPoll: isPoll,
+                        options: options,
+                        votes: {},
+                        author: currentUserData.name,
+                        timestamp: Date.now()
+                    });
+                    window.closeModal('noticeModal');
+                    showToast('تم نشر التعميم بنجاح', 'success');
+                    
+                    // Add Notification to users
+                    sendPushNotification('تعميم جديد', `تم نشر تعميم جديد: ${title}`, 'notices');
+                } catch(e) { console.error(e); }
+            });
+        }
+
+        window.deleteNotice = async (id) => {
+            const isCEO = currentUserData.role === 'CEO';
+            const canPost = currentUserData.permissions?.canNotices;
+            if(!isCEO && !canPost) return;
+
+            if(confirm('حذف هذا الإعلان؟')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', id)).catch(e => console.error(e));
+            }
+        };
+
+        window.submitVote = async (noticeId, optionText) => {
+            if(!currentUserData) return;
+            const notice = globalNotices.find(n => n.id === noticeId);
+            if(!notice) return;
+            
+            const votes = notice.votes || {};
+            votes[currentUserData.uid] = optionText;
+            
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', noticeId), { votes: votes });
+                showToast('تم إرسال صوتك بنجاح', 'success');
+            } catch(e) { console.error(e); }
+        };
+
+        function renderNotices() {
+            const list = document.getElementById('noticesList');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            const isCEO = currentUserData && currentUserData.role === 'CEO';
+            const canPost = currentUserData && currentUserData.permissions?.canNotices;
+            
+            const addNoticeBtn = document.getElementById('addNoticeBtn');
+            if (addNoticeBtn) {
+                if(isCEO || canPost) addNoticeBtn.classList.remove('hidden');
+                else addNoticeBtn.classList.add('hidden');
+            }
+
+            if(globalNotices.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد إعلانات أو تعميمات حالياً.</p>';
+                return;
+            }
+
+            globalNotices.forEach(n => {
+                const dateStr = new Date(n.timestamp).toLocaleDateString('ar-EG');
+                const delBtn = (isCEO || canPost) ? `<button onclick="window.deleteNotice('${n.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '';
+                
+                let pollHtml = '';
+                if(n.isPoll || n.type === 'poll') {
+                    const votes = n.votes || {};
+                    const totalVotes = Object.keys(votes).length;
+                    const myVote = votes[currentUserData.uid];
+                    
+                    pollHtml += `<div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">`;
+                    pollHtml += `<h4 class="font-bold text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-chart-simple text-secondary"></i> شارك في التصويت</h4>`;
+                    
+                    n.options.forEach(opt => {
+                        let optVotesCount = 0;
+                        for(let key in votes) { if(votes[key] === opt) optVotesCount++; }
+                        let percent = totalVotes > 0 ? Math.round((optVotesCount / totalVotes) * 100) : 0;
+                        
+                        let btnClass = myVote === opt ? 'bg-secondary text-white' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600';
+                        
+                        pollHtml += `
+                            <div class="mb-2 relative">
+                                <button onclick="window.submitVote('${n.id}', '${opt}')" class="w-full text-right rtl:text-right ltr:text-left px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-colors font-bold text-sm z-10 relative ${btnClass}">
+                                    ${opt} ${myVote === opt ? '<i class="fa-solid fa-circle-check mx-2"></i>' : ''}
+                                </button>
+                                ${(isCEO || myVote) ? `<div class="absolute top-0 bottom-0 right-0 bg-yellow-400/20 dark:bg-yellow-500/20 rounded-lg pointer-events-none" style="width: ${percent}%"></div>` : ''}
+                            </div>
+                        `;
+                        if(isCEO || myVote) {
+                            pollHtml += `<p class="text-[10px] text-gray-500 dark:text-gray-400 mb-2 px-1">${optVotesCount} صوت (${percent}%)</p>`;
+                        }
+                    });
+                    
+                    if(isCEO) {
+                        pollHtml += `<div class="mt-3 pt-2 border-t border-gray-200 dark:border-gray-600 text-xs text-gray-500 font-bold">إجمالي الأصوات: ${totalVotes}</div>`;
+                    }
+                    pollHtml += `</div>`;
+                }
+
+                const badgeType = n.isPoll || n.type === 'poll' ? 'تصويت' : (n.type || 'تعميم إداري');
+                const badgeClass = n.isPoll || n.type === 'poll' ? 'bg-secondary' : 'bg-primary';
+
+                list.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 ${n.isPoll || n.type==='poll'? 'border-secondary' : 'border-yellow-500'} dark:border-gray-700 relative">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${n.title}</h3>
+                                <span class="${badgeClass} text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-sm">${badgeType}</span>
+                            </div>
+                            ${delBtn}
+                        </div>
+                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4 whitespace-pre-line leading-relaxed">${n.body}</p>
+                        ${pollHtml}
+                        <div class="text-[10px] text-gray-400 flex items-center gap-4 mt-3">
+                            <span><i class="fa-solid fa-user-pen"></i> بواسطة: ${n.author}</span>
+                            <span><i class="fa-solid fa-calendar"></i> ${dateStr}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // العملاء (CRM)
+        const clientForm = document.getElementById('clientForm');
+        if(clientForm) {
+            clientForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData) return;
+                try {
+                    await addDoc(getColRef('clients'), {
+                        name: document.getElementById('clientName').value,
+                        phone: document.getElementById('clientPhone').value,
+                        email: document.getElementById('clientEmail').value,
+                        status: document.getElementById('clientStatus').value,
+                        addedBy: currentUserData.name,
+                        notes: [], 
+                        timestamp: Date.now()
+                    });
+                    window.closeModal('clientModal');
+                    showToast('تم إضافة العميل بنجاح', 'success');
+                } catch(e) { console.error(e); }
+            });
+        }
+
+        window.openNoteModal = (clientId) => {
+            const noteClientId = document.getElementById('noteClientId');
+            if(noteClientId) noteClientId.value = clientId;
+            window.openModal('noteModal');
+        };
+
+        const noteForm = document.getElementById('noteForm');
+        if(noteForm) {
+            noteForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(!currentUserData) return;
+                const cId = document.getElementById('noteClientId').value;
+                const text = document.getElementById('noteText').value;
+                
+                try {
+                    const clientDoc = globalCRM.find(c => c.id === cId);
+                    if(clientDoc) {
+                        const updatedNotes = clientDoc.notes || [];
+                        updatedNotes.push({
+                            authorId: currentUserData.uid,
+                            authorName: currentUserData.name,
+                            text: text,
+                            timestamp: Date.now()
+                        });
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { notes: updatedNotes });
+                        window.closeModal('noteModal');
+                        showToast('تم إضافة الملاحظة', 'success');
+                    }
+                } catch(e) { console.error(e); }
+            });
+        }
+
+        window.updateClientStatus = async (cId, newStatus) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { status: newStatus });
+                showToast('تم تحديث حالة العميل', 'success');
+            } catch(e) { console.error(e); }
+        };
+
+        function renderCRM() {
+            const list = document.getElementById('crmList');
+            if(!list) return;
+            list.innerHTML = '';
+            
+            if(globalCRM.length === 0) {
+                list.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">قاعدة العملاء فارغة حالياً.</p>';
+                return;
+            }
+
+            globalCRM.forEach(c => {
+                let notesHtml = '';
+                if(c.notes && c.notes.length > 0) {
+                    c.notes.forEach(note => {
+                        const canViewNotes = currentUserData.role === 'CEO' || currentUserData.permissions?.canCRM || note.authorId === currentUserData.uid;
+                        if(canViewNotes) {
+                            notesHtml += `
+                                <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600">
+                                    <p class="font-bold text-gray-700 dark:text-gray-300">${note.authorName}:</p>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-1">${note.text}</p>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+
+                const statusColor = c.status === 'تم الاتصال به' ? 'text-green-600 bg-green-50' : 'text-gray-600 bg-gray-100';
+
+                list.innerHTML += `
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
+                            <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}"><i class="fa-solid fa-user-tie mx-1"></i> ${c.name}</h3>
+                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor}">
+                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال</option>
+                                <option value="تم الاتصال به" ${c.status === 'تم الاتصال به' ? 'selected' : ''}>تم الاتصال</option>
+                            </select>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1">
+                            <p><i class="fa-solid fa-phone text-gray-400 mx-1"></i> <span dir="ltr">${c.phone || '-'}</span></p>
+                            <p><i class="fa-solid fa-envelope text-gray-400 mx-1"></i> ${c.email || '-'}</p>
+                        </div>
+                        <div class="mt-4 border-t dark:border-gray-700 pt-3">
+                            <h4 class="text-xs font-bold text-gray-500 mb-2">الملاحظات الخاصة:</h4>
+                            <div class="max-h-32 overflow-y-auto mb-2">${notesHtml}</div>
+                            <button onclick="window.openNoteModal('${c.id}')" class="w-full text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 py-1.5 rounded transition font-bold"><i class="fa-solid fa-plus mx-1"></i> إضافة ملاحظة</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ===============================================
+        // المهام - التصميم الجديد
+        // ===============================================
+
+        window.toggleTaskPriority = () => {
+            const btn = document.getElementById('taskPriorityBtn');
+            const isPriorityInput = document.getElementById('taskIsPriority');
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                isPriorityInput.value = "false";
+            } else {
+                btn.classList.add('active');
+                isPriorityInput.value = "true";
             }
         };
 
         window.toggleChecklistSection = () => {
-            const sec = document.getElementById('checklistSection');
-            sec.classList.toggle('hidden');
+            const container = document.getElementById('checklistsContainer');
+            container.classList.toggle('hidden');
         };
 
         window.addChecklistItem = () => {
-            const input = document.getElementById('newChecklistItemInput');
-            const text = input.value.trim();
-            if(text) {
-                currentTaskChecklist.push({ text: text, isCompleted: false, id: Date.now().toString() });
-                input.value = '';
-                renderTaskChecklistUI();
-            }
+            const container = document.getElementById('checklistItems');
+            const id = 'chk_' + Date.now();
+            const html = `
+                <div class="flex items-center gap-3 animate-fade-in" id="row_${id}">
+                    <input type="checkbox" class="custom-checkbox shrink-0" onchange="window.updateChecklistProgress()">
+                    <input type="text" placeholder="نص العنصر" class="flex-1 border-b border-gray-200 dark:border-gray-600 bg-transparent text-sm focus:outline-none focus:border-blue-500 dark:text-gray-200 py-1">
+                    <button type="button" onclick="document.getElementById('row_${id}').remove(); window.updateChecklistProgress()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            window.updateChecklistProgress();
         };
 
-        window.removeChecklistItem = (id) => {
-            currentTaskChecklist = currentTaskChecklist.filter(item => item.id !== id);
-            renderTaskChecklistUI();
+        window.updateChecklistProgress = () => {
+            const container = document.getElementById('checklistItems');
+            const total = container.querySelectorAll('input[type="checkbox"]').length;
+            const checked = container.querySelectorAll('input[type="checkbox"]:checked').length;
+            
+            document.getElementById('checklistProgressText').innerText = `المكتمل: ${checked} من ${total}`;
+            const percentage = total > 0 ? (checked / total) * 100 : 0;
+            document.getElementById('checklistProgressBar').style.width = `${percentage}%`;
         };
 
-        window.toggleChecklistItem = (id) => {
-            const item = currentTaskChecklist.find(item => item.id === id);
-            if(item) {
-                item.isCompleted = !item.isCompleted;
-                renderTaskChecklistUI();
-            }
-        };
-
-        function renderTaskChecklistUI() {
-            const container = document.getElementById('checklistItemsContainer');
-            const progText = document.getElementById('checklistProgressText');
-            const progBar = document.getElementById('checklistProgressBar');
-            
-            container.innerHTML = '';
-            let completed = 0;
-            
-            currentTaskChecklist.forEach(item => {
-                if(item.isCompleted) completed++;
-                container.innerHTML += `
-                    <div class="flex items-center justify-between bg-white dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600">
-                        <label class="flex items-center gap-2 cursor-pointer flex-1">
-                            <input type="checkbox" ${item.isCompleted ? 'checked' : ''} onchange="window.toggleChecklistItem('${item.id}')" class="w-4 h-4 text-[#10b981] rounded border-gray-300 focus:ring-[#10b981]">
-                            <span class="text-sm ${item.isCompleted ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}">${item.text}</span>
-                        </label>
-                        <button type="button" onclick="window.removeChecklistItem('${item.id}')" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                `;
-            });
-
-            const total = currentTaskChecklist.length;
-            progText.innerText = `المكتمل: ${completed} من ${total}`;
-            progBar.style.width = total === 0 ? '0%' : `${(completed/total)*100}%`;
-        }
-
-        // --- إعادة كتابة دالة عرض المهام (Table View) ---
-        function renderTasks() {
-            const tbody = document.getElementById('tasksTableBody');
-            const totalCountEl = document.getElementById('totalTasksCount');
-            const totalChecklistEl = document.getElementById('totalChecklistCount');
-            
-            if(!tbody) return;
-            tbody.innerHTML = '';
-
-            const isCEO = currentUserData.role === 'CEO';
-            const slicedTasks = globalTasks.slice(-200).sort((a,b) => b.timestamp - a.timestamp); 
-            
-            let displayCount = 0;
-            let totalChecklistsInView = 0;
-
-            slicedTasks.forEach(task => {
-                const isMyTask = task.assigneeId === currentUserData.uid;
-                if (!isCEO && !isMyTask) return;
-                
-                displayCount++;
-                const isCompleted = task.status === 'completed';
-                
-                // حساب قائمة التحقق إن وجدت
-                let checklistText = '';
-                if(task.checklist && task.checklist.length > 0) {
-                    totalChecklistsInView++;
-                    const compCount = task.checklist.filter(c => c.isCompleted).length;
-                    checklistText = `<div class="text-[10px] text-gray-400 mt-1 flex items-center gap-1 border border-gray-200 dark:border-gray-600 rounded px-1 w-max"><i class="fa-solid fa-check-square"></i> ${compCount}/${task.checklist.length}</div>`;
-                }
-
-                // علامة النار
-                const fireHtml = task.isHighPriority ? `<i class="fa-solid fa-fire text-orange-500 text-xs mx-1" title="أولوية قصوى"></i>` : '';
-                
-                // التواريخ
-                const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'}) : '-';
-                
-                // إنشاء الصف
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group";
-                if(isCompleted) tr.classList.add('opacity-60');
-
-                tr.innerHTML = `
-                    <td class="p-3 text-center border-l dark:border-gray-700">
-                        <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked disabled' : ''} onchange="window.markTaskCompleteFromTable('${task.id}', '${task.title.replace(/'/g, "\\'")}')">
-                    </td>
-                    <td class="p-3 text-center text-gray-300 group-hover:text-gray-500 transition"><i class="fa-solid fa-bars"></i></td>
-                    <td class="p-3 text-sm font-bold text-gray-800 dark:text-gray-200">
-                        <div class="flex flex-col">
-                            <span class="${isCompleted ? 'line-through' : ''}">${task.title} ${fireHtml}</span>
-                            ${checklistText}
-                        </div>
-                    </td>
-                    <td class="p-3 text-sm text-gray-600 dark:text-gray-300">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full ${isCompleted ? 'bg-gray-400' : 'bg-[#10b981]'}"></span>
-                            ${isCompleted ? 'مكتمل' : 'نشط'}
-                        </div>
-                    </td>
-                    <td class="p-3 text-xs md:text-sm text-gray-600 dark:text-gray-300">${deadlineStr}</td>
-                    <td class="p-3 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                        <i class="fa-solid fa-user-circle text-gray-400 text-lg"></i>
-                        <span class="truncate w-24" title="${task.creatorName || 'المدير'}">${task.creatorName || 'المدير'}</span>
-                    </td>
-                    <td class="p-3 text-sm text-gray-600 dark:text-gray-300">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-user-circle text-gray-400 text-lg"></i>
-                            <span class="truncate w-24" title="${task.assigneeName}">${task.assigneeName}</span>
-                        </div>
-                    </td>
-                    <td class="p-3 text-sm text-gray-600 dark:text-gray-300">
-                        <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded px-2 py-1 w-max">
-                            <i class="fa-solid fa-folder text-[#3b82f6]"></i> ${task.project || 'MENA'}
-                        </div>
-                    </td>
-                    <td class="p-3 text-sm text-gray-600 dark:text-gray-300">${task.tags || 'MENA'}</td>
-                `;
-                
-                tbody.appendChild(tr);
-            });
-
-            if(totalCountEl) totalCountEl.innerText = displayCount;
-            if(totalChecklistEl) totalChecklistEl.innerText = totalChecklistsInView;
-        }
-
-        // دالة لإكمال المهمة مباشرة من الجدول
-        window.markTaskCompleteFromTable = async (taskId, taskTitle) => {
-            if(!confirm('هل أنت متأكد من إكمال هذه المهمة؟')) {
-                renderTasks(); // reset checkbox if cancelled
-                return;
-            }
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
-                    status: 'completed',
-                    completedAt: Date.now(),
-                    reportText: 'تم الإكمال السريع من القائمة'
-                });
-                showToast('تم إكمال المهمة بنجاح', 'success');
-                logAction('إنجاز مهمة', `تم إنجاز المهمة "${taskTitle}" السريع`);
-            } catch(e) { console.error(e); }
-        };
-
-        // --- تحديث دالة فتح النافذة للإرسال ---
         window.openTaskModal = () => {
             const select = document.getElementById('taskAssignee');
             select.innerHTML = '';
-            
-            // تهيئة النافذة (Reset)
-            isTaskHighPriority = false;
-            currentTaskChecklist = [];
-            document.getElementById('priorityToggleBtn').className = 'text-gray-300 hover:text-orange-500 transition text-xl';
-            document.getElementById('checklistSection').classList.add('hidden');
-            renderTaskChecklistUI();
             
             const isCEO = currentUserData.role === 'CEO';
             const canAssign = currentUserData.permissions?.canAssignTasks;
@@ -1530,10 +2270,17 @@
                 select.innerHTML = `<option value="${currentUserData.uid}" selected>${currentUserData.name} (${t('أنت')})</option>`;
                 select.disabled = true;
             }
+
+            // Reset custom fields
+            document.getElementById('taskPriorityBtn').classList.remove('active');
+            document.getElementById('taskIsPriority').value = "false";
+            document.getElementById('checklistsContainer').classList.add('hidden');
+            document.getElementById('checklistItems').innerHTML = '';
+            window.updateChecklistProgress();
+
             window.openModal('taskModal');
         };
 
-        // --- تحديث إرسال النموذج (Submit Task) ---
         const addTaskForm = document.getElementById('addTaskForm');
         if (addTaskForm) {
             addTaskForm.addEventListener('submit', async (e) => {
@@ -1547,6 +2294,15 @@
                 const desc = document.getElementById('taskDesc').value;
                 const deadlineVal = document.getElementById('taskDeadline').value;
                 const deadlineTime = new Date(deadlineVal).getTime();
+                const isPriority = document.getElementById('taskIsPriority').value === "true";
+                
+                // جمع بيانات قائمة التحقق
+                const checklistItems = [];
+                document.querySelectorAll('#checklistItems > div').forEach(row => {
+                    const isChecked = row.querySelector('input[type="checkbox"]').checked;
+                    const text = row.querySelector('input[type="text"]').value.trim();
+                    if(text) checklistItems.push({ text, isCompleted: isChecked });
+                });
 
                 try {
                     await addDoc(getColRef('tasks'), {
@@ -1555,273 +2311,169 @@
                         assigneeId: assigneeId,
                         assigneeName: assigneeName,
                         createdBy: currentUserData.uid,
-                        creatorName: currentUserData.name, // جديد للعرض في الجدول
+                        creatorName: currentUserData.name,
                         deadline: deadlineTime,
-                        status: 'pending', // يبدأ كنشط/قيد الانتظار
-                        timestamp: Date.now(),
-                        isHighPriority: isTaskHighPriority, // جديد
-                        checklist: currentTaskChecklist,     // جديد
-                        project: 'MENA',                     // قيمة افتراضية للعرض
-                        tags: 'MENA'                         // قيمة افتراضية للعرض
+                        isPriority: isPriority,
+                        checklists: checklistItems,
+                        project: 'MENA', // افتراضي بناءً على الصورة
+                        status: 'pending', // (نشط)
+                        timestamp: Date.now()
                     });
                     
                     window.closeModal('taskModal');
+                    
+                    const assignedUser = globalUsers.find(u => u.id === assigneeId);
+                    if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
+                        if (currentUserData.uid !== assigneeId) {
+                            sendEmailNotification(assignedUser.email, assigneeName, title, desc);
+                            addNotificationToDB('مهمة جديدة', `لقد أسند إليك ${currentUserData.name} مهمة: ${title}`, 'tasks');
+                        }
+                    }
                     
                     const actionText = (currentUserData.role === 'CEO') 
                         ? `تم إسناد مهمة "${title}" إلى ${assigneeName}` 
                         : `قام الموظف ${currentUserData.name} بإسناد مهمة "${title}" لنفسه`;
                         
                     logAction('إسناد مهمة', actionText);
-                    showToast('تم إنشاء المهمة بنجاح', 'success');
+                    showToast('تم حفظ المهمة بنجاح', 'success');
                 } catch(e) { console.error(e); }
             });
         }
 
-
-        // ==========================================
-        // بقية الدوال الأساسية للعمل (Navigation, Modals, Chat...) كما هي
-        // ==========================================
-
-        window.openModal = (id) => {
-            const el = document.getElementById(id);
-            if(el) el.classList.remove('hidden');
-        };
-        
-        window.closeModal = (id) => {
-            const el = document.getElementById(id);
-            if(el) {
-                el.classList.add('hidden');
-                if(id === 'taskModal') document.getElementById('addTaskForm')?.reset();
-                if(id === 'createGroupModal') document.getElementById('createGroupForm')?.reset();
-                if(id === 'editEmployeeModal') document.getElementById('editEmployeeForm')?.reset();
-                if(id === 'noticeModal') {
-                    document.getElementById('noticeForm')?.reset();
-                    document.getElementById('pollOptionsContainer').classList.add('hidden');
-                    document.getElementById('customNoticeType').classList.add('hidden');
-                }
-                if(id === 'clientModal') document.getElementById('clientForm')?.reset();
-                if(id === 'noteModal') document.getElementById('noteForm')?.reset();
-                if(id === 'taskReportModal') document.getElementById('taskReportForm')?.reset();
-            }
-        };
-
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('translate-x-full');
-            document.getElementById('mobileOverlay').classList.toggle('hidden');
-        };
-
-        function lockNavigationIfNeeded() {
-            if(currentUserData && currentUserData.role !== 'CEO' && !hasPunchedInToday) {
-                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.add('opacity-50', 'pointer-events-none'));
-                document.getElementById('homeGridContainer').classList.add('hidden');
-                document.getElementById('sidebarLockMessage').classList.remove('hidden');
-                document.getElementById('attendanceLockBanner').classList.remove('hidden');
-                
-                const punchOutBtn = document.getElementById('homePunchOutContainer');
-                if(punchOutBtn) punchOutBtn.classList.add('hidden');
-            }
-        }
-
-        function unlockNavigation() {
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('opacity-50', 'pointer-events-none'));
-            document.getElementById('homeGridContainer').classList.remove('hidden');
-            document.getElementById('sidebarLockMessage').classList.add('hidden');
-            document.getElementById('attendanceLockBanner').classList.add('hidden');
+        window.renderTasks = () => {
+            const tableBody = document.getElementById('tasksTableBody');
+            const searchInput = document.getElementById('searchTasksInput');
+            if(!tableBody) return;
             
-            const punchOutBtn = document.getElementById('homePunchOutContainer');
-            if(punchOutBtn) punchOutBtn.classList.remove('hidden');
-        }
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            tableBody.innerHTML = '';
 
-        window.showSection = (sectionId) => {
-            if(window.location.hash !== `#${sectionId}`) {
-                window.history.pushState(null, null, `#${sectionId}`);
-            }
-
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            const targetSec = document.getElementById(sectionId);
-            if(targetSec) targetSec.classList.remove('hidden');
-            
-            if (sectionId === 'home-grid') {
-                document.getElementById('backToHomeBtn').classList.add('hidden');
-                document.getElementById('page-title').classList.remove('hidden');
-            } else {
-                document.getElementById('backToHomeBtn').classList.remove('hidden');
-                document.getElementById('page-title').classList.add('hidden');
-            }
-            
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                b.classList.remove('bg-secondary', 'text-white');
-                b.classList.add('text-gray-300');
-            });
-            
-            if(sectionId !== 'chat') {
-                const activeBtn = document.querySelector(`.nav-btn[data-section="${sectionId}"]`);
-                if(activeBtn) {
-                    activeBtn.classList.remove('text-gray-300');
-                    activeBtn.classList.add('bg-secondary', 'text-white');
-                }
-            }
-            
-            if(window.innerWidth < 768 && sectionId !== 'chat') {
-                document.getElementById('sidebar').classList.add('translate-x-full');
-                document.getElementById('mobileOverlay').classList.add('hidden');
-            }
-        };
-
-        function handleHashChange() {
-            if(!currentUserData) return; 
-            
-            const hash = window.location.hash.replace('#', '');
-            const validSections = ['home-grid', 'dashboard', 'employees', 'tasks', 'chat', 'logs', 'settings', 'notices', 'crm', 'my-profile'];
-            
-            let targetSection = hash || 'home-grid';
-            
-            if (currentUserData.role !== 'CEO') {
-                if (['dashboard', 'employees', 'logs'].includes(targetSection)) {
-                    targetSection = 'home-grid';
-                }
-            }
-
-            window.showSection(validSections.includes(targetSection) ? targetSection : 'home-grid');
-        }
-        window.addEventListener('hashchange', handleHashChange);
-
-        function updateUIWithUserData() {
-            if(!currentUserData) return;
-            document.getElementById('userName').innerText = currentUserData.name;
-            document.getElementById('userRole').innerText = currentUserData.role;
-            document.getElementById('userAvatar').src = currentUserData.photoURL;
-
-            // My Profile Setup
-            const myProfileName = document.getElementById('myProfileName');
-            if(myProfileName) myProfileName.innerText = currentUserData.name;
-            const myProfileRole = document.getElementById('myProfileRole');
-            if(myProfileRole) myProfileRole.innerText = currentUserData.role;
-            const myProfileAvatar = document.getElementById('myProfileAvatar');
-            if(myProfileAvatar) myProfileAvatar.src = currentUserData.photoURL;
-            const myProfileAssets = document.getElementById('myProfileAssets');
-            if(myProfileAssets) myProfileAssets.innerText = currentUserData.assets || 'لا توجد عهد مسجلة حالياً.';
-
-            const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
-            if(settingsAvatarPreview) settingsAvatarPreview.src = currentUserData.photoURL;
-            const settingsName = document.getElementById('settingsName');
-            if(settingsName) settingsName.value = currentUserData.name;
-            const settingsRole = document.getElementById('settingsRole');
-            if(settingsRole) settingsRole.value = currentUserData.role;
-        }
-
-        function startDatabaseListeners() {
-            // مستمعو قاعدة البيانات كما هي (تم دمج المهام الجديد بالأسفل)
-            onSnapshot(getColRef('users'), (snapshot) => {
-                globalUsers = [];
-                snapshot.forEach(docSnap => {
-                    const uData = { id: docSnap.id, ...docSnap.data() };
-                    globalUsers.push(uData);
-                    if(currentUserData && uData.id === currentUserData.uid) {
-                        currentUserData = uData;
-                        updateUIWithUserData();
-                    }
-                });
-                renderEmployees();
-            }, (error) => console.error(error));
-
-            if(currentUserData.role === 'CEO') {
-                onSnapshot(query(getColRef('logs'), orderBy('timestamp', 'desc'), limit(100)), (snapshot) => {
-                    globalLogs = [];
-                    snapshot.forEach(doc => globalLogs.push({ id: doc.id, ...doc.data() }));
-                    renderLogs();
-                });
-            }
-
-            onSnapshot(getColRef('tasks'), (snapshot) => {
-                globalTasks = [];
-                snapshot.forEach(doc => globalTasks.push({ id: doc.id, ...doc.data() }));
-                renderTasks(); // استدعاء الدالة الجديدة لجدول المهام
-                
-                const statTasks = document.getElementById('stat-tasks');
-                if(statTasks) statTasks.innerText = globalTasks.length;
-                const statComp = document.getElementById('stat-completed');
-                if(statComp) statComp.innerText = globalTasks.filter(t => t.status === 'completed').length;
-            });
-            
-            // ... (بقية المستمعين للدردشة والعملاء والإشعارات يعملون في الخلفية بدون مشاكل)
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if(loadingScreen) loadingScreen.classList.add('hidden');
-            
-            if (user) {
-                document.getElementById('systemPasswordScreen').classList.add('hidden');
-                document.getElementById('loginScreen').classList.add('hidden');
-                currentUserAuth = user;
-                try {
-                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid));
-                    if (docSnap.exists()) {
-                        currentUserData = docSnap.data();
-                        document.getElementById('setupProfileScreen').classList.add('hidden');
-                        finishLoginSetup();
-                    } else {
-                        document.getElementById('setupProfileScreen').classList.remove('hidden');
-                    }
-                } catch(e) {}
-            } else {
-                document.getElementById('systemPasswordScreen').classList.remove('hidden');
-            }
-        });
-
-        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) {}
-        });
-
-        document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('setupName').value;
-            const role = document.getElementById('setupRole').value;
-            try {
-                const newUserData = {
-                    name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email', 
-                    photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
-                    timestamp: Date.now(),
-                    permissions: { canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false }
-                };
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
-                currentUserData = newUserData;
-                document.getElementById('setupProfileScreen').classList.add('hidden');
-                finishLoginSetup();
-            } catch(e) { console.error(e); }
-        });
-
-        function finishLoginSetup() {
-            updateUIWithUserData();
             const isCEO = currentUserData.role === 'CEO';
-            const p = currentUserData.permissions || {};
+            let taskCount = 0;
 
-            if(isCEO) {
-                document.getElementById('grid-employees').classList.remove('hidden');
-                document.getElementById('grid-dashboard').classList.remove('hidden');
-                document.getElementById('grid-logs').classList.remove('hidden');
-                document.getElementById('nav-employees-btn').classList.remove('hidden');
-                document.getElementById('nav-dashboard-btn').classList.remove('hidden');
-                document.getElementById('nav-logs-btn').classList.remove('hidden'); 
-            } else {
-                document.getElementById('grid-employees').classList.add('hidden');
-                document.getElementById('grid-dashboard').classList.add('hidden');
-                if(p.canViewLogs) {
-                    document.getElementById('grid-logs').classList.remove('hidden');
-                    document.getElementById('nav-logs-btn').classList.remove('hidden'); 
+            const tasksToRender = globalTasks.filter(task => {
+                const isMyTask = task.assigneeId === currentUserData.uid || task.createdBy === currentUserData.uid;
+                if (!isCEO && !isMyTask) return false;
+                
+                if(searchTerm) {
+                    return task.title.toLowerCase().includes(searchTerm) || 
+                           task.assigneeName.toLowerCase().includes(searchTerm) ||
+                           (task.creatorName && task.creatorName.toLowerCase().includes(searchTerm));
                 }
-            }
-            
-            if (isCEO || p.canAssignTasks) {
-                document.getElementById('addTaskBtn').classList.remove('hidden');
-                document.getElementById('addTaskBtn').style.display = 'flex';
-            }
+                return true;
+            }).sort((a, b) => b.timestamp - a.timestamp);
 
-            startDatabaseListeners();
-            handleHashChange();
-        }
-        
+            document.getElementById('tasksTotalCountText').innerText = `الإجمالي: ${tasksToRender.length}`;
+
+            tasksToRender.forEach(task => {
+                const isMyTask = task.assigneeId === currentUserData.uid;
+                const deadlineDate = task.deadline ? new Date(task.deadline) : null;
+                
+                // Formating Deadline
+                let deadlineHtml = '-';
+                if(deadlineDate) {
+                    const now = new Date();
+                    const isToday = deadlineDate.getDate() === now.getDate() && deadlineDate.getMonth() === now.getMonth() && deadlineDate.getFullYear() === now.getFullYear();
+                    
+                    const timeStr = deadlineDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit'}).toLowerCase();
+                    const dateStr = deadlineDate.toLocaleDateString('ar-EG', {month: 'short', day: 'numeric'});
+                    
+                    if(isToday) {
+                        deadlineHtml = `<span class="bg-yellow-400 text-white px-2 py-0.5 rounded-full text-xs font-bold shadow-sm">${timeStr} اليوم,</span>`;
+                    } else {
+                        deadlineHtml = `<span>${timeStr} ${dateStr}</span>`;
+                    }
+                }
+
+                // Fire Icon Priority
+                const priorityHtml = task.isPriority ? `<i class="fa-solid fa-fire text-red-500 mr-2" title="أولوية عالية"></i>` : '';
+
+                // Checklist count
+                let checklistHtml = '';
+                if(task.checklists && task.checklists.length > 0) {
+                    const total = task.checklists.length;
+                    const completed = task.checklists.filter(c => c.isCompleted).length;
+                    checklistHtml = `<span class="text-[10px] text-gray-500 border border-gray-200 dark:border-gray-600 px-1 rounded flex items-center gap-1 mt-1 w-max"><i class="fa-regular fa-square-check"></i> ${completed}/${total}</span>`;
+                }
+
+                // Status formatting
+                let statusHtml = '';
+                if (task.status === 'completed') {
+                    statusHtml = `<span class="flex items-center gap-1"><i class="fa-solid fa-circle-check text-green-500"></i> مكتمل</span>`;
+                } else {
+                    statusHtml = `<span class="flex items-center gap-1"><i class="fa-solid fa-circle text-green-400 text-[8px]"></i> نشط</span>`;
+                }
+
+                // Avatars
+                const creatorAvatar = `<i class="fa-solid fa-user-circle text-gray-400 text-lg ml-1"></i>`;
+                const assigneeAvatar = `<i class="fa-solid fa-user-circle text-gray-400 text-lg ml-1"></i>`;
+                
+                // Action logic
+                let completeBtn = '';
+                if(isMyTask && task.status !== 'completed') {
+                    completeBtn = `<button onclick="window.updateTaskStatus('${task.id}', 'completed', '${task.title.replace(/'/g, "\\'")}')" class="text-[10px] text-blue-500 hover:underline mr-2">إنجاز</button>`;
+                }
+                const deleteBtn = isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-[10px] text-red-500 hover:underline mr-2">حذف</button>` : '';
+
+                const rowHtml = `
+                    <tr class="hover:bg-blue-50/50 dark:hover:bg-gray-700 transition group border-b border-gray-100 dark:border-gray-700">
+                        <td class="p-3">
+                            <div class="flex items-start gap-2">
+                                <input type="checkbox" class="mt-1 rounded border-gray-300">
+                                <i class="fa-solid fa-bars text-gray-300 mt-1 cursor-grab hover:text-gray-500"></i>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-gray-700 dark:text-gray-200 flex items-center ${task.status === 'completed' ? 'line-through text-gray-400' : ''}">
+                                        ${task.title} ${priorityHtml}
+                                    </span>
+                                    ${checklistHtml}
+                                    <div class="opacity-0 group-hover:opacity-100 transition mt-1">
+                                        ${completeBtn} ${deleteBtn}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3">${statusHtml}</td>
+                        <td class="p-3" dir="ltr"><div class="text-right w-full">${deadlineHtml}</div></td>
+                        <td class="p-3 text-gray-500 dark:text-gray-400 flex items-center mt-1">${creatorAvatar} ${task.creatorName || '-'}</td>
+                        <td class="p-3 text-gray-500 dark:text-gray-400">${assigneeAvatar} ${task.assigneeName || '-'}</td>
+                        <td class="p-3 text-blue-600 dark:text-blue-400 font-semibold"><i class="fa-regular fa-folder ml-1"></i> ${task.project || 'MENA'}</td>
+                        <td class="p-3 text-gray-500">MENA</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += rowHtml;
+                taskCount++;
+            });
+
+            if(taskCount === 0) {
+                tableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">لا توجد مهام حالياً</td></tr>`;
+            }
+        };
+
+
+        window.updateTaskStatus = async (id, newStatus, taskTitle) => {
+            if(newStatus === 'completed') {
+                document.getElementById('reportTaskId').value = id;
+                document.getElementById('reportTaskTitle').value = taskTitle;
+                document.getElementById('reportText').value = '';
+                document.getElementById('reportFileInput').value = '';
+                window.openModal('taskReportModal');
+                return; 
+            }
+            // Fallback for direct updates
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: newStatus });
+            } catch(e) { console.error(e); }
+        };
+
+        window.deleteTask = async (id) => {
+            if(currentUserData.role !== 'CEO') return;
+            if(confirm('حذف هذه المهمة بشكل نهائي؟')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)).catch(e => console.error(e));
+            }
+        };
+
+        // ===============================================
+
     </script>
 </body>
 </html>
