@@ -92,7 +92,6 @@
             font-size: 1.5rem;
         }
 
-        /* Checkbox styling for task list */
         .custom-checkbox {
             appearance: none;
             background-color: #fff;
@@ -136,15 +135,8 @@
             100% { background-color: transparent; }
         }
         
-        /* Task Form Animations */
-        .slide-down {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .slide-down.open {
-            max-height: 1000px;
-        }
+        .slide-down { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .slide-down.open { max-height: 1000px; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 h-screen overflow-hidden flex relative transition-colors duration-300">
@@ -239,21 +231,17 @@
                     <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
                 </button>
 
-                <!-- Notifications Bell -->
                 <div class="relative">
                     <button onclick="window.toggleNotificationsDropdown()" class="text-gray-400 hover:text-secondary p-2 rounded transition relative" title="الإشعارات">
                         <i class="fa-solid fa-bell"></i>
                         <span id="notificationsBadge" class="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center hidden pointer-events-none">0</span>
                     </button>
-                    <!-- Notifications Dropdown -->
                     <div id="notificationsDropdown" class="hidden absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl w-72 max-h-80 overflow-hidden flex flex-col z-50">
                         <div class="bg-gray-50 dark:bg-gray-900 p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
                             <span class="font-bold text-sm text-gray-700 dark:text-gray-200">الإشعارات</span>
                             <button onclick="window.clearAllNotifications()" class="text-xs text-red-500 hover:underline font-bold py-1 px-2">حذف الكل</button>
                         </div>
-                        <div id="notificationsList" class="overflow-y-auto flex-1 p-2 space-y-2">
-                            <!-- Items go here -->
-                        </div>
+                        <div id="notificationsList" class="overflow-y-auto flex-1 p-2 space-y-2"></div>
                     </div>
                 </div>
             </div>
@@ -340,8 +328,7 @@
                             <i id="chatMenuIconMobile" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                         </div>
                     </button>
-                    <div id="chatSubMenuMobile" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0">
-                    </div>
+                    <div id="chatSubMenuMobile" class="flex flex-col pr-8 pl-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out max-h-0 opacity-0"></div>
                 </div>
 
                 <button onclick="window.location.hash='settings'" class="nav-btn w-full flex items-center py-3 px-4 rounded-lg text-gray-300 hover:bg-white/10 hover:text-white transition-colors" data-section="settings">
@@ -498,7 +485,7 @@
                 </div>
             </section>
 
-            <!-- قسم ملفي والعهد -->
+            <!-- قسم ملفي والعهد المحدث -->
             <section id="my-profile" class="section-content animate-fade-in hidden p-4 md:p-0 max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">ملفي الشخصي والعهد</p>
@@ -514,13 +501,14 @@
                     </div>
                     
                     <div class="mb-4">
-                        <h4 class="font-bold text-primary dark:text-blue-400 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-boxes-stacked"></i> العهد والأصول المستلمة:
+                        <h4 class="font-bold text-primary dark:text-blue-400 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-stacked text-xl"></i> العهد والأصول المستلمة:
                         </h4>
-                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[100px]">
-                            <p id="myProfileAssets" class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap font-semibold leading-relaxed">لا توجد عهد مسجلة حالياً.</p>
+                        <!-- تحسين عرض العهد هنا -->
+                        <div id="myProfileAssets" class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[100px]">
+                            <!-- سيتم حقن العهد هنا بواسطة الجافاسكربت بتصميم جميل -->
                         </div>
-                        <p class="text-[10px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info"></i> هذه التفاصيل خاصة بك، ولا يمكن تعديلها إلا من قبل المدير.</p>
+                        <p class="text-[10px] text-gray-500 mt-3"><i class="fa-solid fa-circle-info"></i> هذه التفاصيل خاصة بك، ولا يمكن تعديلها إلا من قبل المدير للإقرار باستلامها.</p>
                     </div>
                 </div>
             </section>
@@ -571,26 +559,31 @@
                 </div>
             </section>
 
+            <!-- قسم العملاء CRM المحدث -->
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
-                <div class="flex justify-between items-center mb-4 md:mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-4">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="قاعدة بيانات العملاء">قاعدة بيانات العملاء (CRM)</p>
-                    <button onclick="window.openModal('clientModal')" class="bg-lime-600 hover:bg-lime-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
-                        <i class="fa-solid fa-user-plus mx-2"></i> إضافة عميل جديد
-                    </button>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="relative w-full md:w-64">
+                            <input type="text" id="crmSearchInput" onkeyup="window.filterCRM()" placeholder="بحث باسم العميل أو الهاتف..." class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2 text-sm w-full focus:outline-none focus:border-lime-500 shadow-sm">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button onclick="window.openModal('clientModal')" class="bg-lime-600 hover:bg-lime-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm whitespace-nowrap">
+                            <i class="fa-solid fa-user-plus mx-2"></i> إضافة عميل
+                        </button>
+                    </div>
                 </div>
                 <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- العملاء سيظهرون هنا -->
                 </div>
             </section>
 
-            <!-- قسم المهام المحدث - List View -->
+            <!-- قسم المهام المحدث -->
             <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                    <!-- رأس قائمة المهام -->
                     <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-primary rounded-t-lg text-white">
                         <div class="flex gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
                             <button class="font-bold text-sm whitespace-nowrap bg-white/20 px-3 py-1 rounded-full"><i class="fa-solid fa-list text-xs ml-1"></i> القائمة</button>
-                            <button class="font-bold text-sm whitespace-nowrap opacity-70 hover:opacity-100 transition"><i class="fa-solid fa-calendar text-xs ml-1"></i> الموعد النهائي</button>
-                            <button class="font-bold text-sm whitespace-nowrap opacity-70 hover:opacity-100 transition"><i class="fa-solid fa-clock text-xs ml-1"></i> متأخرة <span class="bg-red-500 text-white rounded-full px-1.5 text-[10px] ml-1">0</span></button>
                         </div>
                         <div class="flex gap-2 mt-3 md:mt-0 w-full md:w-auto">
                             <button id="viewReportsBtn" onclick="window.openCeoReportsModal()" class="hidden bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 shadow-sm whitespace-nowrap">
@@ -600,20 +593,20 @@
                                 <input type="text" id="taskSearchInput" onkeyup="window.filterTasksList()" placeholder="عامل التصفية والبحث" class="bg-white/10 border border-white/20 rounded text-white px-3 py-1.5 text-sm w-full focus:outline-none focus:bg-white/20 placeholder-white/60">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-xs"></i>
                             </div>
-                            <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-[#22c55e] hover:bg-green-600 text-white px-4 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 whitespace-nowrap shadow-sm">
-                                <i class="fa-solid fa-plus"></i> إنشاء <i class="fa-solid fa-chevron-down text-[10px] mr-1"></i>
+                            <!-- زر إنشاء المهمة الذي يتيح أيضاً الإسناد الذاتي -->
+                            <button id="addTaskBtn" onclick="window.openTaskModal()" class="bg-[#22c55e] hover:bg-green-600 text-white px-4 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 whitespace-nowrap shadow-sm">
+                                <i class="fa-solid fa-plus"></i> إنشاء مهمة
                             </button>
                         </div>
                     </div>
 
-                    <!-- جدول المهام -->
                     <div class="overflow-x-auto min-h-[50vh]">
                         <table class="w-full text-right" id="tasksListTable">
                             <thead class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
                                     <th class="p-3 w-10 text-center"><input type="checkbox" class="custom-checkbox" disabled></th>
                                     <th class="p-3 font-semibold">الاسم</th>
-                                    <th class="p-3 font-semibold">نشط</th>
+                                    <th class="p-3 font-semibold">الحالة</th>
                                     <th class="p-3 font-semibold">الموعد النهائي</th>
                                     <th class="p-3 font-semibold">تم الإنشاء بواسطة</th>
                                     <th class="p-3 font-semibold">الشخص المسؤول</th>
@@ -621,9 +614,7 @@
                                     <th class="p-3 w-10 text-center"></th>
                                 </tr>
                             </thead>
-                            <tbody id="tasksListBody" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm">
-                                <!-- سيتم تعبئة المهام هنا عبر الجافاسكربت -->
-                            </tbody>
+                            <tbody id="tasksListBody" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm"></tbody>
                         </table>
                         <div id="emptyTasksMessage" class="hidden text-center text-gray-500 py-10">
                             <i class="fa-solid fa-clipboard-list text-4xl mb-3 opacity-50"></i>
@@ -631,15 +622,7 @@
                         </div>
                     </div>
                     
-                    <!-- تذييل الجدول -->
-                    <div class="p-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
-                        <div class="flex items-center gap-2">
-                            <span>السجلات: </span>
-                            <select class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 outline-none">
-                                <option>50</option>
-                                <option>100</option>
-                            </select>
-                        </div>
+                    <div class="p-3 border-t border-gray-200 dark:border-gray-700 flex justify-end items-center text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
                         <div class="flex items-center gap-4">
                             <span>الإجمالي: <b id="totalTasksCountList">0</b></span>
                         </div>
@@ -809,12 +792,20 @@
                 </div>
             </section>
 
+            <!-- سجل النظام المحدث مع البحث -->
             <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
-                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
-                    <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-gray-600 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm">
-                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="تفريغ السجل">تفريغ السجل</span>
-                    </button>
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
+                    
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <div class="relative w-full md:w-64">
+                            <input type="text" id="logSearchInput" onkeyup="window.filterLogs()" placeholder="بحث في السجل..." class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2 text-sm w-full focus:outline-none focus:border-blue-500 shadow-sm">
+                            <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-gray-600 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm whitespace-nowrap">
+                            <i class="fa-solid fa-trash-can"></i> <span data-i18n="تفريغ السجل">تفريغ السجل</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                     <table class="w-full text-right min-w-[600px]">
@@ -833,10 +824,8 @@
         </div>
     </div>
 
-    <!-- نافذة إنشاء مهمة جديدة (مطابقة للصورة) -->
     <div id="taskModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50 p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-xl overflow-hidden flex flex-col animate-fade-in">
-            <!-- Header -->
             <div class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
                 <div class="flex items-center gap-3">
                     <span class="text-sm font-bold text-gray-600 dark:text-gray-300">اسم المهمة</span>
@@ -847,27 +836,24 @@
                 <button onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             
-            <!-- Body -->
             <form id="addTaskForm" class="flex flex-col h-full max-h-[80vh]">
                 <div class="p-4 flex-1 overflow-y-auto space-y-4 hide-scrollbar">
                     
                     <input type="hidden" id="isTaskHighPriority" value="false">
 
-                    <!-- Title -->
                     <input type="text" id="taskTitle" required placeholder="اسم المهمة..." class="w-full text-lg md:text-xl font-bold text-gray-800 dark:text-white bg-transparent border-none outline-none placeholder-gray-400">
                     
-                    <!-- Description -->
                     <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
                         <p class="text-xs text-gray-400 mb-1">الوصف</p>
                         <textarea id="taskDesc" rows="2" placeholder="أضف تفاصيل المهمة هنا..." class="w-full text-sm text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none resize-none"></textarea>
                     </div>
 
-                    <!-- Assignment & Meta info -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                         <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
                             <div class="w-6 text-center text-gray-400"><i class="fa-solid fa-user"></i></div>
                             <div class="flex-1">
                                 <p class="text-[10px] text-gray-500">:الشخص المسؤول</p>
+                                <!-- الآن يمكن للجميع اختيار هذا الحقل لإسناد مهمة لأنفسهم -->
                                 <select id="taskAssignee" required class="w-full bg-transparent text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer"></select>
                             </div>
                         </div>
@@ -889,7 +875,6 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons for features -->
                     <div class="flex gap-2 pt-2">
                         <button type="button" onclick="document.getElementById('taskAttachmentInput').click()" class="border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 font-bold transition flex items-center gap-2">
                             <i class="fa-solid fa-paperclip"></i> الملفات
@@ -903,7 +888,6 @@
                     
                     <div id="attachmentNameDisplay" class="hidden text-xs text-blue-500 font-bold bg-blue-50 p-2 rounded"></div>
 
-                    <!-- Checklist Section (الصورة الثالثة) -->
                     <div id="checklistSection" class="hidden border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm mt-4">
                         <div class="flex justify-between items-center mb-3">
                             <div class="flex items-center gap-2">
@@ -921,7 +905,6 @@
                         </div>
 
                         <div id="checklistItemsContainer" class="space-y-2 mb-3">
-                            <!-- Items will be added here -->
                         </div>
 
                         <div class="flex items-center gap-2 border-t border-gray-100 dark:border-gray-700 pt-3">
@@ -932,7 +915,6 @@
                     </div>
                 </div>
                 
-                <!-- Footer -->
                 <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
                     <button type="button" onclick="window.closeModal('taskModal')" class="text-sm font-bold text-gray-500 hover:text-gray-800 transition">إلغاء</button>
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-2 rounded-lg shadow-md transition">إنشاء</button>
@@ -1040,28 +1022,82 @@
         </div>
     </div>
 
+    <!-- نافذة إضافة عميل (محدثة) -->
     <div id="clientModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
-            <div class="bg-lime-600 text-white p-4 flex justify-between items-center">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="bg-lime-600 text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-base md:text-lg">إضافة عميل جديد</h3>
                 <button onclick="window.closeModal('clientModal')" class="hover:text-lime-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <form id="clientForm" class="p-4 md:p-6 space-y-4">
-                <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">اسم العميل / الشركة</label><input type="text" id="clientName" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none"></div>
-                <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">رقم الهاتف</label><input type="tel" id="clientPhone" dir="ltr" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-right"></div>
-                <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">البريد الإلكتروني</label><input type="email" id="clientEmail" dir="ltr" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-right"></div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">حالة العميل مبدئياً</label>
-                    <select id="clientStatus" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none">
-                        <option value="لم يتم الاتصال به">لم يتم الاتصال به</option>
-                        <option value="تم الاتصال به">تم الاتصال به</option>
-                    </select>
-                </div>
-                <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
-                    <button type="button" onclick="window.closeModal('clientModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
-                    <button type="submit" class="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 transition-colors text-sm md:text-base">حفظ العميل</button>
-                </div>
-            </form>
+            <div class="p-4 md:p-6 overflow-y-auto flex-1">
+                <form id="clientForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">اسم العميل / الشركة</label>
+                            <input type="text" id="clientName" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">رابط صورة/شعار (اختياري)</label>
+                            <input type="url" id="clientLogo" placeholder="https://example.com/logo.png" dir="ltr" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-sm text-right">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">رقم الهاتف</label>
+                            <input type="tel" id="clientPhone" dir="ltr" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-right">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">البريد الإلكتروني</label>
+                            <input type="email" id="clientEmail" dir="ltr" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-right">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">حالة العميل المبدئية</label>
+                            <select id="clientStatus" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none font-semibold">
+                                <option value="لم يتم الاتصال" class="text-gray-600">لم يتم الاتصال</option>
+                                <option value="عميل محتمل" class="text-blue-600">عميل محتمل</option>
+                                <option value="تم التواصل" class="text-indigo-600">تم التواصل</option>
+                                <option value="تم إرسال العرض" class="text-yellow-600">تم إرسال العرض</option>
+                                <option value="تم التواصل - مهتم" class="text-green-600">تم التواصل - مهتم</option>
+                                <option value="تم التواصل - غير مهتم" class="text-red-600">تم التواصل - غير مهتم</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تصنيف العميل</label>
+                            <select id="clientCategory" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none">
+                                <option value="عام">عام</option>
+                                <option value="VIP">VIP</option>
+                                <option value="قطاع حكومي">قطاع حكومي</option>
+                                <option value="شركات (B2B)">شركات (B2B)</option>
+                                <option value="أفراد (B2C)">أفراد (B2C)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">طريقة التواصل الرئيسية</label>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="contactMethod" value="whatsapp" checked class="text-green-500 focus:ring-green-500"> <i class="fa-brands fa-whatsapp text-green-500"></i> واتساب</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="contactMethod" value="phone" class="text-gray-600 focus:ring-gray-500"> <i class="fa-solid fa-phone text-gray-500"></i> اتصال</label>
+                                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" name="contactMethod" value="email" class="text-blue-500 focus:ring-blue-500"> <i class="fa-solid fa-envelope text-blue-500"></i> إيميل</label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تاريخ المتابعة القادم (اختياري)</label>
+                            <input type="date" id="clientNextFollowUp" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-lime-500 focus:outline-none text-sm" style="color-scheme: light dark;">
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                        <button type="button" onclick="window.closeModal('clientModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
+                        <button type="submit" class="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 transition-colors text-sm md:text-base font-bold shadow-sm">حفظ العميل</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -1074,6 +1110,12 @@
             <form id="noteForm" class="p-4 md:p-6 space-y-4">
                 <input type="hidden" id="noteClientId">
                 <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تفاصيل الملاحظة (سيراها من لديه صلاحية فقط)</label><textarea id="noteText" rows="3" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-gray-500 focus:outline-none whitespace-pre-wrap"></textarea></div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تحديث تاريخ المتابعة؟ (اختياري)</label>
+                    <input type="date" id="noteFollowUpUpdate" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-gray-500 focus:outline-none text-sm" style="color-scheme: light dark;">
+                </div>
+
                 <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
                     <button type="button" onclick="window.closeModal('noteModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
                     <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm md:text-base">إضافة الملاحظة</button>
@@ -1153,7 +1195,7 @@
                     
                     <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
                         <label class="block text-sm font-bold text-blue-600 dark:text-blue-400 mb-2"><i class="fa-solid fa-boxes-stacked"></i> إضافة عهد للموظف (أجهزة، سيارة...)</label>
-                        <textarea id="editEmpAssets" rows="3" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none text-sm whitespace-pre-wrap" placeholder="اكتب العهد المستلمة هنا..."></textarea>
+                        <textarea id="editEmpAssets" rows="3" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-blue-500 focus:outline-none text-sm whitespace-pre-wrap" placeholder="اكتب كل عهدة في سطر منفصل للحفاظ على التنسيق..."></textarea>
                     </div>
 
                     <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
@@ -1257,6 +1299,11 @@
         const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
         const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
         const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
+
+        // حساب CRM الجديد المُرسل
+        const EMAILJS_SERVICE_ID_4 = 'service_f80zc0r';
+        const EMAILJS_TEMPLATE_CRM_REMINDER = 'template_drbsz4c';
+        const EMAILJS_PUBLIC_KEY_4 = '698vc6jpGh36xcq1U';
 
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 }); 
 
@@ -1370,8 +1417,6 @@
         let selectedChatColor = 'bg-[#00839b]'; 
         
         let replyingToMsg = null;
-
-        // ---- Checklists UI Logic for Creation ----
         let creationChecklists = [];
         
         window.toggleTaskPriority = () => {
@@ -1430,7 +1475,6 @@
             document.getElementById('checklistProgressText').innerText = `المكتمل: 0 من ${creationChecklists.length}`;
         }
         
-        // Handle attachments for Task Creation
         let pendingTaskAttachment = null;
         let pendingTaskAttachmentType = null;
         let pendingTaskAttachmentName = null;
@@ -1464,7 +1508,6 @@
             document.getElementById('attachmentNameDisplay').classList.add('hidden');
         };
 
-        // ====== Notifications Logic ======
         window.toggleNotificationsDropdown = () => {
             const dropdown = document.getElementById('notificationsDropdown');
             dropdown.classList.toggle('hidden');
@@ -1551,7 +1594,6 @@
                 };
             }
         }
-        // =================================
 
         window.checkSystemPassword = () => {
             const pass = document.getElementById('sysPasswordInput').value;
@@ -1606,6 +1648,20 @@
                     showToast('تمت عملية المسح بنجاح', 'success');
                 } catch(e) { console.error(e); }
             }
+        };
+
+        // دالة تصفية السجل للمدير
+        window.filterLogs = () => {
+            const query = document.getElementById('logSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#logsList tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if(text.includes(query)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         };
 
         window.clearOrDeleteGroup = async (action) => {
@@ -1719,12 +1775,9 @@
                     content += `"${a.name}","${a.date}","${pIn}","${pOut}","${a.status}"\n`;
                 });
 
-                content += "\n--- الإجازات والمغادرات (السجل الكامل) ---\nالموظف,النوع,من,إلى,السبب,الحالة\n";
-                globalLeaves.forEach(l => {
-                    const fromStr = new Date(l.from).toLocaleString('ar-EG');
-                    const toStr = new Date(l.to).toLocaleString('ar-EG');
-                    const reasonStr = l.reason ? l.reason.replace(/"/g, '""').replace(/\n/g, ' ') : '-';
-                    content += `"${l.name}","${l.type}","${fromStr}","${toStr}","${reasonStr}","${l.status}"\n`;
+                content += "\n--- العملاء CRM (السجل الكامل) ---\nاسم العميل,الهاتف,التصنيف,الحالة,تمت الإضافة بواسطة\n";
+                globalCRM.forEach(c => {
+                    content += `"${c.name}","${c.phone||'-'}","${c.category||'عام'}","${c.status}","${c.addedBy}"\n`;
                 });
 
                 content += "\n--- المهام (السجل الكامل) ---\nالعنوان,المسؤول,تاريخ الإنشاء,وقت التسليم,الحالة\n";
@@ -1733,11 +1786,6 @@
                     const deadlineStr = t.deadline ? new Date(t.deadline).toLocaleString('ar-EG') : '-';
                     content += `"${t.title.replace(/"/g, '""')}","${t.assigneeName}","${createdStr}","${deadlineStr}","${t.status}"\n`;
                 });
-
-                if(globalExpenses && globalExpenses.length > 0) {
-                    content += "\n--- المصاريف والنثريات (السجل الكامل) ---\nالتاريخ,البيان,المبلغ,بواسطة\n";
-                    globalExpenses.forEach(e => { content += `"${e.date}","${e.desc.replace(/"/g, '""')}","${e.amount}","${e.addedBy}"\n`; });
-                }
 
                 const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -1758,8 +1806,8 @@
                         <ul>
                             <li>عدد الموظفين المسجلين: ${globalUsers.length}</li>
                             <li>إجمالي المهام في النظام: ${globalTasks.length}</li>
-                            <li>إجمالي طلبات الإجازات والمغادرات: ${globalLeaves.length}</li>
-                            <li>إجمالي عدد المصاريف المسجلة: ${globalExpenses ? globalExpenses.length : 0}</li>
+                            <li>إجمالي العملاء المسجلين: ${globalCRM.length}</li>
+                            <li>إجمالي طلبات الإجازات: ${globalLeaves.length}</li>
                         </ul>
                         <p style="margin-top: 50px; text-align: center; color: gray; font-size: 12px;">نهاية التقرير.</p>
                     </div>
@@ -1778,6 +1826,7 @@
             window.logAction('تحميل تقرير', `قام المدير بسحب تفاصيل النظام الكاملة بصيغة ${format.toUpperCase()}`);
         };
 
+        // ارسال تذكيرات المهام
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -1787,13 +1836,47 @@
                     task_title: taskTitle,
                     task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
                     task_link: taskLink, 
-                    company_name: 'نظام شركتي'
+                    company_name: 'نظام شركة Quill'
                 }, EMAILJS_PUBLIC_KEY_1);
                 
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
                     lastReminder: Date.now()
                 });
             } catch (error) { console.error(error); }
+        }
+
+        // ارسال تذكيرات CRM
+        async function checkAndSendCRMReminders() {
+            if(globalCRM.length === 0 || globalUsers.length === 0) return;
+            const now = Date.now();
+            
+            globalCRM.forEach(client => {
+                if(client.nextFollowUp && client.status !== 'تم التعاقد' && client.status !== 'تم التواصل - غير مهتم') {
+                    const followUpTime = new Date(client.nextFollowUp).getTime();
+                    // إذا موعد المتابعة اليوم ولم يتم ارسال ايميل له مسبقاً اليوم
+                    if(followUpTime <= now && (!client.lastReminderSent || (now - client.lastReminderSent > 24 * 60 * 60 * 1000))) {
+                        const assignedUser = globalUsers.find(u => u.uid === client.addedById);
+                        if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
+                            const crmLink = window.location.origin + window.location.pathname + '#crm';
+                            
+                            emailjs.send(EMAILJS_SERVICE_ID_4, EMAILJS_TEMPLATE_CRM_REMINDER, {
+                                to_email: assignedUser.email,
+                                to_name: assignedUser.name,
+                                client_name: client.name,
+                                client_phone: client.phone || 'غير مسجل',
+                                client_email: client.email || 'غير مسجل',
+                                client_category: client.category || 'عام',
+                                followup_date: new Date(client.nextFollowUp).toLocaleDateString('ar-EG'),
+                                crm_link: crmLink
+                            }, EMAILJS_PUBLIC_KEY_4).then(() => {
+                                updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', client.id), {
+                                    lastReminderSent: Date.now()
+                                }).catch(e => console.error(e));
+                            }).catch(e => console.error(e));
+                        }
+                    }
+                }
+            });
         }
 
         function checkAndSendReminders() {
@@ -1822,7 +1905,7 @@
                                 task_title: task.title,
                                 task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
                                 task_link: taskLink, 
-                                company_name: 'نظام شركتي'
+                                company_name: 'نظام شركة Quill'
                             }, EMAILJS_PUBLIC_KEY_1).catch(e => console.error(e));
                         }
 
@@ -1838,7 +1921,7 @@
                                 task_desc: task.desc || 'لا توجد تفاصيل إضافية.',
                                 task_deadline: deadlineStr,
                                 task_link: taskLink,
-                                company_name: 'نظام شركتي'
+                                company_name: 'نظام شركة Quill'
                             }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
                         }
                     }
@@ -1855,7 +1938,7 @@
                     task_title: taskTitle,
                     task_desc: taskDesc || 'لا توجد تفاصيل إضافية.',
                     task_link: taskLink, 
-                    company_name: 'نظام شركتي'
+                    company_name: 'نظام شركة Quill'
                 }, EMAILJS_PUBLIC_KEY_1);
             } catch (error) { console.error(error); }
         }
@@ -1999,7 +2082,6 @@
             document.getElementById('chatAttachmentPreview').classList.add('hidden');
         };
 
-        // تعميمات و تصويت
         window.togglePollOptions = () => {
             const type = document.getElementById('noticeType').value;
             const container = document.getElementById('pollOptionsContainer');
@@ -2067,7 +2149,6 @@
                     window.closeModal('noticeModal');
                     showToast('تم نشر التعميم بنجاح', 'success');
                     
-                    // Add Notification to users
                     sendPushNotification('تعميم جديد', `تم نشر تعميم جديد: ${title}`, 'notices');
                 } catch(e) { console.error(e); }
             });
@@ -2178,24 +2259,33 @@
             });
         }
 
-        // العملاء (CRM)
+        // ================= عملاء CRM (المحدث) ================= //
         const clientForm = document.getElementById('clientForm');
         if(clientForm) {
             clientForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if(!currentUserData) return;
                 try {
+                    const status = document.getElementById('clientStatus').value;
+                    const cMethod = document.querySelector('input[name="contactMethod"]:checked').value;
+                    
                     await addDoc(getColRef('clients'), {
                         name: document.getElementById('clientName').value,
+                        logoUrl: document.getElementById('clientLogo').value || null,
                         phone: document.getElementById('clientPhone').value,
                         email: document.getElementById('clientEmail').value,
-                        status: document.getElementById('clientStatus').value,
+                        status: status,
+                        category: document.getElementById('clientCategory').value,
+                        contactMethod: cMethod,
+                        nextFollowUp: document.getElementById('clientNextFollowUp').value || null,
                         addedBy: currentUserData.name,
+                        addedById: currentUserData.uid,
                         notes: [], 
                         timestamp: Date.now()
                     });
                     window.closeModal('clientModal');
                     showToast('تم إضافة العميل بنجاح', 'success');
+                    logAction('إضافة عميل', `تم إضافة عميل جديد: ${document.getElementById('clientName').value}`);
                 } catch(e) { console.error(e); }
             });
         }
@@ -2213,6 +2303,7 @@
                 if(!currentUserData) return;
                 const cId = document.getElementById('noteClientId').value;
                 const text = document.getElementById('noteText').value;
+                const newFollowUp = document.getElementById('noteFollowUpUpdate').value;
                 
                 try {
                     const clientDoc = globalCRM.find(c => c.id === cId);
@@ -2224,7 +2315,11 @@
                             text: text,
                             timestamp: Date.now()
                         });
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), { notes: updatedNotes });
+                        
+                        const updates = { notes: updatedNotes };
+                        if(newFollowUp) updates.nextFollowUp = newFollowUp;
+
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), updates);
                         window.closeModal('noteModal');
                         showToast('تم إضافة الملاحظة', 'success');
                     }
@@ -2239,13 +2334,45 @@
             } catch(e) { console.error(e); }
         };
 
+        window.filterCRM = () => {
+            const query = document.getElementById('crmSearchInput').value.toLowerCase();
+            document.querySelectorAll('.client-card-item').forEach(el => {
+                const name = el.getAttribute('data-name').toLowerCase();
+                const phone = el.getAttribute('data-phone').toLowerCase();
+                if(name.includes(query) || phone.includes(query)) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        };
+
+        const getCRMStatusStyle = (status) => {
+            switch(status) {
+                case 'لم يتم الاتصال': return 'bg-gray-100 text-gray-700';
+                case 'عميل محتمل': return 'bg-blue-100 text-blue-700';
+                case 'تم التواصل': return 'bg-indigo-100 text-indigo-700';
+                case 'تم إرسال العرض': return 'bg-yellow-100 text-yellow-700';
+                case 'تم التواصل - مهتم': return 'bg-green-100 text-green-700';
+                case 'تم التواصل - غير مهتم': return 'bg-red-100 text-red-700 border border-red-300';
+                default: return 'bg-gray-100 text-gray-700';
+            }
+        };
+
+        const getContactIcon = (method) => {
+            if(method === 'whatsapp') return '<i class="fa-brands fa-whatsapp text-green-500 text-lg" title="تم التواصل واتساب"></i>';
+            if(method === 'email') return '<i class="fa-solid fa-envelope text-blue-500 text-lg" title="تم التواصل بالايميل"></i>';
+            if(method === 'phone') return '<i class="fa-solid fa-phone text-gray-600 dark:text-gray-400 text-lg" title="اتصال هاتفي"></i>';
+            return '<i class="fa-solid fa-address-book text-gray-400"></i>';
+        };
+
         function renderCRM() {
             const list = document.getElementById('crmList');
             if(!list) return;
             list.innerHTML = '';
             
             if(globalCRM.length === 0) {
-                list.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">قاعدة العملاء فارغة حالياً.</p>';
+                list.innerHTML = '<p class="col-span-full text-center text-gray-500 py-8">قاعدة العملاء فارغة حالياً. أضف عميلك الأول!</p>';
                 return;
             }
 
@@ -2258,32 +2385,52 @@
                             notesHtml += `
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600">
                                     <p class="font-bold text-gray-700 dark:text-gray-300">${note.authorName}:</p>
-                                    <p class="text-gray-600 dark:text-gray-400 mt-1">${note.text}</p>
+                                    <p class="text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap">${note.text}</p>
                                 </div>
                             `;
                         }
                     });
                 }
 
-                const statusColor = c.status === 'تم الاتصال به' ? 'text-green-600 bg-green-50' : 'text-gray-600 bg-gray-100';
+                const statusColor = getCRMStatusStyle(c.status);
+                const contactIcon = getContactIcon(c.contactMethod);
+                const avatar = c.logoUrl ? `<img src="${c.logoUrl}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=00839b&color=fff'" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">${c.name.charAt(0)}</div>`;
+                const followUpHtml = c.nextFollowUp ? `<p class="text-xs font-bold text-orange-500 mt-2"><i class="fa-regular fa-calendar-check"></i> المتابعة القادمة: ${new Date(c.nextFollowUp).toLocaleDateString('ar-EG')}</p>` : '';
 
                 list.innerHTML += `
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full">
+                    <div class="client-card-item bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full transition-shadow hover:shadow-md" data-name="${c.name}" data-phone="${c.phone || ''}">
                         <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
-                            <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}"><i class="fa-solid fa-user-tie mx-1"></i> ${c.name}</h3>
-                            <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-1 rounded font-bold outline-none cursor-pointer ${statusColor}">
-                                <option value="لم يتم الاتصال به" ${c.status === 'لم يتم الاتصال به' ? 'selected' : ''}>لم يتم الاتصال</option>
-                                <option value="تم الاتصال به" ${c.status === 'تم الاتصال به' ? 'selected' : ''}>تم الاتصال</option>
-                            </select>
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                ${avatar}
+                                <div class="truncate">
+                                    <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}">${c.name}</h3>
+                                    <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded font-bold">${c.category || 'عام'}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-col items-end gap-2 flex-shrink-0 ml-2">
+                                ${contactIcon}
+                            </div>
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1">
-                            <p><i class="fa-solid fa-phone text-gray-400 mx-1"></i> <span dir="ltr">${c.phone || '-'}</span></p>
-                            <p><i class="fa-solid fa-envelope text-gray-400 mx-1"></i> ${c.email || '-'}</p>
+
+                        <select onchange="window.updateClientStatus('${c.id}', this.value)" class="text-xs p-2 rounded-lg font-bold outline-none cursor-pointer w-full mb-3 text-center transition-colors ${statusColor}">
+                            <option value="لم يتم الاتصال" ${c.status === 'لم يتم الاتصال' ? 'selected' : ''}>لم يتم الاتصال</option>
+                            <option value="عميل محتمل" ${c.status === 'عميل محتمل' ? 'selected' : ''}>عميل محتمل</option>
+                            <option value="تم التواصل" ${c.status === 'تم التواصل' ? 'selected' : ''}>تم التواصل</option>
+                            <option value="تم إرسال العرض" ${c.status === 'تم إرسال العرض' ? 'selected' : ''}>تم إرسال العرض</option>
+                            <option value="تم التواصل - مهتم" ${c.status === 'تم التواصل - مهتم' ? 'selected' : ''}>تم التواصل - مهتم</option>
+                            <option value="تم التواصل - غير مهتم" ${c.status === 'تم التواصل - غير مهتم' ? 'selected' : ''}>تم التواصل - غير مهتم</option>
+                        </select>
+
+                        <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1 font-medium">
+                            <p><i class="fa-solid fa-phone text-gray-400 mx-1 w-4"></i> <span dir="ltr">${c.phone || 'غير مسجل'}</span></p>
+                            <p class="truncate" title="${c.email || ''}"><i class="fa-solid fa-envelope text-gray-400 mx-1 w-4"></i> ${c.email || 'غير مسجل'}</p>
+                            ${followUpHtml}
                         </div>
+
                         <div class="mt-4 border-t dark:border-gray-700 pt-3">
-                            <h4 class="text-xs font-bold text-gray-500 mb-2">الملاحظات الخاصة:</h4>
-                            <div class="max-h-32 overflow-y-auto mb-2">${notesHtml}</div>
-                            <button onclick="window.openNoteModal('${c.id}')" class="w-full text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-600 dark:text-gray-300 py-1.5 rounded transition font-bold"><i class="fa-solid fa-plus mx-1"></i> إضافة ملاحظة</button>
+                            <h4 class="text-xs font-bold text-gray-500 mb-2 flex justify-between">الملاحظات: <span class="text-[9px] font-normal">بواسطة: ${c.addedBy}</span></h4>
+                            <div class="max-h-32 overflow-y-auto mb-2 pr-1 custom-scrollbar">${notesHtml}</div>
+                            <button onclick="window.openNoteModal('${c.id}')" class="w-full text-xs bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 text-gray-600 dark:text-gray-300 py-2 rounded-lg transition font-bold"><i class="fa-solid fa-plus mx-1"></i> إضافة ملاحظة / تذكير</button>
                         </div>
                     </div>
                 `;
@@ -2842,8 +2989,9 @@
                 });
                 select.disabled = false;
             } else {
+                // الموظف يستطيع إسناد المهمة لنفسه فقط
                 select.innerHTML = `<option value="${currentUserData.uid}" selected>${currentUserData.name} (${t('أنت')})</option>`;
-                select.disabled = true;
+                select.disabled = false; // جعلها غير معطلة لتوضيح الفكرة (أو نتركها معطلة، النتيجة واحدة لأن القيمة تُرسل)
             }
             window.openModal('taskModal');
         };
@@ -2884,7 +3032,7 @@
                                 employee_name: currentUserData.name,
                                 task_title: title,
                                 task_link: taskLink,
-                                company_name: 'نظام شركتي'
+                                company_name: 'نظام شركة Quill'
                             }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
                         }
                     } catch(e) { console.error(e); }
@@ -2903,14 +3051,12 @@
 
         window.updateTaskStatusFromCheckbox = async (id, title, isCompleted) => {
             if(isCompleted) {
-                // Open report modal directly
                 document.getElementById('reportTaskId').value = id;
                 document.getElementById('reportTaskTitle').value = title;
                 document.getElementById('reportText').value = '';
                 document.getElementById('reportFileInput').value = '';
                 window.openModal('taskReportModal');
             } else {
-                // If they uncheck a completed task (CEO only usually, but let's allow it back to pending/progress)
                 try {
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { 
                         status: 'in-progress',
@@ -2928,9 +3074,8 @@
             
             const isCEO = currentUserData.role === 'CEO';
             const isAssignee = task.assigneeId === currentUserData.uid;
-            if(!isCEO && !isAssignee) return; // Only assignee or CEO can check off
+            if(!isCEO && !isAssignee) return; 
             
-            // Mark task as in-progress if it was pending and they start checking things
             if(task.status === 'pending' && isChecked) {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), { status: 'in-progress', startedAt: Date.now() });
             }
@@ -2961,14 +3106,12 @@
                     el.style.display = 'table-row';
                 } else {
                     el.style.display = 'none';
-                    // Hide corresponding details row as well
                     const detailsRow = document.getElementById(`task-details-tr-${el.getAttribute('data-id')}`);
                     if(detailsRow) detailsRow.style.display = 'none';
                 }
             });
         };
 
-        // ====== New List View Render ======
         function renderTasks() {
             const listBody = document.getElementById('tasksListBody');
             const totalTasksCountList = document.getElementById('totalTasksCountList');
@@ -2984,7 +3127,7 @@
                 tasksToRender = globalTasks.filter(t => t.assigneeId === currentUserData.uid || t.createdBy === currentUserData.uid);
             }
 
-            tasksToRender.sort((a,b) => b.timestamp - a.timestamp); // Newest first
+            tasksToRender.sort((a,b) => b.timestamp - a.timestamp); 
 
             if(totalTasksCountList) totalTasksCountList.innerText = tasksToRender.length;
 
@@ -3000,7 +3143,6 @@
                 const canCheck = isMyTask || isCEO;
                 const isCompleted = task.status === 'completed';
                 
-                // Status mapping
                 let statusDot = 'bg-gray-300';
                 let statusText = 'قيد الانتظار';
                 if(task.status === 'in-progress') { statusDot = 'bg-blue-500'; statusText = 'قيد التنفيذ'; }
@@ -3009,7 +3151,6 @@
                 const createdDate = new Date(task.timestamp).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour:'2-digit', minute:'2-digit'});
                 const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour:'2-digit', minute:'2-digit'}) : '-';
                 
-                // Checklist Info
                 let checklistHtml = '';
                 let progressBadge = '';
                 if(task.checklists && task.checklists.length > 0) {
@@ -3032,14 +3173,13 @@
                     `;
                 }
 
-                // Fire Icon for priority
                 const fireIcon = task.isHighPriority ? '<i class="fa-solid fa-fire text-orange-500 mr-2" title="أولوية قصوى"></i>' : '';
-                
-                // Assignee Avatar (mock)
                 const assigneeAvatar = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(task.assigneeName)}&background=random&color=fff" class="w-6 h-6 rounded-full inline-block ml-2">`;
-                const creatorAvatar = `<div class="flex items-center"><i class="fa-solid fa-user-pen text-gray-400 ml-2"></i> <span>المدير</span></div>`; // Simplified for display
                 
-                // Attachment Info
+                const creatorUser = globalUsers.find(u => u.uid === task.createdBy);
+                const creatorName = creatorUser ? creatorUser.name : 'مجهول';
+                const creatorAvatar = `<div class="flex items-center"><i class="fa-solid fa-user-pen text-gray-400 mx-2"></i> <span>${creatorName}</span></div>`; 
+                
                 let attHtml = '';
                 if(task.attachmentData) {
                     attHtml = `
@@ -3064,7 +3204,7 @@
                         <td class="p-3 whitespace-nowrap">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full ${statusDot}"></span>
-                                <span class="text-xs text-gray-500">${createdDate.split(',')[1]}</span>
+                                <span class="text-xs text-gray-500">${statusText}</span>
                             </div>
                         </td>
                         <td class="p-3 whitespace-nowrap">
@@ -3098,7 +3238,6 @@
             });
         }
 
-        // Updated Add Task Submit Logic
         const addTaskFormNew = document.getElementById('addTaskForm');
         if (addTaskFormNew) {
             addTaskFormNew.addEventListener('submit', async (e) => {
@@ -3127,7 +3266,7 @@
                             status: 'pending',
                             project: projectTag,
                             isHighPriority: isHighPriority,
-                            checklists: creationChecklists, // Array of {text, isCompleted}
+                            checklists: creationChecklists, 
                             timestamp: Date.now()
                         };
 
@@ -3148,9 +3287,9 @@
                             }
                         }
                         
-                        const actionText = (currentUserData.role === 'CEO') 
+                        const actionText = (currentUserData.uid !== assigneeId) 
                             ? `تم إسناد مهمة "${title}" إلى ${assigneeName}` 
-                            : `قام الموظف ${currentUserData.name} بإسناد مهمة "${title}" لنفسه`;
+                            : `قام الموظف ${currentUserData.name} بإنشاء مهمة ذاتية "${title}"`;
                             
                         logAction('إسناد مهمة', actionText);
                         showToast('تم إنشاء المهمة بنجاح', 'success');
@@ -3281,7 +3420,7 @@
                                             group_name: groupName,
                                             chat_text: text,
                                             chat_link: chatLink,
-                                            company_name: 'نظام شركتي'
+                                            company_name: 'نظام شركة Quill'
                                         }, EMAILJS_PUBLIC_KEY_2).catch(e => console.error(e));
                                     }
                                 }
@@ -3357,6 +3496,7 @@
                 if(actionText.includes('تعديل')) icon = 'fa-pen text-blue-500';
                 if(actionText.includes('ملف')) icon = 'fa-file text-secondary';
                 if(actionText.includes('اجتماع') || actionText.includes('فيديو')) icon = 'fa-video text-green-500';
+                if(actionText.includes('عميل')) icon = 'fa-address-book text-lime-500';
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 dark:bg-gray-800 transition">
@@ -3381,370 +3521,369 @@
             if(pinnedMsgs.length > 0) {
                 pinnedBadge.innerText = pinnedMsgs.length;
                 pinnedBadge.classList.remove('hidden');
-                
-                pinnedDropdown.innerHTML = pinnedMsgs.map(m => `
-                    <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded border-l-4 border-yellow-400 text-xs shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition" onclick="window.scrollToMsg('${m.id}')">
-                        <div class="flex flex-col gap-1 truncate w-full">
-                            <span class="font-bold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-thumbtack text-yellow-500 mx-1"></i> ${m.senderName}</span>
-                            <span class="text-gray-600 dark:text-gray-400 truncate w-full pl-2">${m.text || 'مرفق'}</span>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                pinnedBadge.classList.add('hidden');
-                pinnedDropdown.innerHTML = '<p class="text-center text-gray-500 text-xs py-2">لا توجد رسائل مثبتة هنا</p>';
-            }
-
-            if(filteredChat.length === 0) {
-                chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300 dark:text-gray-600"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
-                return;
-            }
-
-            const layoutPref = currentUserData?.chatLayout || 'media-top';
-            const messagesToRender = filteredChat.slice(-100); 
-            
-            let htmlBuffer = '';
-
-            messagesToRender.forEach(msg => {
-                const isMe = msg.uid === currentUserData.uid;
-                
-                // Read Receipts logic
-                let readStatusHtml = '';
-                if (isMe) {
-                    const group = globalGroups.find(g => g.id === (msg.groupId || 'global'));
-                    if (group) {
-                        let membersToCheck = [];
-                        if (group.id === 'global') {
-                            membersToCheck = globalUsers.map(u => u.uid).filter(uid => uid !== currentUserData.uid);
-                        } else {
-                            membersToCheck = group.members.filter(uid => uid !== currentUserData.uid);
-                        }
-                        
-                        let allRead = true;
-                        if (membersToCheck.length === 0) {
-                            allRead = false; 
-                        } else {
-                            allRead = membersToCheck.every(uid => {
-                                const u = globalUsers.find(user => user.uid === uid);
-                                return u && u.readReceipts && u.readReceipts[group.id] >= msg.timestamp;
-                            });
-                        }
-                        readStatusHtml = allRead ? '<i class="fa-solid fa-check-double text-green-400 text-[10px] ml-1 mr-1" title="تمت المشاهدة"></i>' : '<i class="fa-solid fa-check text-gray-300 text-[10px] ml-1 mr-1" title="تم الإرسال"></i>';
-                    }
-                }
-
-                let formattedText = msg.text || '';
-                const rawTextForCopy = msg.text ? msg.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n") : '';
-
-                if (formattedText) {
-                    if (formattedText.includes('@الجميع')) {
-                        formattedText = formattedText.replace(/@الجميع/g, '<span class="text-white font-bold bg-red-500/80 px-1 rounded mx-1">@الجميع</span>');
-                    }
-
-                    let mentionedNames = [];
-                    const sortedNames = globalUsers.map(u => u.name).sort((a, b) => b.length - a.length);
                     
-                    let counter = 0;
-                    sortedNames.forEach((name) => {
-                        const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        const regex = new RegExp(`@${safeName}`, 'g');
-                        if (regex.test(formattedText)) {
-                            mentionedNames.push({key: `__MENTION_${counter}__`, name: name});
-                            formattedText = formattedText.replace(regex, `__MENTION_${counter}__`);
-                            counter++;
-                        }
-                    });
-                    
-                    formattedText = formattedText.replace(/@([^\s_<>]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
-                    
-                    mentionedNames.forEach((item) => {
-                        formattedText = formattedText.replace(new RegExp(item.key, 'g'), `<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@${item.name}</span>`);
-                    });
-                }
-                
-                const alignClass = isMe ? 'justify-start' : 'justify-end';
-                const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200');
-                
-                const isColored = msg.color && msg.color !== 'bg-white' && msg.color !== 'bg-gray-800';
-                const textClass = isColored || isMe ? 'text-gray-300 font-bold' : 'text-gray-800 dark:text-gray-300 font-bold';
-                
-                const radiusClass = isMe ? 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-bl-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-br-xl' : 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-br-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-bl-xl';
-                const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName || 'مستخدم')}&background=00839b&color=fff`;
-
-                let attachmentHtml = '';
-                if(msg.fileData) {
-                    const fileTypeSafe = msg.fileType || '';
-                    if(fileTypeSafe.startsWith('image/')) {
-                        attachmentHtml = `<img src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10 shadow-sm" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')">`;
-                    } else if(fileTypeSafe.startsWith('video/')) {
-                        attachmentHtml = `<div class="relative cursor-pointer" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')"><video src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 bg-black shadow-sm"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
-                    } else {
-                        attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit shadow-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
-                    }
-                }
-
-                let replyHtml = '';
-                if(msg.replyTo) {
-                    replyHtml = `
-                        <div class="mb-2 p-2 bg-black/10 dark:bg-black/20 rounded border-r-2 border-primary dark:border-secondary cursor-pointer hover:bg-black/20 transition text-xs flex flex-col gap-0.5" onclick="window.scrollToMsg('${msg.replyTo.id}')">
-                            <span class="font-bold text-primary dark:text-secondary opacity-80">${msg.replyTo.senderName}</span>
-                            <span class="truncate opacity-80 whitespace-pre-wrap">${msg.replyTo.text}</span>
-                        </div>
-                    `;
-                }
-
-                let messageBody = '';
-                if (layoutPref === 'text-top') {
-                    messageBody = `
-                        ${replyHtml}
-                        ${formattedText ? `<p class="text-sm md:text-base break-words whitespace-pre-wrap ${msg.fileData ? 'mb-2' : ''}">${formattedText}</p>` : ''}
-                        ${attachmentHtml}
-                    `;
-                } else {
-                    messageBody = `
-                        ${replyHtml}
-                        ${attachmentHtml}
-                        ${formattedText ? `<p class="text-sm md:text-base break-words whitespace-pre-wrap ${msg.fileData ? 'mt-2' : ''}">${formattedText}</p>` : ''}
-                    `;
-                }
-
-                let msgActionsHtml = `
-                    <div class="relative flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-2">
-                        <button onclick="window.toggleMsgMenu('${msg.id}')" class="msg-options-btn text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                            <i class="fa-solid fa-ellipsis-vertical px-2 py-1"></i>
-                        </button>
-                        
-                        <div id="msg-menu-${msg.id}" class="msg-dropdown-menu hidden absolute ${isMe ? 'right-full mr-1' : 'left-full ml-1'} bottom-0 mb-8 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-lg w-44 z-30 text-sm overflow-hidden flex flex-col text-right font-bold">
-                            <button onclick="window.replyToMsg('${msg.id}', decodeURIComponent('${encodeURIComponent(msg.text || '')}'), '${msg.senderName}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
-                                <span>الرد</span> <i class="fa-solid fa-reply text-gray-400"></i>
-                            </button>
-                            <button onclick="window.togglePinMsg('${msg.id}', ${msg.isPinned || false})" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
-                                <span>${msg.isPinned ? 'إلغاء التثبيت' : 'تثبيت'}</span> <i class="fa-solid fa-thumbtack text-gray-400"></i>
-                            </button>
-                            <button onclick="window.copyMsgText('${rawTextForCopy}', '${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors">
-                                <span>نسخ النص</span> <i class="fa-regular fa-copy text-gray-400"></i>
-                            </button>
-                            ${isMe || (currentUserData && currentUserData.role === 'CEO') ? `
-                            <div class="border-t border-gray-100 dark:border-gray-700"></div>
-                            <button onclick="window.showMsgReadDetails('${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-between transition-colors">
-                                <span>التفاصيل (من شاهدها)</span> <i class="fa-solid fa-eye text-blue-400"></i>
-                            </button>
-                            <button onclick="window.deleteSingleMsg('${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 flex items-center justify-between transition-colors">
-                                <span>حذف</span> <i class="fa-solid fa-trash-can text-red-400"></i>
-                            </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
-
-                const timeStr = new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-
-                htmlBuffer += `
-                    <div id="msg-${msg.id}" class="chat-msg-item flex ${alignClass} mb-4 items-end gap-2 group w-full relative transition-all duration-500 rounded-lg p-1" data-text="${encodeURIComponent(msg.text || '')}" data-sender="${encodeURIComponent(msg.senderName || '')}">
-                        ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
-                        
-                        ${isMe ? msgActionsHtml : ''}
-
-                        <div class="max-w-[85%] md:max-w-[70%] min-w-[150px] relative">
-                            <div class="flex items-center gap-2 mb-1 px-1 ${isMe ? 'flex-row-reverse' : ''}">
-                                <span class="text-[10px] ${textClass}">${msg.senderName || 'مجهول'}</span>
-                                ${msg.isPinned ? '<i class="fa-solid fa-thumbtack text-[10px] text-yellow-500"></i>' : ''}
+                    pinnedDropdown.innerHTML = pinnedMsgs.map(m => `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded border-l-4 border-yellow-400 text-xs shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition" onclick="window.scrollToMsg('${m.id}')">
+                            <div class="flex flex-col gap-1 truncate w-full">
+                                <span class="font-bold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-thumbtack text-yellow-500 mx-1"></i> ${m.senderName}</span>
+                                <span class="text-gray-600 dark:text-gray-400 truncate w-full pl-2">${m.text || 'مرفق'}</span>
                             </div>
-                            <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
-                                ${messageBody}
-                                <div class="text-[9px] mt-1 text-right opacity-70 flex justify-end items-center gap-1" dir="ltr">
-                                    ${timeStr} ${readStatusHtml}
+                        </div>
+                    `).join('');
+                } else {
+                    pinnedBadge.classList.add('hidden');
+                    pinnedDropdown.innerHTML = '<p class="text-center text-gray-500 text-xs py-2">لا توجد رسائل مثبتة هنا</p>';
+                }
+
+                if(filteredChat.length === 0) {
+                    chatBox.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 text-sm"><i class="fa-regular fa-comments text-4xl mb-3 text-gray-300 dark:text-gray-600"></i><p>لا توجد رسائل هنا. ابدأ المحادثة الآن!</p></div>';
+                    return;
+                }
+
+                const layoutPref = currentUserData?.chatLayout || 'media-top';
+                const messagesToRender = filteredChat.slice(-100); 
+                
+                let htmlBuffer = '';
+
+                messagesToRender.forEach(msg => {
+                    const isMe = msg.uid === currentUserData.uid;
+                    
+                    let readStatusHtml = '';
+                    if (isMe) {
+                        const group = globalGroups.find(g => g.id === (msg.groupId || 'global'));
+                        if (group) {
+                            let membersToCheck = [];
+                            if (group.id === 'global') {
+                                membersToCheck = globalUsers.map(u => u.uid).filter(uid => uid !== currentUserData.uid);
+                            } else {
+                                membersToCheck = group.members.filter(uid => uid !== currentUserData.uid);
+                            }
+                            
+                            let allRead = true;
+                            if (membersToCheck.length === 0) {
+                                allRead = false; 
+                            } else {
+                                allRead = membersToCheck.every(uid => {
+                                    const u = globalUsers.find(user => user.uid === uid);
+                                    return u && u.readReceipts && u.readReceipts[group.id] >= msg.timestamp;
+                                });
+                            }
+                            readStatusHtml = allRead ? '<i class="fa-solid fa-check-double text-green-400 text-[10px] ml-1 mr-1" title="تمت المشاهدة"></i>' : '<i class="fa-solid fa-check text-gray-300 text-[10px] ml-1 mr-1" title="تم الإرسال"></i>';
+                        }
+                    }
+
+                    let formattedText = msg.text || '';
+                    const rawTextForCopy = msg.text ? msg.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n") : '';
+
+                    if (formattedText) {
+                        if (formattedText.includes('@الجميع')) {
+                            formattedText = formattedText.replace(/@الجميع/g, '<span class="text-white font-bold bg-red-500/80 px-1 rounded mx-1">@الجميع</span>');
+                        }
+
+                        let mentionedNames = [];
+                        const sortedNames = globalUsers.map(u => u.name).sort((a, b) => b.length - a.length);
+                        
+                        let counter = 0;
+                        sortedNames.forEach((name) => {
+                            const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const regex = new RegExp(`@${safeName}`, 'g');
+                            if (regex.test(formattedText)) {
+                                mentionedNames.push({key: `__MENTION_${counter}__`, name: name});
+                                formattedText = formattedText.replace(regex, `__MENTION_${counter}__`);
+                                counter++;
+                            }
+                        });
+                        
+                        formattedText = formattedText.replace(/@([^\s_<>]+)/g, '<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@$1</span>');
+                        
+                        mentionedNames.forEach((item) => {
+                            formattedText = formattedText.replace(new RegExp(item.key, 'g'), `<span class="text-white font-bold bg-black/20 px-1 rounded mx-1">@${item.name}</span>`);
+                        });
+                    }
+                    
+                    const alignClass = isMe ? 'justify-start' : 'justify-end';
+                    const msgBgClass = msg.color ? `${msg.color} text-white border-transparent` : (isMe ? 'bg-[#00839b] text-white border-transparent' : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200');
+                    
+                    const isColored = msg.color && msg.color !== 'bg-white' && msg.color !== 'bg-gray-800';
+                    const textClass = isColored || isMe ? 'text-gray-300 font-bold' : 'text-gray-800 dark:text-gray-300 font-bold';
+                    
+                    const radiusClass = isMe ? 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-bl-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-br-xl' : 'rtl:rounded-tl-xl rtl:rounded-tr-xl rtl:rounded-br-xl ltr:rounded-tl-xl ltr:rounded-tr-xl ltr:rounded-bl-xl';
+                    const avatarUrl = msg.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.senderName || 'مستخدم')}&background=00839b&color=fff`;
+
+                    let attachmentHtml = '';
+                    if(msg.fileData) {
+                        const fileTypeSafe = msg.fileType || '';
+                        if(fileTypeSafe.startsWith('image/')) {
+                            attachmentHtml = `<img src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10 shadow-sm" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')">`;
+                        } else if(fileTypeSafe.startsWith('video/')) {
+                            attachmentHtml = `<div class="relative cursor-pointer" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')"><video src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 bg-black shadow-sm"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
+                        } else {
+                            attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit shadow-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                        }
+                    }
+
+                    let replyHtml = '';
+                    if(msg.replyTo) {
+                        replyHtml = `
+                            <div class="mb-2 p-2 bg-black/10 dark:bg-black/20 rounded border-r-2 border-primary dark:border-secondary cursor-pointer hover:bg-black/20 transition text-xs flex flex-col gap-0.5" onclick="window.scrollToMsg('${msg.replyTo.id}')">
+                                <span class="font-bold text-primary dark:text-secondary opacity-80">${msg.replyTo.senderName}</span>
+                                <span class="truncate opacity-80 whitespace-pre-wrap">${msg.replyTo.text}</span>
+                            </div>
+                        `;
+                    }
+
+                    let messageBody = '';
+                    if (layoutPref === 'text-top') {
+                        messageBody = `
+                            ${replyHtml}
+                            ${formattedText ? `<p class="text-sm md:text-base break-words whitespace-pre-wrap ${msg.fileData ? 'mb-2' : ''}">${formattedText}</p>` : ''}
+                            ${attachmentHtml}
+                        `;
+                    } else {
+                        messageBody = `
+                            ${replyHtml}
+                            ${attachmentHtml}
+                            ${formattedText ? `<p class="text-sm md:text-base break-words whitespace-pre-wrap ${msg.fileData ? 'mt-2' : ''}">${formattedText}</p>` : ''}
+                        `;
+                    }
+
+                    let msgActionsHtml = `
+                        <div class="relative flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-2">
+                            <button onclick="window.toggleMsgMenu('${msg.id}')" class="msg-options-btn text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                                <i class="fa-solid fa-ellipsis-vertical px-2 py-1"></i>
+                            </button>
+                            
+                            <div id="msg-menu-${msg.id}" class="msg-dropdown-menu hidden absolute ${isMe ? 'right-full mr-1' : 'left-full ml-1'} bottom-0 mb-8 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-lg w-44 z-30 text-sm overflow-hidden flex flex-col text-right font-bold">
+                                <button onclick="window.replyToMsg('${msg.id}', decodeURIComponent('${encodeURIComponent(msg.text || '')}'), '${msg.senderName}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
+                                    <span>الرد</span> <i class="fa-solid fa-reply text-gray-400"></i>
+                                </button>
+                                <button onclick="window.togglePinMsg('${msg.id}', ${msg.isPinned || false})" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
+                                    <span>${msg.isPinned ? 'إلغاء التثبيت' : 'تثبيت'}</span> <i class="fa-solid fa-thumbtack text-gray-400"></i>
+                                </button>
+                                <button onclick="window.copyMsgText('${rawTextForCopy}', '${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors">
+                                    <span>نسخ النص</span> <i class="fa-regular fa-copy text-gray-400"></i>
+                                </button>
+                                ${isMe || (currentUserData && currentUserData.role === 'CEO') ? `
+                                <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                                <button onclick="window.showMsgReadDetails('${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-between transition-colors">
+                                    <span>التفاصيل (من شاهدها)</span> <i class="fa-solid fa-eye text-blue-400"></i>
+                                </button>
+                                <button onclick="window.deleteSingleMsg('${msg.id}')" class="w-full text-right px-4 py-2.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 flex items-center justify-between transition-colors">
+                                    <span>حذف</span> <i class="fa-solid fa-trash-can text-red-400"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    const timeStr = new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+
+                    htmlBuffer += `
+                        <div id="msg-${msg.id}" class="chat-msg-item flex ${alignClass} mb-4 items-end gap-2 group w-full relative transition-all duration-500 rounded-lg p-1" data-text="${encodeURIComponent(msg.text || '')}" data-sender="${encodeURIComponent(msg.senderName || '')}">
+                            ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
+                            
+                            ${isMe ? msgActionsHtml : ''}
+
+                            <div class="max-w-[85%] md:max-w-[70%] min-w-[150px] relative">
+                                <div class="flex items-center gap-2 mb-1 px-1 ${isMe ? 'flex-row-reverse' : ''}">
+                                    <span class="text-[10px] ${textClass}">${msg.senderName || 'مجهول'}</span>
+                                    ${msg.isPinned ? '<i class="fa-solid fa-thumbtack text-[10px] text-yellow-500"></i>' : ''}
+                                </div>
+                                <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
+                                    ${messageBody}
+                                    <div class="text-[9px] mt-1 text-right opacity-70 flex justify-end items-center gap-1" dir="ltr">
+                                        ${timeStr} ${readStatusHtml}
+                                    </div>
                                 </div>
                             </div>
+
+                            ${!isMe ? msgActionsHtml : ''}
+                            
+                            ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
                         </div>
-
-                        ${!isMe ? msgActionsHtml : ''}
-                        
-                        ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
-                    </div>
-                `;
-            });
-            
-            chatBox.innerHTML = htmlBuffer;
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function getGroupUnreadInfo(groupId) {
-            const lastRead = groupReadTimestamps[groupId] || 0;
-            const activeGroup = globalGroups.find(g => g.id === groupId);
-            if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
-                return { count: 0, hasMention: false }; 
+                    `;
+                });
+                
+                chatBox.innerHTML = htmlBuffer;
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
 
-            const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
-            
-            let unreadCount = groupMessages.length;
-            let hasMention = groupMessages.some(m => m.text && (m.text.includes(`@${currentUserData.name}`) || m.text.includes(`@الجميع`)));
-            
-            return { count: unreadCount, hasMention: hasMention };
-        }
+            function getGroupUnreadInfo(groupId) {
+                const lastRead = groupReadTimestamps[groupId] || 0;
+                const activeGroup = globalGroups.find(g => g.id === groupId);
+                if(activeGroup && activeGroup.id !== 'global' && !activeGroup.members.includes(currentUserData.uid)) {
+                    return { count: 0, hasMention: false }; 
+                }
 
-        function renderChatSidebarList() {
-            const innerList = document.getElementById('innerChatSidebarList');
-            const mobileList = document.getElementById('chatSubMenuMobile');
-            
-            if(innerList) innerList.innerHTML = '';
-            if(mobileList) mobileList.innerHTML = '';
-            
-            let totalUnreadCount = 0;
-            let totalMentions = false;
-            const isCEO = currentUserData && currentUserData.role === 'CEO';
-
-            globalGroups.forEach(g => {
-                const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
+                const groupMessages = globalChat.filter(m => (m.groupId || 'global') === groupId && m.timestamp > lastRead && m.uid !== currentUserData.uid);
                 
-                const unreadInfo = getGroupUnreadInfo(g.id);
-                totalUnreadCount += unreadInfo.count;
-                if(unreadInfo.hasMention) totalMentions = true;
-
-                let badgeHtml = '';
-                if(unreadInfo.hasMention) {
-                    badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">@</span>`;
-                } else if(unreadInfo.count > 0) {
-                    badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
-                }
+                let unreadCount = groupMessages.length;
+                let hasMention = groupMessages.some(m => m.text && (m.text.includes(`@${currentUserData.name}`) || m.text.includes(`@الجميع`)));
                 
-                let creatorHtml = '';
-                if (isCEO && g.id !== 'global') {
-                    const creatorUser = globalUsers.find(u => u.uid === g.createdBy);
-                    const creatorName = creatorUser ? creatorUser.name : t('مجهول');
-                    creatorHtml = `<span class="block text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">${t('بواسطة:')} ${creatorName}</span>`;
-                }
+                return { count: unreadCount, hasMention: hasMention };
+            }
 
-                if (innerList) {
-                    innerList.innerHTML += `
-                        <button onclick="window.selectGroup('${g.id}')" class="w-full text-right rtl:text-right ltr:text-left py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-white font-bold border border-gray-100 dark:border-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}">
-                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center mx-2 text-gray-400 ${isActive ? 'text-primary dark:text-secondary' : ''}"></i> 
-                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-                                <span class="truncate">${g.name}</span>
-                                ${creatorHtml}
-                            </div>
-                            ${badgeHtml}
-                        </button>
-                    `;
-                }
+            function renderChatSidebarList() {
+                const innerList = document.getElementById('innerChatSidebarList');
+                const mobileList = document.getElementById('chatSubMenuMobile');
+                
+                if(innerList) innerList.innerHTML = '';
+                if(mobileList) mobileList.innerHTML = '';
+                
+                let totalUnreadCount = 0;
+                let totalMentions = false;
+                const isCEO = currentUserData && currentUserData.role === 'CEO';
 
-                if (mobileList) {
-                    mobileList.innerHTML += `
-                        <button onclick="window.selectGroup('${g.id}')" class="text-right rtl:text-right ltr:text-left w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
-                            <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center mx-2"></i> 
-                            <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-                                <span>${g.name}</span>
-                                ${creatorHtml.replace('text-gray-400', 'text-gray-400/70')}
-                            </div>
-                            ${badgeHtml}
-                        </button>
-                    `;
-                }
-            });
-            
-            const homeBadge = document.getElementById('homeChatBadge');
-            const mobileBadge = document.getElementById('globalChatBadgeMobile');
-            const externalChatBadges = document.querySelectorAll('.external-chat-badge');
-            
-            [homeBadge, mobileBadge].forEach(badge => {
-                if(badge) {
+                globalGroups.forEach(g => {
+                    const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
+                    
+                    const unreadInfo = getGroupUnreadInfo(g.id);
+                    totalUnreadCount += unreadInfo.count;
+                    if(unreadInfo.hasMention) totalMentions = true;
+
+                    let badgeHtml = '';
+                    if(unreadInfo.hasMention) {
+                        badgeHtml = `<span class="bg-red-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">@</span>`;
+                    } else if(unreadInfo.count > 0) {
+                        badgeHtml = `<span class="bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full mx-2">${unreadInfo.count > 99 ? '+99' : unreadInfo.count}</span>`;
+                    }
+                    
+                    let creatorHtml = '';
+                    if (isCEO && g.id !== 'global') {
+                        const creatorUser = globalUsers.find(u => u.uid === g.createdBy);
+                        const creatorName = creatorUser ? creatorUser.name : t('مجهول');
+                        creatorHtml = `<span class="block text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">${t('بواسطة:')} ${creatorName}</span>`;
+                    }
+
+                    if (innerList) {
+                        innerList.innerHTML += `
+                            <button onclick="window.selectGroup('${g.id}')" class="w-full text-right rtl:text-right ltr:text-left py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-white font-bold border border-gray-100 dark:border-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}">
+                                <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center mx-2 text-gray-400 ${isActive ? 'text-primary dark:text-secondary' : ''}"></i> 
+                                <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                    <span class="truncate">${g.name}</span>
+                                    ${creatorHtml}
+                                </div>
+                                ${badgeHtml}
+                            </button>
+                        `;
+                    }
+
+                    if (mobileList) {
+                        mobileList.innerHTML += `
+                            <button onclick="window.selectGroup('${g.id}')" class="text-right rtl:text-right ltr:text-left w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
+                                <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center mx-2"></i> 
+                                <div class="flex flex-col flex-1 overflow-hidden min-w-0">
+                                    <span>${g.name}</span>
+                                    ${creatorHtml.replace('text-gray-400', 'text-gray-400/70')}
+                                </div>
+                                ${badgeHtml}
+                            </button>
+                        `;
+                    }
+                });
+                
+                const homeBadge = document.getElementById('homeChatBadge');
+                const mobileBadge = document.getElementById('globalChatBadgeMobile');
+                const externalChatBadges = document.querySelectorAll('.external-chat-badge');
+                
+                [homeBadge, mobileBadge].forEach(badge => {
+                    if(badge) {
+                        if(totalMentions) {
+                            badge.innerText = '@';
+                            badge.classList.remove('hidden');
+                            badge.classList.replace('bg-blue-500', 'bg-red-500');
+                        } else if(totalUnreadCount > 0) {
+                            badge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
+                            badge.classList.remove('hidden');
+                            badge.classList.replace('bg-red-500', 'bg-blue-500');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                });
+
+                externalChatBadges.forEach(badge => {
                     if(totalMentions) {
                         badge.innerText = '@';
                         badge.classList.remove('hidden');
                         badge.classList.replace('bg-blue-500', 'bg-red-500');
                     } else if(totalUnreadCount > 0) {
-                        badge.innerText = totalUnreadCount > 99 ? '+99' : totalUnreadCount;
+                        badge.innerText = '!';
                         badge.classList.remove('hidden');
                         badge.classList.replace('bg-red-500', 'bg-blue-500');
                     } else {
                         badge.classList.add('hidden');
                     }
-                }
-            });
-
-            externalChatBadges.forEach(badge => {
-                if(totalMentions) {
-                    badge.innerText = '@';
-                    badge.classList.remove('hidden');
-                    badge.classList.replace('bg-blue-500', 'bg-red-500');
-                } else if(totalUnreadCount > 0) {
-                    badge.innerText = '!';
-                    badge.classList.remove('hidden');
-                    badge.classList.replace('bg-red-500', 'bg-blue-500');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            });
-            
-            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
-            if(activeGroup) {
-                const titleEl = document.getElementById('chatHeaderTitle');
-                if (titleEl) titleEl.innerText = activeGroup.name;
+                });
                 
-                const clearMessagesBtn = document.getElementById('clearMessagesBtn');
-                const deleteGroupBtn = document.getElementById('deleteGroupBtn');
-                const chatForm = document.getElementById('chatForm');
-                const readOnlyMsg = document.getElementById('readOnlyMessage');
+                const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+                if(activeGroup) {
+                    const titleEl = document.getElementById('chatHeaderTitle');
+                    if (titleEl) titleEl.innerText = activeGroup.name;
+                    
+                    const clearMessagesBtn = document.getElementById('clearMessagesBtn');
+                    const deleteGroupBtn = document.getElementById('deleteGroupBtn');
+                    const chatForm = document.getElementById('chatForm');
+                    const readOnlyMsg = document.getElementById('readOnlyMessage');
 
-                if(activeGroup.id === 'global') {
-                    const desc = document.getElementById('chatHeaderDesc');
-                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
-                    
-                    if(isCEO) {
-                        if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
-                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden'); 
-                    } else {
-                        if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
-                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
-                    }
-                    
-                    if(chatForm) chatForm.classList.remove('hidden');
-                    if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
-                } else {
-                    const desc = document.getElementById('chatHeaderDesc');
-                    if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
-                    
-                    if(isCEO) {
-                        if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
-                        if(deleteGroupBtn) deleteGroupBtn.classList.remove('hidden');
+                    if(activeGroup.id === 'global') {
+                        const desc = document.getElementById('chatHeaderDesc');
+                        if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('يتواجد هنا جميع أعضاء مساحة العمل')}</span>`;
                         
-                        if(!activeGroup.members.includes(currentUserData.uid)) {
-                            if(chatForm) chatForm.classList.add('hidden');
-                            if(readOnlyMsg) readOnlyMsg.classList.remove('hidden');
+                        if(isCEO) {
+                            if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
+                            if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden'); 
                         } else {
+                            if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
+                            if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
+                        }
+                        
+                        if(chatForm) chatForm.classList.remove('hidden');
+                        if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
+                    } else {
+                        const desc = document.getElementById('chatHeaderDesc');
+                        if(desc) desc.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${t('مجموعة خاصة')} - ${activeGroup.members.length} ${t('أعضاء')}</span>`;
+                        
+                        if(isCEO) {
+                            if(clearMessagesBtn) clearMessagesBtn.classList.remove('hidden');
+                            if(deleteGroupBtn) deleteGroupBtn.classList.remove('hidden');
+                            
+                            if(!activeGroup.members.includes(currentUserData.uid)) {
+                                if(chatForm) chatForm.classList.add('hidden');
+                                if(readOnlyMsg) readOnlyMsg.classList.remove('hidden');
+                            } else {
+                                if(chatForm) chatForm.classList.remove('hidden');
+                                if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
+                            }
+                        } else {
+                            if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
+                            if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
                             if(chatForm) chatForm.classList.remove('hidden');
                             if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                         }
-                    } else {
-                        if(clearMessagesBtn) clearMessagesBtn.classList.add('hidden');
-                        if(deleteGroupBtn) deleteGroupBtn.classList.add('hidden');
-                        if(chatForm) chatForm.classList.remove('hidden');
-                        if(readOnlyMsg) readOnlyMsg.classList.add('hidden');
                     }
                 }
             }
-        }
 
-        function listenForExternalBadges() {
-            onSnapshot(getColRef('meetings'), (snapshot) => {
-                if(!currentUserData) return;
-                let activeMeetingsCount = 0;
-                snapshot.forEach(doc => {
-                    const meeting = doc.data();
-                    const isInvited = meeting.invitedUsers && (meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO');
-                    if(isInvited && (meeting.status === 'scheduled' || meeting.status === 'active')) {
-                        activeMeetingsCount++;
-                    }
-                });
-                
-                const gridBadge = document.getElementById('gridMeetingsBadge');
-                const sidebarBadge = document.getElementById('sidebarMeetingsBadge');
-                
-                if(activeMeetingsCount > 0) {
-                    if(gridBadge) { gridBadge.innerText = activeMeetingsCount; gridBadge.classList.remove('hidden'); }
-                    if(sidebarBadge) { sidebarBadge.innerText = activeMeetingsCount; sidebarBadge.classList.remove('hidden'); }
-                } else {
+            function listenForExternalBadges() {
+                onSnapshot(getColRef('meetings'), (snapshot) => {
+                    if(!currentUserData) return;
+                    let activeMeetingsCount = 0;
+                    snapshot.forEach(doc => {
+                        const meeting = doc.data();
+                        const isInvited = meeting.invitedUsers && (meeting.invitedUsers.includes(currentUserData.uid) || currentUserData.role === 'CEO');
+                        if(isInvited && (meeting.status === 'scheduled' || meeting.status === 'active')) {
+                            activeMeetingsCount++;
+                        }
+                    });
+                    
+                    const gridBadge = document.getElementById('gridMeetingsBadge');
+                    const sidebarBadge = document.getElementById('sidebarMeetingsBadge');
+                    
+                    if(activeMeetingsCount > 0) {
+                        if(gridBadge) { gridBadge.innerText = activeMeetingsCount; gridBadge.classList.remove('hidden'); }
+                        if(sidebarBadge) { sidebarBadge.innerText = activeMeetingsCount; sidebarBadge.classList.remove('hidden'); }
+                    } else {
                         if(gridBadge) gridBadge.classList.add('hidden');
                         if(sidebarBadge) sidebarBadge.classList.add('hidden');
                     }
@@ -3777,15 +3916,35 @@
                 document.getElementById('userRole').innerText = currentUserData.role;
                 document.getElementById('userAvatar').src = currentUserData.photoURL;
 
-                // My Profile Setup
+                // My Profile Setup & Assets styling
                 const myProfileName = document.getElementById('myProfileName');
                 if(myProfileName) myProfileName.innerText = currentUserData.name;
                 const myProfileRole = document.getElementById('myProfileRole');
                 if(myProfileRole) myProfileRole.innerText = currentUserData.role;
                 const myProfileAvatar = document.getElementById('myProfileAvatar');
                 if(myProfileAvatar) myProfileAvatar.src = currentUserData.photoURL;
+                
                 const myProfileAssets = document.getElementById('myProfileAssets');
-                if(myProfileAssets) myProfileAssets.innerText = currentUserData.assets || 'لا توجد عهد مسجلة حالياً.';
+                if(myProfileAssets) {
+                    const assetsStr = currentUserData.assets || '';
+                    if (assetsStr.trim() === '') {
+                        myProfileAssets.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 text-center font-bold py-4">لا توجد عهد أو ممتلكات مسجلة حالياً.</p>';
+                    } else {
+                        const items = assetsStr.split('\n').filter(item => item.trim() !== '');
+                        let html = '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">';
+                        items.forEach(item => {
+                            html += `
+                            <div class="flex items-center gap-3 bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-600 shadow-sm transition hover:shadow-md">
+                                <div class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-2 rounded-full">
+                                    <i class="fa-solid fa-check text-sm"></i>
+                                </div>
+                                <span class="font-bold text-gray-700 dark:text-gray-200 text-sm flex-1 leading-snug">${item}</span>
+                            </div>`;
+                        });
+                        html += '</div>';
+                        myProfileAssets.innerHTML = html;
+                    }
+                }
 
                 const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
                 if(settingsAvatarPreview) settingsAvatarPreview.src = currentUserData.photoURL;
@@ -4154,8 +4313,8 @@
                 }
                 
                 if (isCEO || p.canAssignTasks) {
-                    document.getElementById('addTaskBtn').classList.remove('hidden');
-                    document.getElementById('addTaskBtn').style.display = 'flex';
+                    // المدير والموظف اللي عنده صلاحية هيشوفوا كل الناس في القائمة
+                    // تم تعديل الدالة نفسها بالأعلى ليتوافق ذلك، الزر نفسه ظاهر للجميع لأن أي شخص يقدر يسند لنفسه.
                 }
                 
                 document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
@@ -4173,6 +4332,7 @@
                 updateActivity();
                 setInterval(updateActivity, 60000);
                 setInterval(checkAndSendReminders, 300000);
+                setInterval(checkAndSendCRMReminders, 600000); // يفحص تذكيرات CRM كل 10 دقايق
             }
             
             function updateActivity() {
