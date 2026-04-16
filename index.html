@@ -7,7 +7,10 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#002d74">
-    <link rel="apple-touch-icon" href="https://uploads.onecompiler.io/43n8uttmw/44hm8gjgg/download%20(2).jpeg">
+    
+    <!-- الأيقونات الديناميكية (سيتم تغييرها بالجافاسكربت حسب الثيم) -->
+    <link id="dynamic-apple-icon" rel="apple-touch-icon" href="https://uploads.onecompiler.io/43n8uttmw/44k6d22hf/Screenshot_2025-06-20_213937-removebg-preview.png">
+    <link id="dynamic-favicon" rel="icon" href="https://uploads.onecompiler.io/43n8uttmw/44k6d22hf/Screenshot_2025-06-20_213937-removebg-preview.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -514,7 +517,7 @@
                 </div>
             </section>
 
-            <!-- قسم الحضور والانصراف (المنقول) -->
+            <!-- قسم الحضور والانصراف -->
             <section id="attendance" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="سجل الحضور والانصراف">سجل الحضور والانصراف اليومي وتحديد الموقع</p>
@@ -1105,7 +1108,7 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة عميل (محدثة مع من يمكنه الرؤية) -->
+    <!-- نافذة إضافة عميل -->
     <div id="clientModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-lime-600 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1162,7 +1165,6 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
                         <div>
-                            <!-- تحويل الراديو إلى شيك بوكس بناء على طلبك لاختيار أكثر من وسيلة -->
                             <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">طرق التواصل (يمكن اختيار أكثر من وسيلة)</label>
                             <div class="flex items-center gap-4">
                                 <label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="contactMethod" value="whatsapp" checked class="w-4 h-4 text-green-500 rounded focus:ring-green-500"> <i class="fa-brands fa-whatsapp text-green-500"></i> واتساب</label>
@@ -1176,7 +1178,6 @@
                         </div>
                     </div>
                     
-                    <!-- إضافة من يمكنه رؤية العميل -->
                     <div class="border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">من يمكنه رؤية هذا العميل؟</label>
                         <p class="text-[10px] text-gray-500 mb-2">ملاحظة: المدير والموظف الذي أضاف العميل يريان هذا السجل تلقائياً ولن يظهرا في القائمة.</p>
@@ -1218,7 +1219,7 @@
         </div>
     </div>
     
-    <!-- نافذة تعديل ملاحظة العميل الجديدة -->
+    <!-- نافذة تعديل ملاحظة العميل -->
     <div id="editNoteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
@@ -1417,7 +1418,6 @@
         const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
         const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
 
-        // حساب CRM الجديد المُرسل
         const EMAILJS_SERVICE_ID_4 = 'service_f80zc0r';
         const EMAILJS_TEMPLATE_CRM_REMINDER = 'template_drbsz4c';
         const EMAILJS_PUBLIC_KEY_4 = '698vc6jpGh36xcq1U';
@@ -1486,6 +1486,17 @@
             }
         }
 
+        // تحديث الأيقونات الديناميكية
+        window.updateFavicon = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            const iconUrl = isDark
+                ? "https://uploads.onecompiler.io/43n8uttmw/44kht2pts/New-Project-10-1.png"
+                : "https://uploads.onecompiler.io/43n8uttmw/44k6d22hf/Screenshot_2025-06-20_213937-removebg-preview.png";
+
+            document.getElementById('dynamic-favicon').href = iconUrl;
+            document.getElementById('dynamic-apple-icon').href = iconUrl;
+        };
+
         window.toggleLanguage = () => {
             window.currentLang = window.currentLang === 'ar' ? 'en' : 'ar';
             localStorage.setItem('appLang', window.currentLang);
@@ -1497,6 +1508,7 @@
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('appTheme', isDark ? 'dark' : 'light');
             document.getElementById('themeToggleIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            window.updateFavicon(); // تغيير الأيقونة مع تغيير الثيم
         };
 
         if (localStorage.getItem('appTheme') === 'dark') {
@@ -1506,7 +1518,10 @@
                 if (icon) icon.className = 'fa-solid fa-sun';
             });
         }
-        document.addEventListener("DOMContentLoaded", applyLanguageToDOM);
+        document.addEventListener("DOMContentLoaded", () => {
+            applyLanguageToDOM();
+            window.updateFavicon(); // تفعيل الأيقونة عند بدء التحميل
+        });
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -1536,7 +1551,6 @@
         let replyingToMsg = null;
         let creationChecklists = [];
         
-        // دالة تحديد الموقع الجغرافي للموظف
         function requestLocation() {
             return new Promise((resolve) => {
                 if ("geolocation" in navigator) {
@@ -1786,7 +1800,6 @@
             }
         };
 
-        // دالة تصفية السجل للمدير
         window.filterLogs = () => {
             const query = document.getElementById('logSearchInput').value.toLowerCase();
             const rows = document.querySelectorAll('#logsList tr');
@@ -2101,7 +2114,6 @@
             window.logAction('تحميل تقرير', `قام المدير بسحب تفاصيل النظام الكاملة بصيغة ${format.toUpperCase()}`);
         };
 
-        // ارسال تذكيرات المهام
         async function sendReminderEmail(toEmail, assigneeName, taskTitle, taskDesc, taskId) {
             try {
                 const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -2120,7 +2132,6 @@
             } catch (error) { console.error(error); }
         }
 
-        // ارسال تذكيرات CRM
         async function checkAndSendCRMReminders() {
             if(globalCRM.length === 0 || globalUsers.length === 0) return;
             const now = Date.now();
@@ -2128,7 +2139,6 @@
             globalCRM.forEach(client => {
                 if(client.nextFollowUp && client.status !== 'تم التعاقد' && client.status !== 'تم التواصل - غير مهتم') {
                     const followUpTime = new Date(client.nextFollowUp).getTime();
-                    // إذا موعد المتابعة اليوم ولم يتم ارسال ايميل له مسبقاً اليوم
                     if(followUpTime <= now && (!client.lastReminderSent || (now - client.lastReminderSent > 24 * 60 * 60 * 1000))) {
                         const assignedUser = globalUsers.find(u => u.uid === client.addedById);
                         if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
@@ -2534,9 +2544,6 @@
             });
         }
 
-        // ================= عملاء CRM (المحدث) ================= //
-        
-        // دالة جديدة لحذف العميل
         window.deleteClient = async (cId) => {
             if(confirm('هل أنت متأكد من حذف هذا العميل نهائياً من قاعدة البيانات؟')) {
                 try {
@@ -2590,7 +2597,6 @@
             window.openModal('noteModal');
         };
         
-        // دالة جديدة لحذف الملاحظة
         window.deleteNote = async (cId, noteTimestamp) => {
             if(confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
                 try {
@@ -2604,7 +2610,6 @@
             }
         };
 
-        // فتح نافذة تعديل الملاحظة
         window.openEditNoteModal = (cId, noteTimestamp, noteTextEncoded) => {
             document.getElementById('editNoteClientId').value = cId;
             document.getElementById('editNoteTimestamp').value = noteTimestamp;
@@ -2612,7 +2617,6 @@
             window.openModal('editNoteModal');
         };
 
-        // حفظ تعديل الملاحظة
         const editNoteForm = document.getElementById('editNoteForm');
         if(editNoteForm) {
             editNoteForm.addEventListener('submit', async (e) => {
@@ -2719,7 +2723,7 @@
                 if (isCEO) return true;
                 if (c.addedById === currentUserData.uid) return true;
                 if (c.visibleTo && c.visibleTo.includes(currentUserData.uid)) return true;
-                if (!c.visibleTo) return true; // دعم العملاء القدامى
+                if (!c.visibleTo) return true; 
                 return false;
             });
 
@@ -3365,9 +3369,8 @@
                 });
                 select.disabled = false;
             } else {
-                // الموظف يستطيع إسناد المهمة لنفسه فقط
                 select.innerHTML = `<option value="${currentUserData.uid}" selected>${currentUserData.name} (${t('أنت')})</option>`;
-                select.disabled = false; // جعلها غير معطلة لتوضيح الفكرة (أو نتركها معطلة، النتيجة واحدة لأن القيمة تُرسل)
+                select.disabled = false;
             }
             window.openModal('taskModal');
         };
@@ -3614,7 +3617,6 @@
             });
         }
 
-        // Updated Add Task Submit Logic
         const addTaskFormNew = document.getElementById('addTaskForm');
         if (addTaskFormNew) {
             addTaskFormNew.addEventListener('submit', async (e) => {
@@ -4627,7 +4629,7 @@
                     globalExpenses = [];
                     snapshot.forEach(doc => globalExpenses.push({id: doc.id, ...doc.data()}));
                     globalExpenses.sort((a,b) => b.timestamp - a.timestamp);
-                    window.renderExpenses();
+                    if(typeof window.renderExpenses === 'function') window.renderExpenses();
                 }, (error) => console.error(error));
             }
             
@@ -4663,7 +4665,9 @@
                     if (docSnap.exists()) {
                         currentUserData = docSnap.data();
                         groupReadTimestamps = currentUserData.readReceipts || {};
-                        if(!currentUserData.notificationPreferences) currentUserData.notificationPreferences = defaultNotifPreferences;
+                        
+                        // تم إصلاح الخطأ هنا
+                        if(!currentUserData.notificationPreferences) currentUserData.notificationPreferences = { email: true, push: true };
                         
                         if(currentUserData.lastSystemExport) {
                             const txt = document.getElementById('lastSystemExportTxt');
@@ -4671,7 +4675,9 @@
                         }
                         
                         document.getElementById('setupProfileScreen').classList.add('hidden');
-                        window.handleLeaveTypeChange();
+                        
+                        // تم حذف الكود الذي يسبب الخلل من هنا 
+                        
                         finishLoginSetup();
                     } else {
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
@@ -4766,11 +4772,6 @@
                 document.getElementById('grid-expenses-ext').classList.remove('hidden');
             }
             
-            if (isCEO || p.canAssignTasks) {
-                // المدير والموظف اللي عنده صلاحية هيشوفوا كل الناس في القائمة
-                // تم تعديل الدالة نفسها بالأعلى ليتوافق ذلك، الزر نفسه ظاهر للجميع لأن أي شخص يقدر يسند لنفسه.
-            }
-            
             document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
             
             if(currentUserData.lastSystemExport) {
@@ -4786,7 +4787,7 @@
             updateActivity();
             setInterval(updateActivity, 60000);
             setInterval(checkAndSendReminders, 300000);
-            setInterval(checkAndSendCRMReminders, 600000); // يفحص تذكيرات CRM كل 10 دقايق
+            setInterval(checkAndSendCRMReminders, 600000); 
         }
         
         function updateActivity() {
