@@ -327,8 +327,1446 @@
         </aside>
         
         <div class="flex-1 overflow-y-auto p-0 md:p-6 bg-gray-50 dark:bg-gray-900 relative" id="mainScrollArea" onclick="window.closeNotifDropdownIfOpen(event)">
+            <section id="home-grid" class="section-content animate-fade-in p-4 md:p-10 max-w-6xl mx-auto">
+                <div id="attendanceLockBanner" class="bg-red-500 text-white p-4 rounded-xl mb-6 text-center font-bold shadow-md hidden flex-col items-center justify-center gap-3">
+                    <div>
+                        <i class="fa-solid fa-lock text-2xl mb-2 block"></i>
+                        <span>النظام مقفل. يجب تسجيل الدخول (الحضور) أولاً لفتح التطبيقات.</span>
+                    </div>
+                    <button onclick="window.punchIn()" class="bg-white text-red-600 hover:bg-gray-100 px-6 py-2 rounded-lg font-bold transition shadow-sm w-max mx-auto">
+                        <i class="fa-solid fa-right-to-bracket mx-1"></i> تسجيل الدخول الآن
+                    </button>
+                </div>
+
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                    <div class="text-right">
+                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white" data-i18n="التطبيقات">الخدمات والتطبيقات</h2>
+                        <p class="text-gray-500 dark:text-gray-400 text-sm mt-2" data-i18n="اختر التطبيق الذي تود العمل عليه">اختر التطبيق الذي تود العمل عليه</p>
+                    </div>
+                    <div id="homePunchOutContainer" class="hidden w-full md:w-auto flex flex-col gap-2">
+                        <div id="ceoExportSection" class="hidden">
+                            <button onclick="window.openModal('exportModal')" class="w-full bg-primary hover:bg-secondary text-white px-5 py-2.5 rounded-xl transition-colors font-bold shadow-md flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-file-export"></i> سحب تفاصيل النظام
+                            </button>
+                        </div>
+                        <button onclick="window.punchOutFromMain()" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-person-walking-arrow-right"></i> تسجيل الانصراف (إنهاء الدوام)
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="homeGridContainer">
+                    <div onclick="window.location.hash='tasks'" class="app-card hover:border-emerald-200 group relative">
+                        <div class="app-icon-container bg-emerald-50 text-emerald-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المهام">المهام</span>
+                        <span id="gridTasksBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </div>
+
+                    <div onclick="window.location.hash='chat'" class="app-card hover:border-orange-200 group relative">
+                        <div class="app-icon-container bg-orange-50 text-orange-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المناقشة">المناقشة</span>
+                        <span id="homeChatBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </div>
+
+                    <div onclick="window.location.hash='crm'" class="app-card hover:border-lime-200 group">
+                        <div class="app-icon-container bg-lime-50 text-lime-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-address-book"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="العملاء">العملاء</span>
+                    </div>
+
+                    <div id="grid-notices" onclick="window.location.hash='notices'" class="app-card hover:border-yellow-200 group relative">
+                        <div class="app-icon-container bg-yellow-50 text-yellow-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bullhorn"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="التعميمات">التعميمات</span>
+                        <span id="gridNoticesBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </div>
+
+                    <div onclick="window.location.hash='meetings'" class="app-card hover:border-blue-200 group relative">
+                        <div class="app-icon-container bg-blue-50 text-blue-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-video"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الاجتماعات">الاجتماعات</span>
+                        <span id="gridMeetingsBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </div>
+
+                    <div onclick="window.location.hash='drive'" class="app-card hover:border-cyan-200 group">
+                        <div class="app-icon-container bg-cyan-50 text-cyan-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="المستندات">المستندات</span>
+                    </div>
+
+                    <div onclick="window.location.hash='attendance'" class="app-card hover:border-indigo-200 group">
+                        <div class="app-icon-container bg-indigo-50 text-indigo-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-clock"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الحضور والانصراف">الحضور والانصراف</span>
+                    </div>
+
+                    <div onclick="window.location.hash='leaves'" class="app-card hover:border-pink-200 group relative">
+                        <div class="app-icon-container bg-pink-50 text-pink-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-plane-departure"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الإجازات">الإجازات</span>
+                        <span id="gridLeavesBadge" class="absolute top-4 left-4 hidden bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md"></span>
+                    </div>
+
+                    <div onclick="window.location.hash='robots'" class="app-card hover:border-blue-300 group relative">
+                        <div class="app-icon-container bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">الروبوتات</span>
+                    </div>
+
+                    <div onclick="window.location.hash='office-inventory'" class="app-card hover:border-purple-200 group relative">
+                        <div class="app-icon-container bg-purple-50 text-purple-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-desktop"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">جرد المكتب</span>
+                    </div>
+
+                    <div onclick="window.location.hash='warehouse-inventory'" class="app-card hover:border-orange-200 group relative">
+                        <div class="app-icon-container bg-orange-50 text-orange-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">جرد المستودع</span>
+                    </div>
+
+                    <div onclick="window.location.hash='trainees'" class="app-card hover:border-amber-200 group relative">
+                        <div class="app-icon-container bg-amber-50 text-amber-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">المتدربين</span>
+                    </div>
+
+                    <div onclick="window.location.hash='my-profile'" class="app-card hover:border-sky-200 group">
+                        <div class="app-icon-container bg-sky-50 text-sky-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-id-card"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">ملفي والعهد</span>
+                    </div>
+
+                    <div id="grid-expenses-ext" onclick="window.location.hash='expenses'" class="hidden app-card hover:border-teal-200 group relative">
+                        <div class="app-icon-container bg-teal-50 text-teal-600 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200">المصاريف والنثريات</span>
+                    </div>
+
+                    <div id="grid-employees" onclick="window.location.hash='employees'" class="app-card hover:border-purple-200 group hidden">
+                        <div class="app-icon-container bg-purple-50 text-purple-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="الموظفون">الموظفون</span>
+                    </div>
+
+                    <div id="grid-dashboard" onclick="window.location.hash='dashboard'" class="app-card hover:border-fuchsia-200 group hidden">
+                        <div class="app-icon-container bg-fuchsia-50 text-fuchsia-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="لوحات البيانات">لوحات البيانات</span>
+                    </div>
+
+                    <div id="grid-logs" onclick="window.location.hash='logs'" class="app-card hover:border-red-200 group hidden">
+                        <div class="app-icon-container bg-red-50 text-red-500 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <span class="font-bold text-gray-800 dark:text-gray-200" data-i18n="سجل النظام">سجل النظام</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="my-profile" class="section-content animate-fade-in hidden p-4 md:p-0 max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">ملفي الشخصي والعهد</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+                        <img id="myProfileAvatar" src="" class="w-20 h-20 rounded-full object-cover border-2 border-secondary">
+                        <div>
+                            <h3 id="myProfileName" class="text-xl font-bold text-gray-800 dark:text-white"></h3>
+                            <p id="myProfileRole" class="text-secondary font-semibold text-sm"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-primary dark:text-blue-400 mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-stacked"></i> العهد والأصول المستلمة:
+                        </h4>
+                        <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[100px]">
+                            <p id="myProfileAssets" class="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap font-semibold leading-relaxed">لا توجد عهد مسجلة حالياً.</p>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info"></i> هذه التفاصيل خاصة بك، ولا يمكن تعديلها إلا من قبل المدير.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dashboard" class="section-content animate-fade-in hidden p-4 md:p-0">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-primary">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="الموظفين المسجلين">الموظفين المسجلين</p><h3 id="stat-employees" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-blue-50 dark:bg-gray-700 text-primary dark:text-blue-400 p-3 md:p-4 rounded-full"><i class="fa-solid fa-users text-xl md:text-2xl"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-secondary">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="إجمالي المهام">إجمالي المهام</p><h3 id="stat-tasks" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-teal-50 dark:bg-gray-700 text-secondary dark:text-teal-400 p-3 md:p-4 rounded-full"><i class="fa-solid fa-list-check text-xl md:text-2xl"></i></div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between border-b-4 border-b-green-500">
+                        <div><p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1" data-i18n="مهام مكتملة">مهام مكتملة</p><h3 id="stat-completed" class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">0</h3></div>
+                        <div class="bg-green-50 dark:bg-gray-700 text-green-500 p-3 md:p-4 rounded-full"><i class="fa-solid fa-check-double text-xl md:text-2xl"></i></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="employees" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="فريق العمل المسجل">فريق العمل المسجل في النظام</p>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
+                    <table class="w-full text-right min-w-[500px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                            <tr>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الاسم">الاسم</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الوظيفة">الوظيفة</th>
+                                <th id="empActionHeader" class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200 hidden text-left" data-i18n="الإجراءات">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                    <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-primary rounded-t-lg text-white">
+                        <div class="flex gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+                            <button class="font-bold text-sm whitespace-nowrap bg-white/20 px-3 py-1 rounded-full"><i class="fa-solid fa-list text-xs ml-1"></i> القائمة</button>
+                            <button class="font-bold text-sm whitespace-nowrap opacity-70 hover:opacity-100 transition"><i class="fa-solid fa-calendar text-xs ml-1"></i> الموعد النهائي</button>
+                            <button class="font-bold text-sm whitespace-nowrap opacity-70 hover:opacity-100 transition"><i class="fa-solid fa-clock text-xs ml-1"></i> متأخرة <span class="bg-red-500 text-white rounded-full px-1.5 text-[10px] ml-1">0</span></button>
+                        </div>
+                        <div class="flex gap-2 mt-3 md:mt-0 w-full md:w-auto">
+                            <button id="viewReportsBtn" onclick="window.openCeoReportsModal()" class="hidden bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 shadow-sm whitespace-nowrap">
+                                <i class="fa-solid fa-folder-open"></i> تقارير الموظفين
+                            </button>
+                            <div class="relative w-full md:w-48">
+                                <input type="text" id="taskSearchInput" onkeyup="window.filterTasksList()" placeholder="عامل التصفية والبحث" class="bg-white/10 border border-white/20 rounded text-white px-3 py-1.5 text-sm w-full focus:outline-none focus:bg-white/20 placeholder-white/60">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-xs"></i>
+                            </div>
+                            <button id="addTaskBtn" onclick="window.openTaskModal()" class="hidden bg-[#22c55e] hover:bg-green-600 text-white px-4 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 whitespace-nowrap shadow-sm">
+                                <i class="fa-solid fa-plus"></i> إنشاء <i class="fa-solid fa-chevron-down text-[10px] mr-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto min-h-[50vh]">
+                        <table class="w-full text-right" id="tasksListTable">
+                            <thead class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                <tr>
+                                    <th class="p-3 w-10 text-center"><input type="checkbox" class="custom-checkbox" disabled></th>
+                                    <th class="p-3 font-semibold">الاسم</th>
+                                    <th class="p-3 font-semibold">نشط</th>
+                                    <th class="p-3 font-semibold">الموعد النهائي</th>
+                                    <th class="p-3 font-semibold">تم الإنشاء بواسطة</th>
+                                    <th class="p-3 font-semibold">الشخص المسؤول</th>
+                                    <th class="p-3 font-semibold">المشروع</th>
+                                    <th class="p-3 w-10 text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tasksListBody" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm"></tbody>
+                        </table>
+                        <div id="emptyTasksMessage" class="hidden text-center text-gray-500 py-10">
+                            <i class="fa-solid fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+                            <p>لا توجد مهام حالياً</p>
+                        </div>
+                    </div>
+                    <div class="p-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
+                        <div class="flex items-center gap-2">
+                            <span>السجلات: </span>
+                            <select class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 outline-none">
+                                <option>50</option><option>100</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span>الإجمالي: <b id="totalTasksCountList">0</b></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="قاعدة بيانات العملاء">قاعدة بيانات العملاء (CRM)</p>
+                    <button onclick="window.openAddClientModal()" class="bg-lime-600 hover:bg-lime-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
+                        <i class="fa-solid fa-user-plus mx-2"></i> إضافة عميل جديد
+                    </button>
+                </div>
+                <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="notices" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="التعميمات">لوحة الإعلانات والتعميمات الرسمية</p>
+                    <button id="addNoticeBtn" onclick="window.openModal('noticeModal')" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
+                        <i class="fa-solid fa-bullhorn mx-2"></i> إضافة إعلان جديد
+                    </button>
+                </div>
+                <div id="noticesList" class="space-y-4"></div>
+            </section>
+
+            <section id="chat" class="section-content hidden animate-fade-in h-[calc(100vh-80px)] md:h-full pb-0 md:pb-4 p-0 md:p-0">
+                <div class="flex h-full bg-white dark:bg-gray-800 md:rounded-xl shadow-sm border-x border-b border-gray-200 dark:border-gray-700 overflow-hidden relative">
+                    <div class="w-64 bg-gray-50 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 flex-col hidden md:flex flex-shrink-0 z-10">
+                        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-white dark:bg-gray-800 h-[68px]">
+                            <span class="font-bold text-gray-700 dark:text-gray-200 text-sm"><i class="fa-solid fa-list-ul mx-2 text-gray-400"></i><span data-i18n="القنوات والمجموعات">القنوات والمجموعات</span></span>
+                            <button id="innerCreateGroupBtn" onclick="window.openCreateGroupModal()" class="text-gray-400 hover:text-primary transition" title="إنشاء مجموعة جديدة">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="p-2 overflow-y-auto flex-1 space-y-1" id="innerChatSidebarList"></div>
+                    </div>
+                    <div class="flex-1 flex flex-col min-w-0 bg-white dark:bg-gray-800 relative">
+                        <div class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-3 md:p-4 flex flex-col md:flex-row justify-between md:items-center z-10 shadow-sm flex-shrink-0 min-h-[68px] gap-3 relative">
+                            <div class="flex items-center gap-3 min-w-0 overflow-hidden">
+                                <button onclick="window.toggleSidebar()" class="md:hidden text-gray-500 hover:text-primary"><i class="fa-solid fa-bars text-xl"></i></button>
+                                <div class="bg-secondary text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 shadow-inner"><i class="fa-solid fa-comments"></i></div>
+                                <div class="flex flex-col min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-1 rounded transition" onclick="window.openGroupInfoModal()" title="عرض معلومات وأعضاء المجموعة">
+                                    <h3 id="chatHeaderTitle" class="font-bold text-primary dark:text-secondary text-sm md:text-base truncate">الدردشة العامة للشركة</h3>
+                                    <p id="chatHeaderDesc" class="text-[10px] md:text-xs text-gray-400 truncate flex items-center gap-1"><i class="fa-solid fa-circle-info"></i> <span>يتواجد هنا جميع أعضاء مساحة العمل</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0" id="chatHeaderActions">
+                                <button onclick="window.togglePinnedDropdown()" class="relative text-gray-500 hover:text-yellow-500 transition p-2" title="الرسائل المثبتة">
+                                    <i class="fa-solid fa-thumbtack text-lg"></i>
+                                    <span id="pinnedCountBadge" class="absolute top-0 right-0 bg-yellow-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                                </button>
+                                <div class="relative w-full md:w-auto ml-2">
+                                    <input type="text" id="chatSearchInput" onkeyup="window.filterChat()" placeholder="البحث..." class="bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full px-8 py-1.5 text-sm focus:outline-none focus:border-secondary w-full md:w-48 transition-colors text-gray-700 dark:text-gray-200">
+                                    <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                </div>
+                                <button id="clearMessagesBtn" onclick="window.clearOrDeleteGroup('clear')" class="hidden text-xs bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 text-orange-600 border border-orange-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1"><i class="fa-solid fa-eraser"></i> <span class="hidden sm:inline">مسح</span></button>
+                                <button id="deleteGroupBtn" onclick="window.clearOrDeleteGroup('delete')" class="hidden text-xs bg-red-50 dark:bg-gray-700 hover:bg-red-100 text-red-600 border border-red-200 px-2 py-2 rounded-lg transition-colors flex items-center justify-center gap-1"><i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">حذف</span></button>
+                            </div>
+                            <div id="pinnedMessagesDropdown" class="hidden absolute top-full left-4 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl rounded-lg w-72 max-h-64 overflow-y-auto z-40 p-2 space-y-2"></div>
+                        </div>
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-bg relative"></div>
+                        <div id="chatAttachmentPreview" class="hidden px-4 py-2 bg-blue-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between flex-shrink-0">
+                            <div class="flex items-center gap-2 text-sm text-primary dark:text-blue-400 font-bold"><i class="fa-solid fa-file-circle-check"></i> <span id="attachmentFileName">ملف جاهز</span></div>
+                            <button type="button" onclick="window.clearChatAttachment()" class="text-red-500 hover:text-red-700 font-bold"><i class="fa-solid fa-xmark"></i> إزالة</button>
+                        </div>
+                        <div id="chatReplyPreview" class="hidden px-4 py-2 bg-gray-100 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 items-center justify-between flex-shrink-0 text-sm">
+                            <div class="flex flex-col truncate border-r-4 border-secondary pr-2">
+                                <span class="font-bold text-primary dark:text-secondary text-xs flex items-center gap-1"><i class="fa-solid fa-reply"></i> الرد على: <span id="replyTargetName" class="text-gray-800 dark:text-gray-200"></span></span>
+                                <span class="text-gray-500 dark:text-gray-400 text-xs truncate w-48 md:w-96" id="replyTargetText"></span>
+                            </div>
+                            <button type="button" onclick="window.cancelReply()" class="text-gray-400 hover:text-red-500 transition px-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                        </div>
+                        <div class="p-3 md:p-4 bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 relative z-10 flex-shrink-0">
+                            <div id="mentionsList" class="hidden absolute bottom-full mb-2 right-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg w-48 max-h-40 overflow-y-auto z-20"></div>
+                            <div id="chatColorPicker" class="hidden absolute bottom-full mb-3 right-16 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 shadow-xl rounded-lg p-3 flex gap-2 z-20">
+                                <button type="button" onclick="window.setChatColor('bg-[#00839b]', this)" class="color-btn w-6 h-6 rounded-full bg-[#00839b] ring-2 ring-offset-2 ring-[#00839b] transition-transform" title="بترولي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-[#002d74]', this)" class="color-btn w-6 h-6 rounded-full bg-[#002d74] hover:scale-110 transition-transform" title="كحلي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-rose-600', this)" class="color-btn w-6 h-6 rounded-full bg-rose-600 hover:scale-110 transition-transform" title="وردي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-teal-600', this)" class="color-btn w-6 h-6 rounded-full bg-teal-600 hover:scale-110 transition-transform" title="تركواز"></button>
+                                <button type="button" onclick="window.setChatColor('bg-amber-600', this)" class="color-btn w-6 h-6 rounded-full bg-amber-600 hover:scale-110 transition-transform" title="برتقالي"></button>
+                                <button type="button" onclick="window.setChatColor('bg-gray-700', this)" class="color-btn w-6 h-6 rounded-full bg-gray-700 hover:scale-110 transition-transform" title="رمادي"></button>
+                            </div>
+                            <div id="readOnlyMessage" class="hidden text-center text-sm font-bold text-gray-500 dark:text-gray-400 p-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                                <i class="fa-solid fa-eye mx-1"></i> <span data-i18n="أنت تشاهد كمراقب">أنت تشاهد هذه المجموعة بصفة مراقب.</span>
+                            </div>
+                            <form id="chatForm" class="flex items-center bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl pr-4 pl-1 py-1 w-full relative shadow-sm">
+                                <button type="button" onclick="window.toggleMentions()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors font-bold self-end mb-2" title="ذكر شخص">@</button>
+                                <input type="file" id="chatFileInput" class="hidden" accept="image/*,video/*,application/pdf" onchange="window.handleChatAttachment(event)">
+                                <button type="button" onclick="document.getElementById('chatFileInput').click()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors self-end mb-2" title="إرفاق ملف">
+                                    <i class="fa-solid fa-paperclip"></i>
+                                </button>
+                                <button type="button" onclick="window.toggleChatColorPicker()" class="text-gray-400 hover:text-secondary text-lg mx-2 transition-colors self-end mb-2" title="تغيير اللون">
+                                    <i class="fa-solid fa-palette"></i>
+                                </button>
+                                <textarea id="chatInput" rows="1" placeholder="اكتب رسالتك... (Shift+Enter لسطر جديد)" class="flex-1 bg-transparent border-none focus:outline-none text-sm md:text-base py-3 px-2 text-gray-700 dark:text-gray-200 resize-none overflow-y-auto min-h-[44px] max-h-[120px]"></textarea>
+                                <button type="submit" class="bg-secondary hover:bg-primary text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition-colors mx-2 shadow self-end mb-1">
+                                    <i class="fa-regular fa-paper-plane transform -scale-x-100" id="sendIconDir"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="attendance" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="سجل الحضور والانصراف">سجل الحضور والانصراف اليومي</p>
+                </div>
+                <div id="empAttendanceView" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 text-center mb-6 relative overflow-hidden">
+                    <h3 class="text-lg font-bold text-primary dark:text-secondary mb-2 mt-2" id="currentDateStr"></h3>
+                    <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm" id="attendanceStatusMsg">لم تقم بتسجيل الدخول اليوم.</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button onclick="window.punchIn()" id="punchInBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center gap-2"><i class="fa-solid fa-right-to-bracket"></i> تسجيل دخول</button>
+                        <button onclick="window.punchBreak()" id="punchBreakBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center gap-2 hidden"><i class="fa-solid fa-mug-hot"></i> خروج مؤقت</button>
+                        <button onclick="window.returnFromBreak()" id="returnBreakBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center gap-2 hidden"><i class="fa-solid fa-rotate-left"></i> عودة للعمل</button>
+                        <button onclick="window.punchOut()" id="punchOutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-xl shadow transition flex items-center gap-2 hidden"><i class="fa-solid fa-person-walking-arrow-right"></i> تسجيل انصراف</button>
+                    </div>
+                </div>
+                <div id="ceoAttendanceView" class="hidden">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex items-center gap-2 w-full md:w-auto">
+                            <label class="font-bold text-gray-700 dark:text-gray-300">الموظف:</label>
+                            <select id="attendanceEmpSelect" onchange="window.renderSelectedEmpAttendance()" class="flex-1 md:w-64 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:border-secondary"><option value="">-- اختر موظف --</option></select>
+                        </div>
+                        <div class="search-wrapper w-full md:w-auto">
+                            <i class="fa-solid fa-search search-icon"></i>
+                            <input type="text" id="searchAttendance" oninput="window.renderSelectedEmpAttendance()" placeholder="بحث في السجل..." class="search-input w-full">
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
+                        <table class="w-full text-right min-w-[700px]">
+                            <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                                <tr>
+                                    <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">التاريخ</th>
+                                    <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">وقت الدخول</th>
+                                    <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">فترات الخروج المؤقت</th>
+                                    <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">وقت الانصراف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceRecordsList" class="divide-y divide-gray-100 dark:divide-gray-700">
+                                <tr><td colspan="4" class="p-4 text-center text-gray-500">اختر موظفاً لعرض السجل</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="leaves" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="طلبات الإجازات">طلبات الإجازات والمغادرات</p>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <div class="search-wrapper flex-1 md:flex-none">
+                            <i class="fa-solid fa-search search-icon"></i>
+                            <input type="text" id="searchLeaves" oninput="renderLeaves()" placeholder="بحث في الطلبات..." class="search-input">
+                        </div>
+                        <button id="reqLeaveBtn" onclick="window.openModal('leaveModal')" class="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
+                            <i class="fa-solid fa-plus mx-2"></i> طلب
+                        </button>
+                    </div>
+                </div>
+                <div id="myLeaveBalances" class="hidden grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border-t-4 border-indigo-500 shadow-sm text-center">
+                        <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-1 text-sm"><i class="fa-solid fa-calendar-day text-indigo-500 mx-1"></i> رصيد الإجازات</h4>
+                        <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400" id="balDaysTxt">14 <span class="text-sm font-normal">يوم</span></p>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border-t-4 border-teal-500 shadow-sm text-center">
+                        <h4 class="font-bold text-gray-700 dark:text-gray-300 mb-1 text-sm"><i class="fa-solid fa-clock text-teal-500 mx-1"></i> رصيد المغادرات</h4>
+                        <p class="text-2xl font-bold text-teal-600 dark:text-teal-400" id="balHoursTxt">20 <span class="text-sm font-normal">ساعة</span></p>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
+                    <table class="w-full text-right min-w-[700px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                            <tr>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">الموظف</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">النوع (الرصيد)</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200 text-center">التفاصيل</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">من تاريخ</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">إلى تاريخ</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">الحالة</th>
+                                <th id="leaveActionHeader" class="p-3 font-semibold text-gray-600 dark:text-gray-200 hidden text-center">الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leavesList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="drive" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div class="flex justify-between text-sm mb-2 font-bold text-gray-700 dark:text-gray-300">
+                        <span data-i18n="المساحة المستخدمة">المساحة المستخدمة</span>
+                        <span id="storageText">0 MB / 15 MB</span>
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 border border-gray-200 dark:border-gray-600 overflow-hidden">
+                        <div id="storageBar" class="bg-green-500 h-full transition-all duration-500 w-0"></div>
+                    </div>
+                    <p id="storageWarning" class="text-xs text-red-500 mt-2 font-bold hidden"><i class="fa-solid fa-triangle-exclamation"></i> لا يمكن رفع ملفات جديدة، المساحة ممتلئة!</p>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="مشاركة الملفات">إدارة المستندات</p>
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <div class="search-wrapper flex-1 md:flex-none w-full md:w-auto">
+                            <i class="fa-solid fa-search search-icon"></i>
+                            <input type="text" id="searchDrive" oninput="renderDriveFiles()" placeholder="بحث في المجلد..." class="search-input">
+                        </div>
+                        <button onclick="window.openModal('createFolderModal')" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow flex-1 md:flex-none justify-center">
+                            <i class="fa-solid fa-folder-plus mx-2"></i> مجلد
+                        </button>
+                        <input type="file" id="driveFileInput" class="hidden" onchange="window.handleDriveFileSelect(event)">
+                        <button id="uploadFileBtn" onclick="document.getElementById('driveFileInput').click()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow flex-1 md:flex-none justify-center">
+                            <i class="fa-solid fa-cloud-arrow-up mx-2"></i> ملف
+                        </button>
+                    </div>
+                </div>
+                <div id="driveBreadcrumbs" class="flex flex-wrap items-center gap-2 mb-4 text-sm font-bold text-gray-600 dark:text-gray-300"></div>
+                <h3 id="pinnedFilesTitle" class="font-bold text-gray-800 dark:text-gray-200 mb-3 border-b dark:border-gray-700 pb-2"><i class="fa-solid fa-thumbtack text-primary dark:text-secondary mx-2"></i><span data-i18n="الملفات المثبتة">الملفات المثبتة</span></h3>
+                <div id="pinnedFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"></div>
+                <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-3 border-b dark:border-gray-700 pb-2"><i class="fa-regular fa-folder-open text-secondary mx-2"></i>المحتويات</h3>
+                <div id="allFilesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+            </section>
+
+            <section id="meetings" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="إدارة الاجتماعات">إدارة وجدولة مكالمات الفيديو</p>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <div class="search-wrapper flex-1 md:flex-none">
+                            <i class="fa-solid fa-search search-icon"></i>
+                            <input type="text" id="searchMeetings" oninput="renderMeetings()" placeholder="بحث عن اجتماع..." class="search-input">
+                        </div>
+                        <button id="createMeetingBtn" onclick="window.openCreateMeetingModal()" class="hidden bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg transition-colors items-center text-sm md:text-base w-full md:w-auto justify-center font-bold shadow">
+                            <i class="fa-solid fa-video mx-2"></i> <span data-i18n="بدء / جدولة اجتماع">بدء / جدولة اجتماع</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-bold text-primary dark:text-blue-400 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2"><i class="fa-solid fa-calendar-check mx-2"></i>الاجتماعات الحالية والمجدولة</h3>
+                        <div id="activeMeetingsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-600 dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2 mt-8"><i class="fa-solid fa-clock-rotate-left mx-2"></i>سجل الاجتماعات السابقة</h3>
+                        <div id="pastMeetingsList" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="expenses" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">سجل المصاريف والنثريات (خاص بالمالية والمدير)</p>
+                    <div class="search-wrapper w-full md:w-auto">
+                        <i class="fa-solid fa-search search-icon"></i>
+                        <input type="text" id="searchExpenses" oninput="renderExpenses()" placeholder="بحث في المصاريف..." class="search-input">
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+                    <h3 class="font-bold text-teal-600 dark:text-teal-400 mb-4 border-b border-gray-100 dark:border-gray-700 pb-2">إضافة مصروف جديد</h3>
+                    <form id="expensesForm" onsubmit="window.handleExpenseSubmit(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div><label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">البيان / الوصف</label><input type="text" id="expDesc" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"></div>
+                        <div><label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">المبلغ</label><input type="number" step="0.01" id="expAmount" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500 text-left" dir="ltr"></div>
+                        <div><label class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">التاريخ</label><input type="date" id="expDate" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-teal-500"></div>
+                        <div class="flex items-end"><button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm shadow">إضافة</button></div>
+                    </form>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
+                    <table class="w-full text-right min-w-[700px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                            <tr>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">التاريخ</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">البيان</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">المبلغ</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">أُضيف بواسطة</th>
+                                <th class="p-3 font-semibold text-gray-600 dark:text-gray-200 text-center">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="trainees" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">إدارة المتدربين ومتابعة تقدمهم</p>
+                    <div class="flex gap-2 w-full md:w-auto items-center">
+                        <div class="flex items-center gap-2 flex-1 md:flex-none">
+                            <div class="search-wrapper w-full">
+                                <i class="fa-solid fa-search search-icon"></i>
+                                <input type="text" id="searchTrainees" oninput="renderTrainees()" placeholder="بحث عن متدرب..." class="search-input w-full">
+                            </div>
+                            <span id="traineesSearchCount" class="text-xs bg-secondary text-white px-2 py-1 rounded-lg font-bold hidden whitespace-nowrap shadow-sm"></span>
+                        </div>
+                        <button onclick="window.openAddTraineeModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-sm flex gap-2">
+                            <i class="fa-solid fa-user-plus"></i> إضافة
+                        </button>
+                    </div>
+                </div>
+                <div class="flex gap-4 border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <button onclick="window.switchTraineesTab('active')" id="tabTraineesActive" class="py-2 px-4 font-bold text-sm border-b-2 border-amber-500 text-amber-600 dark:text-amber-400">الحاليين</button>
+                    <button onclick="window.switchTraineesTab('past')" id="tabTraineesPast" class="py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">السابقين</button>
+                </div>
+                <div id="activeTraineesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="pastTraineesContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="robots" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-blue-600 dark:text-blue-400 font-bold"><i class="fa-solid fa-robot mx-2"></i>إدارة الروبوتات والعملاء</p>
+                    <div class="flex gap-2 w-full md:w-auto items-center flex-wrap">
+                        <div class="flex items-center gap-2 flex-1 md:flex-none">
+                            <div class="search-wrapper w-full">
+                                <i class="fa-solid fa-search search-icon"></i>
+                                <input type="text" id="searchRobots" oninput="window.renderCurrentRobotsTab()" placeholder="بحث..." class="search-input w-full">
+                            </div>
+                            <span id="robotsSearchCount" class="text-xs bg-secondary text-white px-2 py-1 rounded-lg font-bold hidden whitespace-nowrap shadow-sm"></span>
+                        </div>
+                        <button id="addRentalBtn" onclick="window.openAddRentalModal()" class="hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-sm flex gap-2"><i class="fa-solid fa-plus"></i> إضافة مستأجر</button>
+                        <button id="addClientBtn" onclick="window.openAddClientModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-sm flex gap-2"><i class="fa-solid fa-user-plus"></i> إضافة عميل</button>
+                        <button id="addRobotCompanyBtn" onclick="window.openAddRobotModal('company')" class="hidden bg-gradient-to-r from-teal-500 to-teal-700 hover:from-teal-600 text-white px-5 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-md flex gap-2"><i class="fa-solid fa-plus-circle"></i> إضافة روبوت للشركة</button>
+                        <button id="addRobotWarehouseBtn" onclick="window.openAddRobotModal('warehouse')" class="hidden bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 text-white px-5 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-md flex gap-2"><i class="fa-solid fa-plus-circle"></i> إضافة للمستودع</button>
+                    </div>
+                </div>
+                <div class="flex overflow-x-auto hide-scroll gap-2 border-b border-gray-200 dark:border-gray-700 mb-6 pb-2">
+                    <button onclick="window.switchRobotsTab('rentedNow')" id="tabRobotsRentedNow" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 flex items-center gap-2"><i class="fa-solid fa-hand-holding-hand"></i> المستأجرة الآن</button>
+                    <button onclick="window.switchRobotsTab('clients')" id="tabRobotsClients" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 flex items-center gap-2"><i class="fa-solid fa-users"></i> العملاء</button>
+                    <button onclick="window.switchRobotsTab('inCompany')" id="tabRobotsInCompany" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2"><i class="fa-solid fa-building"></i> في الشركة</button>
+                    <button onclick="window.switchRobotsTab('inWarehouse')" id="tabRobotsInWarehouse" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2"><i class="fa-solid fa-warehouse"></i> في المستودع</button>
+                    <button onclick="window.switchRobotsTab('pastRenters')" id="tabRobotsPastRenters" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i> المستأجرين السابقين</button>
+                    <button onclick="window.switchRobotsTab('sold')" id="tabRobotsSold" class="whitespace-nowrap py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex items-center gap-2"><i class="fa-solid fa-cart-shopping"></i> تم بيعها</button>
+                </div>
+                <div id="rentedNowContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="clientsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="inCompanyContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="inWarehouseContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="pastRentersContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="soldContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="office-inventory" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-purple-600 dark:text-purple-400 font-bold"><i class="fa-solid fa-desktop mx-2"></i>إدارة جرد المكتب</p>
+                    <div class="flex gap-2 w-full md:w-auto items-center">
+                        <div class="flex items-center gap-2 flex-1 md:flex-none">
+                            <div class="search-wrapper w-full"><i class="fa-solid fa-search search-icon"></i><input type="text" id="searchOfficeInventory" oninput="renderInventory('office')" placeholder="بحث..." class="search-input w-full"></div>
+                            <span id="officeSearchCount" class="text-xs bg-secondary text-white px-2 py-1 rounded-lg font-bold hidden whitespace-nowrap shadow-sm"></span>
+                        </div>
+                        <button onclick="window.openAddInventoryModal('office')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors items-center text-sm font-bold shadow-sm flex gap-2"><i class="fa-solid fa-plus"></i> إضافة</button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button onclick="window.switchInventoryTab('office', 'active')" id="tabOfficeActive" class="py-2 px-4 font-bold text-sm border-b-2 border-purple-600 text-purple-600">آخر جرد</button>
+                        <button onclick="window.switchInventoryTab('office', 'past')" id="tabOfficePast" class="py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500">جرد قديم</button>
+                    </div>
+                    <div id="bulkMoveOfficeContainer" class="w-full md:w-auto pb-2 md:pb-0">
+                        <button onclick="window.moveAllToOldInventory('office')" class="w-full md:w-auto bg-gray-500 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg transition text-xs font-bold shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-boxes-packing"></i> نقل الكل للقديم</button>
+                    </div>
+                </div>
+                <div id="officeActiveContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="officePastContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="warehouse-inventory" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-orange-600 dark:text-orange-400 font-bold"><i class="fa-solid fa-boxes-stacked mx-2"></i>إدارة جرد المستودع</p>
+                    <div class="flex gap-2 w-full md:w-auto items-center">
+                        <div class="flex items-center gap-2 flex-1 md:flex-none">
+                            <div class="search-wrapper w-full"><i class="fa-solid fa-search search-icon"></i><input type="text" id="searchWarehouseInventory" oninput="renderInventory('warehouse')" placeholder="بحث..." class="search-input w-full"></div>
+                            <span id="warehouseSearchCount" class="text-xs bg-secondary text-white px-2 py-1 rounded-lg font-bold hidden whitespace-nowrap shadow-sm"></span>
+                        </div>
+                        <button onclick="window.openAddInventoryModal('warehouse')" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition text-sm font-bold shadow-sm flex gap-2"><i class="fa-solid fa-plus"></i> إضافة</button>
+                    </div>
+                </div>
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-200 dark:border-gray-700 mb-6">
+                    <div class="flex gap-4 w-full md:w-auto">
+                        <button onclick="window.switchInventoryTab('warehouse', 'active')" id="tabWarehouseActive" class="py-2 px-4 font-bold text-sm border-b-2 border-orange-600 text-orange-600">آخر جرد</button>
+                        <button onclick="window.switchInventoryTab('warehouse', 'past')" id="tabWarehousePast" class="py-2 px-4 font-bold text-sm border-b-2 border-transparent text-gray-500">جرد قديم</button>
+                    </div>
+                    <div id="bulkMoveWarehouseContainer" class="w-full md:w-auto pb-2 md:pb-0">
+                        <button onclick="window.moveAllToOldInventory('warehouse')" class="w-full md:w-auto bg-gray-500 hover:bg-gray-600 text-white px-4 py-1.5 rounded-lg transition text-xs font-bold shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-boxes-packing"></i> نقل الكل للقديم</button>
+                    </div>
+                </div>
+                <div id="warehouseActiveContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <div id="warehousePastContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </section>
+
+            <section id="settings" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex justify-between items-center mb-4 md:mb-6">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="إعدادات الحساب">إعدادات الحساب والتفضيلات</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 class="font-bold text-primary dark:text-secondary mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 text-lg"><i class="fa-solid fa-user-gear mx-2"></i>معلومات الحساب</h3>
+                        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-right">
+                            <div class="relative group">
+                                <img id="settingsAvatarPreview" src="https://ui-avatars.com/api/?name=مستخدم&background=00839b&color=fff" class="w-24 h-24 rounded-full border-4 border-gray-50 dark:border-gray-700 object-cover shadow-md">
+                                <div class="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onclick="document.getElementById('profilePicInput').click()"><i class="fa-solid fa-camera text-white text-xl"></i></div>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-800 dark:text-gray-200 text-base mb-1" data-i18n="تغيير الصورة">تغيير الصورة الشخصية</h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3" data-i18n="اختر صورة تعبر عنك">اختر صورة يراها زملاؤك (الحد الأقصى 500KB).</p>
+                                <input type="file" id="profilePicInput" class="hidden" accept="image/*" onchange="window.handleProfilePicChange(event)">
+                                <button onclick="document.getElementById('profilePicInput').click()" class="bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm"><i class="fa-solid fa-upload mx-2"></i> <span data-i18n="اختيار صورة">اختيار صورة</span></button>
+                            </div>
+                        </div>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الاسم الكامل">الاسم الكامل</span></label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-user absolute rtl:right-3 ltr:left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="settingsName" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg rtl:pr-10 ltr:pl-10 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1"><span data-i18n="الوظيفة (الدور)">الوظيفة (الدور)</span></label>
+                                <div class="relative">
+                                    <i class="fa-solid fa-briefcase absolute rtl:right-3 ltr:left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="settingsRole" readonly class="w-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 rounded-lg rtl:pr-10 ltr:pl-10 py-3 text-gray-600 dark:text-gray-300 font-medium cursor-not-allowed outline-none">
+                                </div>
+                            </div>
+                            <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">ترتيب عرض وسائط المحادثة</label>
+                                <div class="relative mt-2">
+                                    <i class="fa-solid fa-layer-group absolute rtl:right-3 ltr:left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <select id="settingsChatLayout" onchange="window.updateChatLayoutPref(this.value)" class="w-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg rtl:pr-10 ltr:pl-10 py-3 text-gray-600 dark:text-gray-200 font-medium focus:border-secondary focus:outline-none transition shadow-sm cursor-pointer hover:border-gray-300 dark:hover:border-gray-500">
+                                        <option value="media-top">الوسائط في الأعلى والنص في الأسفل (الافتراضي)</option>
+                                        <option value="text-top">النص في الأعلى والوسائط في الأسفل</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <h3 class="font-bold text-primary dark:text-secondary mb-6 border-b border-gray-100 dark:border-gray-700 pb-3 text-lg"><i class="fa-solid fa-bell mx-2"></i>إعدادات الإشعارات</h3>
+                        <form id="notificationSettingsForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">شكل مؤشر الإشعارات</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 border rounded-lg flex-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition dark:border-gray-600">
+                                        <input type="radio" name="notifStyle" value="number" class="text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-bold text-gray-700 dark:text-gray-300">رقم (مثال: 3)</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 border rounded-lg flex-1 hover:bg-gray-50 dark:hover:bg-gray-700 transition dark:border-gray-600">
+                                        <input type="radio" name="notifStyle" value="dot" class="text-primary focus:ring-primary h-4 w-4">
+                                        <span class="text-sm font-bold text-gray-700 dark:text-gray-300">نقطة وميض ملونة</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">ألوان الإشعارات حسب الحدث</label>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between border-b dark:border-gray-700 pb-2">
+                                        <span class="text-xs font-bold text-gray-600 dark:text-gray-400">إشعارات المتدربين:</span>
+                                        <select id="colorTrainees" class="text-xs border rounded p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-bold">
+                                            <option value="red" class="text-red-500">أحمر</option><option value="green" class="text-green-500">أخضر</option><option value="blue" class="text-blue-500">أزرق</option><option value="yellow" class="text-yellow-500">أصفر</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between border-b dark:border-gray-700 pb-2">
+                                        <span class="text-xs font-bold text-gray-600 dark:text-gray-400">طلبات الاستلام:</span>
+                                        <select id="colorHandover" class="text-xs border rounded p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-bold">
+                                            <option value="red" class="text-red-500">أحمر</option><option value="green" class="text-green-500">أخضر</option><option value="blue" class="text-blue-500">أزرق</option><option value="yellow" class="text-yellow-500">أصفر</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between border-b dark:border-gray-700 pb-2">
+                                        <span class="text-xs font-bold text-gray-600 dark:text-gray-400">الاجتماعات:</span>
+                                        <select id="colorMeetings" class="text-xs border rounded p-1 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-bold">
+                                            <option value="red" class="text-red-500">أحمر</option><option value="green" class="text-green-500">أخضر</option><option value="blue" class="text-blue-500">أزرق</option><option value="yellow" class="text-yellow-500">أصفر</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="window.saveNotificationSettings()" class="w-full bg-secondary hover:bg-primary text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm mt-4 shadow">حفظ تفضيلات الإشعارات</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
+                    <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
+                    <button id="clearLogsBtn" onclick="window.clearSystemLogs()" class="hidden bg-red-50 dark:bg-gray-800 hover:bg-red-100 dark:hover:bg-gray-700 text-red-600 dark:text-red-400 border border-red-200 dark:border-gray-600 px-4 py-2 rounded-lg transition-colors items-center gap-2 text-sm font-bold shadow-sm">
+                        <i class="fa-solid fa-trash-can"></i> <span data-i18n="تفريغ السجل">تفريغ السجل</span>
+                    </button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
+                    <table class="w-full text-right min-w-[600px]">
+                        <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
+                            <tr>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الوقت">الوقت</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="المستخدم">المستخدم</th>
+                                <th class="p-3 md:p-4 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-200" data-i18n="الحدث">الحدث</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsList" class="divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                    </table>
+                </div>
+            </section>
+            <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
+                    <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
+                        <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
+                        <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    </div>
+                    <div class="p-4 overflow-y-auto flex-1" id="msgReadersList"></div>
+                </div>
             </div>
+
+            <div id="taskReportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+                    <div class="bg-green-600 text-white p-4 flex justify-between items-center">
+                        <h3 class="font-bold text-base md:text-lg">تأكيد إنجاز المهمة والتقرير</h3>
+                        <button onclick="window.closeModal('taskReportModal')" class="hover:text-green-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <form id="taskReportForm" class="p-4 md:p-6 space-y-4">
+                        <input type="hidden" id="reportTaskId">
+                        <input type="hidden" id="reportTaskTitle">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تفاصيل التقرير (ماذا أنجزت؟)</label>
+                            <textarea id="reportText" rows="3" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-green-500 focus:outline-none whitespace-pre-wrap"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">إرفاق ملف إثبات</label>
+                            <input type="file" id="reportFileInput" accept="image/*,application/pdf,.xlsx,.xls,.doc,.docx" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg px-3 py-2 focus:outline-none text-sm">
+                            <p class="text-[10px] text-gray-400 mt-1">الحد الأقصى 1 ميجابايت.</p>
+                        </div>
+                        <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
+                            <button type="button" onclick="window.closeModal('taskReportModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 text-sm font-bold">إلغاء</button>
+                            <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-bold shadow-sm">إرسال وإنهاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="ceoReportsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
+                    <div class="bg-gray-700 text-white p-4 flex justify-between items-center flex-shrink-0">
+                        <h3 class="font-bold text-base md:text-lg"><i class="fa-solid fa-folder-open mx-2"></i> تقارير المهام المنجزة</h3>
+                        <button onclick="window.closeModal('ceoReportsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+                        <div class="w-full md:w-1/3 border-b md:border-b-0 md:border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2" id="ceoReportEmployeesList"></div>
+                        <div class="w-full md:w-2/3 p-4 overflow-y-auto bg-white dark:bg-gray-800 relative" id="ceoReportTasksDetails"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="noticeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
+                    <div class="bg-yellow-500 text-white p-4 flex justify-between items-center flex-shrink-0">
+                        <h3 class="font-bold text-base md:text-lg">إضافة إعلان أو تعميم</h3>
+                        <button onclick="window.closeModal('noticeModal')" class="hover:text-yellow-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div class="p-4 md:p-6 overflow-y-auto flex-1">
+                        <form id="noticeForm" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">نوع الإعلان</label>
+                                <select id="noticeType" onchange="window.togglePollOptions()" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:outline-none">
+                                    <option value="تعميم إداري">تعميم إداري</option>
+                                    <option value="تعميم عادي">تعميم عادي</option>
+                                    <option value="إعلان هام">إعلان هام</option>
+                                    <option value="poll">تصويت (Poll)</option>
+                                    <option value="custom">تخصيص...</option>
+                                </select>
+                                <input type="text" id="customNoticeType" class="hidden w-full border mt-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:outline-none" placeholder="التصنيف المخصص...">
+                            </div>
+                            <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">العنوان</label><input type="text" id="noticeTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2"></div>
+                            <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">التفاصيل</label><textarea id="noticeBody" rows="4" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 whitespace-pre-wrap"></textarea></div>
+                            <div id="pollOptionsContainer" class="hidden border p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">خيارات التصويت</label>
+                                <div id="pollInputsList" class="space-y-2">
+                                    <input type="text" class="poll-option-input w-full border rounded-lg px-3 py-2 text-sm" value="نعم">
+                                    <input type="text" class="poll-option-input w-full border rounded-lg px-3 py-2 text-sm" value="لا">
+                                </div>
+                                <button type="button" onclick="window.addPollOption()" class="mt-2 text-xs bg-yellow-100 text-yellow-700 px-3 py-2 rounded font-bold w-full"><i class="fa-solid fa-plus mx-1"></i> خيار إضافي</button>
+                            </div>
+                            <div class="pt-4 flex justify-end gap-2">
+                                <button type="button" onclick="window.closeModal('noticeModal')" class="px-4 py-2 border rounded-lg font-bold">إلغاء</button>
+                                <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-lg font-bold">نشر</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="editEmployeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+                    <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                        <h3 class="font-bold text-base md:text-lg">تعديل بيانات الموظف</h3>
+                        <button onclick="window.closeModal('editEmployeeModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <div class="p-4 md:p-6 overflow-y-auto flex-1">
+                        <form id="editEmployeeForm" class="space-y-4">
+                            <input type="hidden" id="editEmpId">
+                            <div><label class="block text-sm font-bold mb-1">الاسم الكامل</label><input type="text" id="editEmpName" required class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700"></div>
+                            <div>
+                                <label class="block text-sm font-bold mb-1">الوظيفة</label>
+                                <select id="editEmpRole" required class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700">
+                                    <option value="technical team supervisor">Technical Team Supervisor</option>
+                                    <option value="Technical Engineer">Technical Engineer</option>
+                                    <option value="accountant">Accountant</option>
+                                </select>
+                            </div>
+                            <div class="border-t pt-3 mt-3">
+                                <label class="block text-sm font-bold text-blue-600 mb-2">إضافة عهد للموظف</label>
+                                <textarea id="editEmpAssets" rows="3" class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700 text-sm whitespace-pre-wrap"></textarea>
+                            </div>
+                            <div class="border-t pt-3 mt-3">
+                                <label class="block text-sm font-bold text-blue-600 mb-2">صلاحيات إضافية:</label>
+                                <div class="space-y-2 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="permAssignTasks" class="w-4 h-4 rounded"><span class="text-sm font-bold">إسناد المهام للآخرين</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="permExpenses" class="w-4 h-4 rounded"><span class="text-sm font-bold">إدارة المصاريف</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="permCRM" class="w-4 h-4 rounded"><span class="text-sm font-bold">إدارة العملاء</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="permNotices" class="w-4 h-4 rounded"><span class="text-sm font-bold">إدارة التعميمات</span></label>
+                                </div>
+                            </div>
+                            <div class="pt-4 flex justify-end gap-2">
+                                <button type="button" onclick="window.closeModal('editEmployeeModal')" class="px-4 py-2 border rounded-lg font-bold">إلغاء</button>
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">حفظ</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="taskModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50 p-4 transition-opacity">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-xl overflow-hidden flex flex-col animate-fade-in">
+                    <div class="flex justify-between items-center p-3 border-b bg-gray-50 dark:bg-gray-900">
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm font-bold">مهمة جديدة</span>
+                            <button type="button" id="taskPriorityToggle" onclick="window.toggleTaskPriority()" class="text-gray-400 hover:text-orange-500 transition-colors" title="أولوية قصوى"><i class="fa-solid fa-fire text-lg"></i></button>
+                        </div>
+                        <button onclick="window.closeModal('taskModal')" class="text-gray-400 hover:text-gray-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+                    </div>
+                    <form id="addTaskForm" class="flex flex-col h-full max-h-[80vh]">
+                        <div class="p-4 flex-1 overflow-y-auto space-y-4 hide-scrollbar">
+                            <input type="hidden" id="isTaskHighPriority" value="false">
+                            <input type="text" id="taskTitle" required placeholder="اسم المهمة..." class="w-full text-lg font-bold bg-transparent border-none outline-none">
+                            <div class="border-b pb-2">
+                                <p class="text-xs text-gray-400 mb-1">الوصف</p>
+                                <textarea id="taskDesc" rows="2" placeholder="أضف تفاصيل..." class="w-full text-sm bg-transparent border-none outline-none resize-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                <div class="flex items-center gap-2 border rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
+                                    <div class="w-6 text-center text-gray-400"><i class="fa-solid fa-user"></i></div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-gray-500">المسؤول</p>
+                                        <select id="taskAssignee" required class="w-full bg-transparent text-sm font-semibold outline-none"></select>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 border rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
+                                    <div class="w-6 text-center text-blue-500"><i class="fa-solid fa-calendar-day"></i></div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-gray-500">الموعد النهائي</p>
+                                        <input type="datetime-local" id="taskDeadline" class="w-full bg-transparent text-sm font-semibold outline-none">
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 border rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50 col-span-full md:col-span-1">
+                                    <div class="w-6 text-center text-gray-400"><i class="fa-solid fa-folder"></i></div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-gray-500">المشروع</p>
+                                        <input type="text" id="taskProjectTag" placeholder="اسم المشروع" value="عام" class="w-full bg-transparent text-sm font-semibold outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 pt-2">
+                                <button type="button" onclick="document.getElementById('taskAttachmentInput').click()" class="border rounded-lg px-4 py-2 text-sm font-bold flex gap-2"><i class="fa-solid fa-paperclip"></i> المرفقات</button>
+                                <input type="file" id="taskAttachmentInput" class="hidden" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                                <button type="button" onclick="window.toggleChecklistSection()" class="border rounded-lg px-4 py-2 text-sm font-bold flex gap-2"><i class="fa-solid fa-list-check"></i> قوائم التحقق</button>
+                            </div>
+                            <div id="attachmentNameDisplay" class="hidden text-xs text-blue-500 font-bold bg-blue-50 p-2 rounded"></div>
+                            
+                            <div id="checklistSection" class="hidden border rounded-lg p-4 shadow-sm mt-4">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-bold text-sm"><i class="fa-solid fa-list-ul text-blue-500"></i> قائمة المهام الفرعية</h4>
+                                    <button type="button" onclick="window.toggleChecklistSection()" class="text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <div id="checklistItemsContainer" class="space-y-2 mb-3"></div>
+                                <div class="flex items-center gap-2 border-t pt-3">
+                                    <input type="text" id="newChecklistItemInput" placeholder="إضافة عنصر" class="flex-1 bg-transparent text-sm outline-none" onkeypress="window.handleChecklistEnter(event)">
+                                    <button type="button" onclick="window.addChecklistItem()" class="text-xs bg-gray-200 px-2 py-1 rounded font-bold">إضافة</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+                            <button type="button" onclick="window.closeModal('taskModal')" class="text-sm font-bold text-gray-500">إلغاء</button>
+                            <button type="submit" class="bg-blue-600 text-white text-sm font-bold px-6 py-2 rounded-lg shadow-md">إنشاء المهمة</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="videoCallModal" class="fixed inset-0 bg-black z-[60] hidden flex-col">
+                <div class="bg-gray-900 text-white p-4 flex justify-between items-center flex-shrink-0 border-b border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                        <h3 id="videoCallTitle" class="font-bold text-sm md:text-base">مكالمة جارية</h3>
+                    </div>
+                    <button onclick="window.endVideoCall()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-xs md:text-sm"><i class="fa-solid fa-phone-slash"></i> إنهاء</button>
+                </div>
+                <div id="jitsiContainer" class="flex-1 w-full bg-black relative"></div>
+            </div>
+
+            <div id="createGroupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+                    <div class="bg-primary dark:bg-gray-900 text-white p-4 flex justify-between items-center">
+                        <h3 class="font-bold text-base md:text-lg">إنشاء مجموعة دردشة</h3>
+                        <button onclick="window.closeModal('createGroupModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+                    </div>
+                    <form id="createGroupForm" class="p-4 md:p-6 space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold mb-1">اسم المجموعة</label>
+                            <input type="text" id="newGroupName" required placeholder="فريق التسويق..." class="w-full border rounded-lg px-3 py-2 dark:bg-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold mb-2">إضافة الأعضاء</label>
+                            <div id="groupMembersSelection" class="border rounded-lg p-2 max-h-40 overflow-y-auto space-y-1 dark:bg-gray-700"></div>
+                        </div>
+                        <div class="pt-4 flex justify-end gap-2">
+                            <button type="button" onclick="window.closeModal('createGroupModal')" class="px-4 py-2 border rounded-lg font-bold">إلغاء</button>
+                            <button type="submit" class="px-4 py-2 bg-secondary text-white rounded-lg font-bold">إنشاء</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="printArea" class="hidden bg-white text-black p-8 text-right" dir="rtl"></div>
+        </div>
+    </div> <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW not registered', err));
+            });
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-    </div>
+        // إعدادات قاعدة البيانات الرئيسية والمشتركة
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
+            authDomain: "quill-world.firebaseapp.com",
+            projectId: "quill-world",
+            storageBucket: "quill-world.firebasestorage.app",
+            messagingSenderId: "339188796023",
+            appId: "1:339188796023:web:e0a1ba750b49909220d472",
+            measurementId: "G-BMEZ49L6CN"
+        };
+        
+        const firebaseConfigStorage = {
+            apiKey: "AIzaSyBjPerebbHAtkKWJV_LFkoaL-15oTNHRdg",
+            authDomain: "quill-worl.firebaseapp.com",
+            projectId: "quill-worl",
+            storageBucket: "quill-worl.firebasestorage.app",
+            messagingSenderId: "192227363160",
+            appId: "1:192227363160:web:59a620429b4bfdfb7cfd2d",
+            measurementId: "G-NLY5LN0830"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appStorage = initializeApp(firebaseConfigStorage, "StorageApp");
+        const dbStorage = getFirestore(appStorage);
+        const appId = 'quill-world-system';
+
+        // إعدادات Email.js
+        const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
+        const EMAILJS_SERVICE_ID_2 = 'service_cf5myn4'; 
+        const EMAILJS_SERVICE_ID_3 = 'service_kiswf1m';
+        const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
+        const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
+        const EMAILJS_TEMPLATE_MENTION = 'template_93xzb4z'; 
+        const EMAILJS_TEMPLATE_MEETING = 'template_j95rjoh'; 
+        const EMAILJS_TEMPLATE_TASK_COMPLETED = 'template_z8qeiqg';
+        const EMAILJS_TEMPLATE_TASK_DELAYED = 'template_zuaaqx8';
+        const EMAILJS_PUBLIC_KEY_1 = '1jeick6OIh3v4znyt';
+        const EMAILJS_PUBLIC_KEY_2 = 'V9oeJRZybd-4PFBdz';
+        const EMAILJS_PUBLIC_KEY_3 = 'oW-Knt3_uP7BiYM-k';
+
+        emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY_1 });
+
+        // متغيرات النظام العامة (State Management)
+        let currentUserAuth = null;
+        let currentUserData = null; 
+        
+        let globalUsers = [], globalTasks = [], globalLogs = [], globalChat = [], globalGroups = [];
+        let globalNotices = [], globalCRM = [], globalAttendance = [], globalLeaves = [], globalExpenses = [];
+        let globalTrainees = [], globalInventory = [], globalClients = [], globalRentals = [], globalRobots = [];
+        let globalFiles = [], globalFolders = [];
+        let globalMeetings = [];
+
+        let currentGroupId = 'global'; 
+        let currentFolderId = null;
+        let folderHistory = [{id: null, name: 'الرئيسية'}];
+        let groupReadTimestamps = {}; 
+        let hasPunchedInToday = true;
+        let selectedChatColor = 'bg-[#00839b]'; 
+        let replyingToMsg = null;
+        let pendingChatFileData = null, pendingChatFileType = null;
+        let pendingTaskAttachment = null, pendingTaskAttachmentType = null, pendingTaskAttachmentName = null;
+        let creationChecklists = [];
+        let currentMeetingId = null, jitsiApi = null;
+        const MAX_GLOBAL_STORAGE = 15 * 1024 * 1024; // 15MB
+
+        // دوال المساعدة للواجهة (UI Utilities)
+        window.showToast = (message, type = 'info') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const colorClass = type === 'success' ? 'bg-green-500' : (type === 'warning' ? 'bg-secondary' : (type === 'error' ? 'bg-red-500' : 'bg-primary'));
+            const icon = type === 'success' ? 'fa-check' : (type === 'warning' ? 'fa-bell' : (type === 'error' ? 'fa-triangle-exclamation' : 'fa-info-circle'));
+            toast.className = `toast-enter ${colorClass} text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-sm w-max z-50`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span class="font-bold">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.replace('toast-enter', 'toast-leave'); setTimeout(() => toast.remove(), 500); }, 4000);
+        };
+
+        function getColRef(colName) { return collection(db, 'artifacts', appId, 'public', 'data', colName); }
+        function getStorageColRef(colName) { return collection(dbStorage, 'artifacts', appId, 'public', 'data', colName); }
+
+        window.logAction = async (action, details) => {
+            if(!currentUserData) return;
+            try { await addDoc(getColRef('logs'), { action, details, userName: currentUserData.name, uid: currentUserData.uid, timestamp: Date.now() }); } catch(e) {}
+        };
+
+        window.getTodayDateString = () => {
+            const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        };
+
+        // إدارة المستخدمين والتسجيل
+        window.checkSystemPassword = () => {
+            if(document.getElementById('sysPasswordInput').value === '1112021') {
+                document.getElementById('systemPasswordScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+            } else { document.getElementById('sysPassError').classList.remove('hidden'); }
+        };
+
+        document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (error) { console.error(error); }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            if (user) {
+                document.getElementById('systemPasswordScreen').classList.add('hidden');
+                document.getElementById('loginScreen').classList.add('hidden');
+                currentUserAuth = user;
+                try {
+                    const docSnap = await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid));
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        groupReadTimestamps = currentUserData.readReceipts || {};
+                        if(!currentUserData.notificationPreferences) currentUserData.notificationPreferences = { style: 'number', colors: { trainees: 'green', handover: 'yellow', meetings: 'blue' }};
+                        
+                        document.getElementById('setupProfileScreen').classList.add('hidden');
+                        finishLoginSetup();
+                    } else {
+                        document.getElementById('setupProfileScreen').classList.remove('hidden');
+                    }
+                } catch(e) { showToast('خطأ في قراءة البيانات', 'error'); }
+            } else {
+                localStorage.removeItem('quill_user_cache_main');
+                document.getElementById('systemPasswordScreen').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('setupProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('setupName').value;
+            const role = document.getElementById('setupRole').value;
+            const newUserData = {
+                name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
+                photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
+                readReceipts: {}, notifications: [], notificationPreferences: { style: 'number', colors: { trainees: 'green', handover: 'yellow', meetings: 'blue' }}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]',
+                permissions: { canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false }, lastActive: Date.now(), timestamp: Date.now()
+            };
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserAuth.uid), newUserData);
+            currentUserData = newUserData;
+            document.getElementById('setupProfileScreen').classList.add('hidden');
+            finishLoginSetup();
+        });
+
+        function finishLoginSetup() {
+            localStorage.setItem('quill_user_cache_main', JSON.stringify(currentUserData));
+            updateUIWithUserData();
+            
+            const isCEO = currentUserData.role === 'CEO';
+            const p = currentUserData.permissions || {};
+            
+            // تهيئة الصلاحيات بالواجهة
+            if(isCEO) {
+                ['grid-employees', 'grid-dashboard', 'grid-logs', 'nav-employees-btn', 'nav-dashboard-btn', 'nav-logs-btn', 'clearLogsBtn', 'viewReportsBtn', 'ceoExportSection', 'empActionHeader', 'createMeetingBtn', 'ceoAttendanceView'].forEach(id => {
+                    const el = document.getElementById(id); if(el) el.classList.remove('hidden');
+                });
+            } else {
+                if(p.canViewLogs) { document.getElementById('grid-logs')?.classList.remove('hidden'); document.getElementById('nav-logs-btn')?.classList.remove('hidden'); }
+            }
+            
+            if(isCEO || p.canNotices) document.getElementById('addNoticeBtn')?.classList.remove('hidden');
+            if(isCEO || currentUserData.role === 'accountant' || p.canExpenses) {
+                document.getElementById('nav-expenses-btn')?.classList.remove('hidden');
+                document.getElementById('grid-expenses-ext')?.classList.remove('hidden');
+            }
+            if(isCEO || p.canAssignTasks) document.getElementById('addTaskBtn')?.classList.remove('hidden');
+
+            window.logAction('تسجيل دخول', `سجل ${currentUserData.name} الدخول للنظام الشامل`);
+            startDatabaseListeners();
+            handleHashChange();
+            setInterval(() => { if(currentUserData) updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { lastActive: Date.now() }).catch(()=>{}); }, 60000);
+        }
+
+        function updateUIWithUserData() {
+            document.getElementById('userName').innerText = currentUserData.name;
+            document.getElementById('userRole').innerText = currentUserData.role;
+            document.getElementById('userAvatar').src = currentUserData.photoURL;
+            
+            if(document.getElementById('myProfileName')) {
+                document.getElementById('myProfileName').innerText = currentUserData.name;
+                document.getElementById('myProfileRole').innerText = currentUserData.role;
+                document.getElementById('myProfileAvatar').src = currentUserData.photoURL;
+                document.getElementById('myProfileAssets').innerText = currentUserData.assets || 'لا توجد عهد.';
+            }
+
+            if(document.getElementById('settingsName')) {
+                document.getElementById('settingsAvatarPreview').src = currentUserData.photoURL;
+                document.getElementById('settingsName').value = currentUserData.name;
+                document.getElementById('settingsRole').value = currentUserData.role;
+                if(currentUserData.chatLayout) document.getElementById('settingsChatLayout').value = currentUserData.chatLayout;
+            }
+
+            if (currentUserData.chatColor) {
+                selectedChatColor = currentUserData.chatColor;
+                const sendBtn = document.querySelector('#chatForm button[type="submit"]');
+                if(sendBtn) sendBtn.className = `${selectedChatColor} text-white w-10 h-10 min-w-[40px] rounded-full flex items-center justify-center transition shadow hover:opacity-80`;
+            }
+        }
+
+        // التوجيهات (Routing) وتحديث الـ UI بناءً على الـ Hash
+        function handleHashChange() {
+            if(!currentUserData) return; 
+            const hash = window.location.hash.replace('#', '') || 'home-grid';
+            
+            if (!hasPunchedInToday && currentUserData.role !== 'CEO' && hash !== 'attendance' && hash !== 'home-grid') {
+                window.location.hash = 'attendance';
+                showToast('عذراً، يجب تسجيل الحضور أولاً.', 'warning');
+                return;
+            }
+            
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            const targetSec = document.getElementById(hash);
+            if(targetSec) targetSec.classList.remove('hidden');
+
+            document.getElementById('backToHomeBtn').classList.toggle('hidden', hash === 'home-grid');
+            document.getElementById('page-title').classList.toggle('hidden', hash !== 'home-grid');
+
+            document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('bg-secondary', 'text-white'); b.classList.add('text-gray-300'); });
+            const activeBtn = document.querySelector(`.nav-btn[data-section="${hash}"]`);
+            if(activeBtn) { activeBtn.classList.remove('text-gray-300'); activeBtn.classList.add('bg-secondary', 'text-white'); }
+
+            if(window.innerWidth < 768 && hash !== 'chat') { document.getElementById('sidebar').classList.add('translate-x-full'); document.getElementById('mobileOverlay').classList.add('hidden'); }
+
+            // استدعاء دوال التحديث المخصصة لكل قسم
+            if(hash === 'attendance') window.renderEmpAttendanceView();
+            if(hash === 'leaves') window.renderLeaves();
+            if(hash === 'trainees') window.renderTrainees();
+            if(hash === 'drive') window.renderDriveFiles();
+            if(hash === 'office-inventory') window.renderInventory('office');
+            if(hash === 'warehouse-inventory') window.renderInventory('warehouse');
+            if(hash === 'meetings') window.renderMeetings();
+            if(hash === 'expenses') window.renderExpenses();
+            if(hash === 'robots') window.renderCurrentRobotsTab();
+            if(hash === 'chat') { window.updateReadReceipt(currentGroupId); const cb = document.getElementById('chatMessages'); if(cb) cb.scrollTop = cb.scrollHeight; }
+        }
+        window.addEventListener('hashchange', handleHashChange);
+
+        // دالة المراقبة الشاملة لقواعد البيانات (Firebase Listeners)
+        function startDatabaseListeners() {
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    currentUserData.notifications = data.notifications || [];
+                    window.renderNotifications(currentUserData.notifications);
+                }
+            });
+
+            onSnapshot(getColRef('users'), (snapshot) => {
+                globalUsers = []; snapshot.forEach(d => globalUsers.push({ uid: d.id, ...d.data(), id: d.id }));
+                window.renderEmployees();
+                const sel = document.getElementById('attendanceEmpSelect');
+                if(sel && sel.options.length <= 1) globalUsers.filter(u=>u.role!=='CEO').forEach(u => sel.innerHTML += `<option value="${u.uid}">${u.name}</option>`);
+            });
+
+            onSnapshot(getColRef('tasks'), (snapshot) => {
+                globalTasks = []; let pendingTasks = 0;
+                snapshot.forEach(doc => {
+                    const task = {id: doc.id, ...doc.data()}; globalTasks.push(task);
+                    if(task.assigneeId === currentUserData.uid && task.status === 'pending') pendingTasks++;
+                });
+                document.querySelectorAll('.external-task-badge').forEach(b => { b.innerText = pendingTasks; b.classList.toggle('hidden', pendingTasks === 0); });
+                window.renderTasks();
+            });
+
+            onSnapshot(getColRef('attendance'), (snapshot) => {
+                globalAttendance = []; snapshot.forEach(d => globalAttendance.push({ id: d.id, ...d.data() }));
+                const today = window.getTodayDateString();
+                const myRecord = globalAttendance.find(a => a.uid === currentUserData.uid && a.date === today);
+                if (!myRecord || myRecord.status === 'completed') { hasPunchedInToday = false; lockNavigationIfNeeded(); } 
+                else { hasPunchedInToday = true; unlockNavigation(); }
+                if(!document.getElementById('attendance').classList.contains('hidden')) window.renderEmpAttendanceView();
+            });
+
+            onSnapshot(getColRef('chat'), (cSnap) => {
+                globalChat = []; let unread = 0;
+                cSnap.forEach(doc => {
+                    const msg = {id: doc.id, ...doc.data()}; globalChat.push(msg);
+                    const grpId = msg.groupId || 'global';
+                    if (msg.uid !== currentUserData.uid && msg.timestamp > (groupReadTimestamps[grpId] || 0) && globalGroups.some(g => g.id === grpId)) unread++;
+                });
+                globalChat.sort((a,b)=> a.timestamp - b.timestamp);
+                document.querySelectorAll('.external-chat-badge').forEach(b => { b.innerText = unread > 99 ? '+99' : unread; b.classList.toggle('hidden', unread === 0); });
+                window.renderChatSidebarList(); window.renderChat();
+            });
+
+            onSnapshot(getColRef('groups'), (gSnap) => {
+                globalGroups = [{ id: 'global', name: 'الدردشة العامة', members: [] }];
+                gSnap.forEach(d => { if(currentUserData.role==='CEO' || (d.data().members && d.data().members.includes(currentUserData.uid))) globalGroups.push({id: d.id, ...d.data()}); });
+                window.renderChatSidebarList();
+            });
+
+            onSnapshot(getColRef('leaves'), (snap) => { globalLeaves = []; snap.forEach(d => globalLeaves.push({id: d.id, ...d.data()})); globalLeaves.sort((a,b)=> b.timestamp - a.timestamp); window.renderLeaves(); });
+            onSnapshot(getStorageColRef('folders'), (snap) => { globalFolders = []; snap.forEach(d => globalFolders.push({id: d.id, ...d.data()})); window.renderDriveFiles(); });
+            onSnapshot(getStorageColRef('files'), (snap) => { globalFiles = []; snap.forEach(d => globalFiles.push({id: d.id, ...d.data()})); globalFiles.sort((a,b)=> b.timestamp - a.timestamp); window.updateStorageProgress(); window.renderDriveFiles(); });
+            onSnapshot(getColRef('meetings'), (snap) => { globalMeetings = []; snap.forEach(d => globalMeetings.push({id: d.id, ...d.data()})); globalMeetings.sort((a,b)=> b.timestamp - a.timestamp); window.renderMeetings(); });
+            onSnapshot(getColRef('trainees'), (snap) => { globalTrainees = []; snap.forEach(d => globalTrainees.push({id: d.id, ...d.data()})); globalTrainees.sort((a,b)=> b.timestamp - a.timestamp); window.renderTrainees(); });
+            onSnapshot(getColRef('inventory'), (snap) => { globalInventory = []; snap.forEach(d => globalInventory.push({id: d.id, ...d.data()})); globalInventory.sort((a,b)=> b.timestamp - a.timestamp); window.renderInventory('office'); window.renderInventory('warehouse'); });
+            onSnapshot(getColRef('robots'), (snap) => { globalRobots = []; snap.forEach(d => globalRobots.push({id: d.id, ...d.data()})); globalRobots.sort((a,b)=> b.timestamp - a.timestamp); window.renderCurrentRobotsTab(); });
+            onSnapshot(getColRef('robot_clients'), (snap) => { globalClients = []; snap.forEach(d => globalClients.push({id: d.id, ...d.data()})); globalClients.sort((a,b)=> b.timestamp - a.timestamp); window.renderCurrentRobotsTab(); });
+            onSnapshot(getColRef('rentals'), (snap) => { globalRentals = []; snap.forEach(d => globalRentals.push({id: d.id, ...d.data()})); globalRentals.sort((a,b)=> b.timestamp - a.timestamp); window.renderCurrentRobotsTab(); });
+            onSnapshot(getColRef('notices'), (snap) => { globalNotices = []; snap.forEach(d => globalNotices.push({id: d.id, ...d.data()})); globalNotices.sort((a,b)=> b.timestamp - a.timestamp); window.renderNotices(); });
+            onSnapshot(getColRef('crm'), (snap) => { globalCRM = []; snap.forEach(d => globalCRM.push({id: d.id, ...d.data()})); globalCRM.sort((a,b)=> b.timestamp - a.timestamp); window.renderCRM(); });
+            
+            if(currentUserData.role === 'CEO' || currentUserData.role === 'accountant') {
+                onSnapshot(getColRef('expenses'), (snap) => { globalExpenses = []; snap.forEach(d => globalExpenses.push({id: d.id, ...d.data()})); globalExpenses.sort((a,b)=> b.timestamp - a.timestamp); window.renderExpenses(); });
+            }
+            if(currentUserData.role === 'CEO' || currentUserData.permissions?.canViewLogs) {
+                onSnapshot(query(getColRef('logs'), orderBy('timestamp', 'desc'), limit(100)), (snap) => { globalLogs = []; snap.forEach(d => globalLogs.push({id: d.id, ...d.data()})); window.renderLogs(); });
+            }
+        }
+
+        // ================= الأقفال والصلاحيات =================
+        function lockNavigationIfNeeded() {
+            document.getElementById('mainNavigationMenu').classList.add('hidden');
+            document.getElementById('sidebarLockMessage').classList.remove('hidden');
+            document.getElementById('homeGridContainer').classList.add('hidden');
+            if(document.getElementById('homePunchOutContainer')) document.getElementById('homePunchOutContainer').classList.add('hidden');
+            document.getElementById('attendanceLockBanner').classList.remove('hidden');
+        }
+
+        function unlockNavigation() {
+            document.getElementById('mainNavigationMenu').classList.remove('hidden');
+            document.getElementById('sidebarLockMessage').classList.add('hidden');
+            document.getElementById('homeGridContainer').classList.remove('hidden');
+            document.getElementById('attendanceLockBanner').classList.add('hidden');
+            if(document.getElementById('homePunchOutContainer') && currentUserData.role !== 'CEO') document.getElementById('homePunchOutContainer').classList.remove('hidden');
+        }
+
+        // ================= دوال وتطبيقات النظام (مختصرة ومدمجة) =================
+        // الإشعارات
+        window.renderNotifications = (notifsArray) => {
+            const list = document.getElementById('notifDropdownList');
+            if(!list) return; list.innerHTML = '';
+            if(!notifsArray.length) { list.innerHTML = '<p class="text-center text-gray-500 py-8 text-sm">لا توجد إشعارات حالياً.</p>'; return; }
+            notifsArray.forEach(n => {
+                const timeStr = new Date(n.timestamp).toLocaleString('ar-EG', {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'});
+                const isRead = n.read ? 'opacity-60 bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-800 border-r-4 border-primary';
+                list.innerHTML += `<div class="p-3 rounded-lg border dark:border-gray-700 transition cursor-pointer hover:shadow-md mb-2 ${isRead}" onclick="window.location.hash='${n.link||'home-grid'}'; window.toggleNotifDropdown();"><h4 class="font-bold text-sm text-primary">${n.title}</h4><p class="text-xs text-gray-600 dark:text-gray-400">${n.body}</p><span class="text-[10px] text-gray-400">${timeStr}</span></div>`;
+            });
+            const unreadCount = notifsArray.filter(n => !n.read).length;
+            const badges = [document.getElementById('headerNotifBadge'), document.getElementById('navNotifBadgeNum'), document.getElementById('mobileMenuBadge')];
+            badges.forEach(b => { if(b) { b.classList.toggle('hidden', unreadCount === 0); b.innerText = unreadCount > 99 ? '+99' : unreadCount; }});
+        };
+        window.deleteAllNotifs = async () => { if(currentUserData) { await updateDoc(doc(db, 'users', currentUserData.uid), {notifications: []}); window.renderNotifications([]); window.toggleNotifDropdown(); }};
+
+        // المهام Tasks
+        window.renderTasks = () => {
+            const list = document.getElementById('tasksListBody'); if(!list) return; list.innerHTML = '';
+            const tasksToRender = currentUserData.role === 'CEO' ? globalTasks : globalTasks.filter(t => t.assigneeId === currentUserData.uid || t.createdBy === currentUserData.uid);
+            tasksToRender.sort((a,b) => b.timestamp - a.timestamp).forEach(t => {
+                const isCompleted = t.status === 'completed';
+                const date = t.deadline ? new Date(t.deadline).toLocaleString('ar-EG', {month:'short', day:'numeric'}) : '-';
+                list.innerHTML += `
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 ${isCompleted?'opacity-60':''}">
+                        <td class="p-3 text-center"><input type="checkbox" class="custom-checkbox" ${isCompleted?'checked':''} onchange="window.updateTaskStatus('${t.id}','${t.title}',this.checked)"></td>
+                        <td class="p-3 font-bold ${isCompleted?'line-through':''} cursor-pointer" onclick="document.getElementById('tdet-${t.id}').classList.toggle('hidden')">${t.title} ${t.isHighPriority?'<i class="fa-solid fa-fire text-orange-500"></i>':''}</td>
+                        <td class="p-3 text-xs"><span class="w-2.5 h-2.5 rounded-full inline-block ${t.status==='in-progress'?'bg-blue-500':(isCompleted?'bg-green-500':'bg-gray-300')}"></span></td>
+                        <td class="p-3 text-xs font-bold text-yellow-600">${date}</td>
+                        <td class="p-3 text-xs">${t.creatorName || 'المدير'}</td>
+                        <td class="p-3 text-xs font-bold text-primary">${t.assigneeName}</td>
+                        <td class="p-3 text-xs"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded">${t.project || 'عام'}</span></td>
+                        <td class="p-3 text-center">${currentUserData.role==='CEO'?`<button onclick="window.deleteTask('${t.id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button>`:''}</td>
+                    </tr>
+                    <tr id="tdet-${t.id}" class="hidden bg-gray-50/50"><td colspan="8" class="p-4 text-sm text-gray-600 whitespace-pre-wrap">${t.desc || 'لا يوجد وصف'}<br>${t.attachmentData ? `<a href="${t.attachmentData}" download class="text-blue-500 font-bold mt-2 inline-block"><i class="fa-solid fa-paperclip"></i> تحميل المرفق</a>`:''}</td></tr>
+                `;
+            });
+            document.getElementById('totalTasksCountList').innerText = tasksToRender.length;
+        };
+
+        window.updateTaskStatus = (id, title, checked) => {
+            if(checked) {
+                document.getElementById('reportTaskId').value = id;
+                document.getElementById('reportTaskTitle').value = title;
+                window.openModal('taskReportModal');
+            } else { updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), { status: 'in-progress' }); }
+        };
+
+        // الشات Chat
+        window.renderChatSidebarList = () => {
+            const list = document.getElementById('innerChatSidebarList'); if(!list) return; list.innerHTML = '';
+            globalGroups.forEach(g => {
+                const isActive = g.id === currentGroupId;
+                const unread = globalChat.filter(m => (m.groupId||'global') === g.id && m.uid !== currentUserData.uid && m.timestamp > (groupReadTimestamps[g.id]||0)).length;
+                list.innerHTML += `<button onclick="window.selectGroup('${g.id}')" class="w-full text-right p-2 rounded-lg text-sm mb-1 ${isActive?'bg-white dark:bg-gray-700 font-bold shadow-sm':'hover:bg-gray-100'} flex justify-between items-center"><span class="truncate"><i class="fa-solid ${g.id==='global'?'fa-globe':'fa-users'} text-gray-400 mx-2"></i>${g.name}</span>${unread>0?`<span class="bg-blue-500 text-white text-[10px] px-1.5 rounded-full">${unread}</span>`:''}</button>`;
+            });
+        };
+        
+        window.selectGroup = (id) => { currentGroupId = id; window.updateReadReceipt(id); window.renderChatSidebarList(); window.renderChat(); };
+        window.updateReadReceipt = (id) => { if(currentUserData) { groupReadTimestamps[id] = Date.now()+500; updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), {readReceipts: groupReadTimestamps}); }};
+
+        window.renderChat = () => {
+            const box = document.getElementById('chatMessages'); if(!box) return; box.innerHTML = '';
+            const msgs = globalChat.filter(m => (m.groupId||'global') === currentGroupId).slice(-100);
+            msgs.forEach(m => {
+                const isMe = m.uid === currentUserData.uid;
+                const time = new Date(m.timestamp).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+                const bg = m.color || (isMe ? 'bg-[#00839b] text-white' : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200');
+                const align = isMe ? 'justify-end flex-row-reverse' : 'justify-start';
+                const radius = isMe ? 'rounded-tr-none' : 'rounded-tl-none';
+                let att = '';
+                if(m.fileData) att = m.fileType?.includes('image') ? `<img src="${m.fileData}" class="max-h-40 rounded mt-1">` : `<a href="${m.fileData}" download class="text-blue-300 underline text-xs"><i class="fa-solid fa-download"></i> ملف مرفق</a>`;
+                box.innerHTML += `<div class="flex ${align} mb-4"><div class="flex flex-col ${isMe?'items-end':'items-start'} max-w-[75%]"><span class="text-[10px] text-gray-500 mb-1 mx-1">${m.senderName}</span><div class="${bg} p-3 rounded-xl ${radius} shadow-sm"><p class="text-sm whitespace-pre-wrap break-words">${m.text}</p>${att}<div class="text-[9px] opacity-70 mt-1 text-left" dir="ltr">${time}</div></div></div></div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        };
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput'); const text = input.value.trim();
+            if(!text && !pendingChatFileData) return;
+            input.value = '';
+            await addDoc(getColRef('chat'), { text, uid: currentUserData.uid, senderName: currentUserData.name, photoURL: currentUserData.photoURL, groupId: currentGroupId, color: selectedChatColor, fileData: pendingChatFileData, fileType: pendingChatFileType, timestamp: Date.now() });
+            pendingChatFileData = null; document.getElementById('chatAttachmentPreview').classList.add('hidden');
+        });
+
+        // دوال التصدير (Export)
+        window.exportSystemData = (format) => {
+            if(currentUserData.role !== 'CEO') return;
+            const content = "\uFEFF" + "سجل النظام الشامل\n" + globalUsers.map(u => `الموظف: ${u.name} - ${u.role}`).join('\n') + "\n(التصدير المصغر - للتصدير الكامل يتطلب مكتبة مخصصة)";
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Quill_Export_${Date.now()}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            window.closeModal('exportModal'); window.showToast('تم التحميل', 'success');
+        };
+
+        // تهيئة التفاعل مع المرفقات والألوان
+        window.setChatColor = (c, btn) => { selectedChatColor = c; document.getElementById('chatColorPicker').classList.add('hidden'); };
+        window.toggleChatColorPicker = () => document.getElementById('chatColorPicker').classList.toggle('hidden');
+        window.handleChatAttachment = (e) => {
+            const f = e.target.files[0]; if(!f) return;
+            const reader = new FileReader(); reader.onload = ev => { pendingChatFileData = ev.target.result; pendingChatFileType = f.type; document.getElementById('chatAttachmentPreview').classList.remove('hidden'); document.getElementById('attachmentFileName').innerText = f.name; };
+            reader.readAsDataURL(f);
+        };
+        window.clearChatAttachment = () => { pendingChatFileData = null; document.getElementById('chatFileInput').value = ''; document.getElementById('chatAttachmentPreview').classList.add('hidden'); };
+
+    </script>
 </body>
 </html>
