@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الشركة - الرئيسية</title>
+    <title>Quill system</title>
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json" id="dynamic-manifest">
     <meta name="theme-color" content="#002d74">
     
     <!-- الأيقونات الديناميكية (سيتم تغييرها بالجافاسكربت حسب الثيم) -->
@@ -489,7 +489,6 @@
                 </div>
             </section>
 
-            <!-- قسم ملفي والعهد المحدث -->
             <section id="my-profile" class="section-content animate-fade-in hidden p-4 md:p-0 max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold">ملفي الشخصي والعهد</p>
@@ -508,16 +507,14 @@
                         <h4 class="font-bold text-primary dark:text-blue-400 mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-boxes-stacked text-xl"></i> العهد والأصول المستلمة:
                         </h4>
-                        <!-- تحسين عرض العهد هنا -->
                         <div id="myProfileAssets" class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600 min-h-[100px]">
-                            <!-- سيتم حقن العهد هنا بواسطة الجافاسكربت بتصميم جميل -->
+                            <!-- سيتم حقن العهد هنا بواسطة الجافاسكربت -->
                         </div>
                         <p class="text-[10px] text-gray-500 mt-3"><i class="fa-solid fa-circle-info"></i> هذه التفاصيل خاصة بك، ولا يمكن تعديلها إلا من قبل المدير للإقرار باستلامها.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- قسم الحضور والانصراف -->
             <section id="attendance" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="سجل الحضور والانصراف">سجل الحضور والانصراف اليومي وتحديد الموقع</p>
@@ -549,12 +546,12 @@
                         <div class="flex items-center gap-2 w-full md:w-auto">
                             <label class="font-bold text-gray-700 dark:text-gray-300">الموظف:</label>
                             <select id="attendanceEmpSelect" onchange="window.renderSelectedEmpAttendance()" class="flex-1 md:w-64 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-2 focus:outline-none focus:border-secondary">
-                                <option value="">-- اختر موظف --</option>
+                                <option value="all">-- عرض جميع الموظفين --</option>
                             </select>
                         </div>
                         <div class="relative w-full md:w-auto">
                             <i class="fa-solid fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" id="searchAttendance" oninput="window.renderSelectedEmpAttendance()" placeholder="بحث بالتاريخ..." class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2 text-sm w-full focus:outline-none focus:border-blue-500 shadow-sm">
+                            <input type="text" id="searchAttendance" oninput="window.renderSelectedEmpAttendance()" placeholder="بحث بالاسم أو التاريخ..." class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg pl-3 pr-10 py-2 text-sm w-full focus:outline-none focus:border-blue-500 shadow-sm">
                         </div>
                     </div>
                     
@@ -562,6 +559,7 @@
                         <table class="w-full text-right min-w-[700px]">
                             <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
                                 <tr>
+                                    <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">الموظف</th>
                                     <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">التاريخ</th>
                                     <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">وقت وموقع الدخول</th>
                                     <th class="p-3 font-semibold text-gray-600 dark:text-gray-200">فترات الخروج المؤقت</th>
@@ -569,7 +567,7 @@
                                 </tr>
                             </thead>
                             <tbody id="attendanceRecordsList" class="divide-y divide-gray-100 dark:divide-gray-700">
-                                <tr><td colspan="4" class="p-4 text-center text-gray-500">اختر موظفاً لعرض السجل</td></tr>
+                                <tr><td colspan="5" class="p-4 text-center text-gray-500">لا توجد سجلات لعرضها</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -622,7 +620,6 @@
                 </div>
             </section>
 
-            <!-- قسم العملاء CRM المحدث -->
             <section id="crm" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-4">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="قاعدة بيانات العملاء">قاعدة بيانات العملاء (CRM)</p>
@@ -637,11 +634,9 @@
                     </div>
                 </div>
                 <div id="crmList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- العملاء سيظهرون هنا -->
                 </div>
             </section>
 
-            <!-- قسم المهام المحدث -->
             <section id="tasks" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                     <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-primary rounded-t-lg text-white">
@@ -852,7 +847,6 @@
                         </div>
                     </div>
 
-                    <!-- قسم نقل الإدارة للمدير فقط -->
                     <div id="transferCEOSection" class="hidden mt-8 pt-6 border-t border-red-200 dark:border-red-900/30">
                         <h3 class="font-bold text-red-600 mb-4"><i class="fa-solid fa-triangle-exclamation mx-2"></i>نقل الإدارة (التنازل عن منصب المدير)</h3>
                         <div class="bg-red-50 dark:bg-red-900/10 p-4 rounded-lg border border-red-100 dark:border-red-900/30">
@@ -878,7 +872,6 @@
                 </div>
             </section>
 
-            <!-- سجل النظام المحدث مع البحث -->
             <section id="logs" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="تسجيل حي ومباشر">تسجيل حي ومباشر لكل الحركات في النظام (خاص بالمدير)</p>
@@ -910,6 +903,30 @@
         </div>
     </div>
 
+    <!-- نافذة اختيار الشعار قبل التثبيت (جديد) -->
+    <div id="installIconModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[80] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden text-center">
+            <div class="bg-primary text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base">تثبيت التطبيق - اختر الشعار</h3>
+                <button onclick="window.closeModal('installIconModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-6 font-bold">الرجاء اختيار الشعار الذي تود أن يظهر على شاشة هاتفك/حاسوبك بعد التثبيت:</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="window.triggerAppInstall('light')" class="flex-1 border-2 border-gray-200 hover:border-secondary p-4 rounded-xl transition flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-700">
+                        <img src="https://uploads.onecompiler.io/43n8uttmw/44k6d22hf/Screenshot_2025-06-20_213937-removebg-preview.png" class="w-16 h-16 object-contain mb-3 bg-white p-1 rounded-lg shadow-sm">
+                        <span class="text-xs font-bold text-gray-700 dark:text-gray-200">النمط الفاتح</span>
+                    </button>
+                    <button onclick="window.triggerAppInstall('dark')" class="flex-1 border-2 border-gray-200 hover:border-secondary p-4 rounded-xl transition flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-900">
+                        <img src="https://uploads.onecompiler.io/43n8uttmw/44kht2pts/New-Project-10-1.png" class="w-16 h-16 object-contain mb-3 bg-gray-800 p-1 rounded-lg shadow-sm">
+                        <span class="text-xs font-bold text-gray-800 dark:text-gray-200">النمط الداكن</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة مهمة -->
     <div id="taskModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50 p-4 transition-opacity">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-xl overflow-hidden flex flex-col animate-fade-in">
             <div class="flex justify-between items-center p-3 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -924,11 +941,8 @@
             
             <form id="addTaskForm" class="flex flex-col h-full max-h-[80vh]">
                 <div class="p-4 flex-1 overflow-y-auto space-y-4 hide-scrollbar">
-                    
                     <input type="hidden" id="isTaskHighPriority" value="false">
-
                     <input type="text" id="taskTitle" required placeholder="اسم المهمة..." class="w-full text-lg md:text-xl font-bold text-gray-800 dark:text-white bg-transparent border-none outline-none placeholder-gray-400">
-                    
                     <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
                         <p class="text-xs text-gray-400 mb-1">الوصف</p>
                         <textarea id="taskDesc" rows="2" placeholder="أضف تفاصيل المهمة هنا..." class="w-full text-sm text-gray-700 dark:text-gray-300 bg-transparent border-none outline-none resize-none"></textarea>
@@ -942,7 +956,6 @@
                                 <select id="taskAssignee" required class="w-full bg-transparent text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer"></select>
                             </div>
                         </div>
-                        
                         <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50">
                             <div class="w-6 text-center text-blue-500"><i class="fa-solid fa-calendar-day"></i></div>
                             <div class="flex-1">
@@ -950,8 +963,6 @@
                                 <input type="datetime-local" id="taskDeadline" class="w-full bg-transparent text-sm font-semibold text-gray-700 dark:text-gray-200 outline-none cursor-pointer" style="color-scheme: light dark;">
                             </div>
                         </div>
-                        
-                        <!-- تعديل حقل المشروع هنا -->
                         <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50 dark:bg-gray-700/50 md:col-span-2">
                             <div class="w-6 text-center text-gray-400"><i class="fa-solid fa-folder"></i></div>
                             <div class="flex-1">
@@ -982,17 +993,13 @@
                             </div>
                             <button type="button" onclick="window.toggleChecklistSection()" class="text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
                         </div>
-                        
                         <div class="flex items-center gap-3 mb-4">
                             <span class="text-xs text-gray-500" id="checklistProgressText">المكتمل: 0 من 0</span>
                             <div class="flex-1 bg-gray-200 rounded-full h-1.5 overflow-hidden">
                                 <div id="checklistProgressBar" class="bg-gray-300 h-1.5 rounded-full" style="width: 0%"></div>
                             </div>
                         </div>
-
-                        <div id="checklistItemsContainer" class="space-y-2 mb-3">
-                        </div>
-
+                        <div id="checklistItemsContainer" class="space-y-2 mb-3"></div>
                         <div class="flex items-center gap-2 border-t border-gray-100 dark:border-gray-700 pt-3">
                             <i class="fa-solid fa-plus text-gray-400 text-xs"></i>
                             <input type="text" id="newChecklistItemInput" placeholder="إضافة عنصر" class="flex-1 bg-transparent text-sm outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400" onkeypress="window.handleChecklistEnter(event)">
@@ -1000,7 +1007,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
                     <button type="button" onclick="window.closeModal('taskModal')" class="text-sm font-bold text-gray-500 hover:text-gray-800 transition">إلغاء</button>
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-6 py-2 rounded-lg shadow-md transition">إنشاء</button>
@@ -1009,15 +1015,14 @@
         </div>
     </div>
 
-
+    <!-- نوافذ الإعدادات والمهام المتبقية كما هي (لم يتم تغيير محتواها الأساسي) -->
     <div id="msgReadDetailsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh]">
             <div class="bg-primary text-white p-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-sm md:text-base">تفاصيل قراءة الرسالة</h3>
                 <button onclick="window.closeModal('msgReadDetailsModal')" class="hover:text-gray-300 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList">
-            </div>
+            <div class="p-4 overflow-y-auto flex-1" id="msgReadersList"></div>
         </div>
     </div>
 
@@ -1108,7 +1113,6 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة عميل -->
     <div id="clientModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-lime-600 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1182,7 +1186,6 @@
                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">من يمكنه رؤية هذا العميل؟</label>
                         <p class="text-[10px] text-gray-500 mb-2">ملاحظة: المدير والموظف الذي أضاف العميل يريان هذا السجل تلقائياً ولن يظهرا في القائمة.</p>
                         <div id="clientVisibilitySelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-32 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700">
-                            <!-- سيتم تعبئتها بواسطة الجافاسكربت -->
                         </div>
                     </div>
 
@@ -1195,7 +1198,6 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة ملاحظة للعميل -->
     <div id="noteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-gray-700 text-white p-4 flex justify-between items-center">
@@ -1219,7 +1221,6 @@
         </div>
     </div>
     
-    <!-- نافذة تعديل ملاحظة العميل -->
     <div id="editNoteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
@@ -1486,7 +1487,6 @@
             }
         }
 
-        // تحديث الأيقونات الديناميكية
         window.updateFavicon = () => {
             const isDark = document.documentElement.classList.contains('dark');
             const iconUrl = isDark
@@ -1508,7 +1508,7 @@
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('appTheme', isDark ? 'dark' : 'light');
             document.getElementById('themeToggleIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-            window.updateFavicon(); // تغيير الأيقونة مع تغيير الثيم
+            window.updateFavicon(); 
         };
 
         if (localStorage.getItem('appTheme') === 'dark') {
@@ -1520,8 +1520,72 @@
         }
         document.addEventListener("DOMContentLoaded", () => {
             applyLanguageToDOM();
-            window.updateFavicon(); // تفعيل الأيقونة عند بدء التحميل
+            window.updateFavicon();
         });
+
+        // --- PWA Custom Install Logic ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('installAppBtn');
+            if(installBtn) {
+                installBtn.classList.remove('hidden');
+                installBtn.onclick = () => window.openModal('installIconModal');
+            }
+        });
+
+        window.triggerAppInstall = async (theme) => {
+            if (!deferredPrompt) return;
+
+            const iconUrl = theme === 'dark'
+                ? "https://uploads.onecompiler.io/43n8uttmw/44kht2pts/New-Project-10-1.png"
+                : "https://uploads.onecompiler.io/43n8uttmw/44k6d22hf/Screenshot_2025-06-20_213937-removebg-preview.png";
+
+            const manifest = {
+                name: "نظام شركة Quill",
+                short_name: "Quill",
+                start_url: ".",
+                display: "standalone",
+                background_color: theme === 'dark' ? "#1f2937" : "#ffffff",
+                theme_color: "#002d74",
+                icons: [{
+                    src: iconUrl,
+                    sizes: "192x192",
+                    type: "image/png"
+                }, {
+                    src: iconUrl,
+                    sizes: "512x512",
+                    type: "image/png"
+                }]
+            };
+
+            const stringManifest = JSON.stringify(manifest);
+            const blob = new Blob([stringManifest], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(blob);
+            
+            const manifestLink = document.getElementById('dynamic-manifest');
+            if(manifestLink) manifestLink.setAttribute('href', manifestURL);
+
+            window.closeModal('installIconModal');
+
+            // إعطاء المتصفح لحظة بسيطة لقراءة ملف ال manifest الجديد قبل عرض المطالبة
+            setTimeout(async () => {
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    const installBtn = document.getElementById('installAppBtn');
+                    if(installBtn) installBtn.classList.add('hidden');
+                } catch(e) {
+                    console.log("Error displaying install prompt", e);
+                }
+            }, 300);
+        };
+        // --------------------------------
 
         let currentUserAuth = null;
         let currentUserData = null; 
@@ -1992,14 +2056,17 @@
             const list = document.getElementById('attendanceRecordsList');
             list.innerHTML = '';
             
-            if(!empId) { list.innerHTML = '<tr><td colspan="4" class="p-4 text-center">اختر موظفاً</td></tr>'; return; }
-
-            const empRecords = globalAttendance.filter(a => 
-                a.uid === empId && 
-                a.date.toLowerCase().includes(searchTerm) 
-            ).sort((a, b) => b.date.localeCompare(a.date));
+            let empRecords = globalAttendance;
             
-            if(empRecords.length === 0) { list.innerHTML = '<tr><td colspan="4" class="p-4 text-center">لا توجد نتائج</td></tr>'; return; }
+            if(empId && empId !== 'all') {
+                empRecords = empRecords.filter(a => a.uid === empId);
+            }
+
+            empRecords = empRecords.filter(a => 
+                a.date.toLowerCase().includes(searchTerm) || (a.name && a.name.toLowerCase().includes(searchTerm))
+            ).sort((a, b) => b.date.localeCompare(a.date) || b.punchIn - a.punchIn);
+            
+            if(empRecords.length === 0) { list.innerHTML = '<tr><td colspan="5" class="p-4 text-center">لا توجد نتائج</td></tr>'; return; }
 
             empRecords.forEach(r => {
                 let pIn = r.punchIn ? new Date(r.punchIn).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) : '-';
@@ -2030,8 +2097,9 @@
                 }
 
                 list.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
-                        <td class="p-3 text-sm font-bold">${r.date}</td>
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b dark:border-gray-700">
+                        <td class="p-3 text-sm font-bold text-primary dark:text-secondary">${r.name || 'غير محدد'}</td>
+                        <td class="p-3 text-sm font-bold text-gray-600 dark:text-gray-300">${r.date}</td>
                         <td class="p-3 text-sm text-green-600 dark:text-green-400 font-bold leading-tight">${pIn}</td>
                         <td class="p-3">${breaksHtml}</td>
                         <td class="p-3 text-sm text-red-600 dark:text-red-400 font-bold leading-tight">${pOut}</td>
@@ -2945,7 +3013,7 @@
                 const chatBox = document.getElementById('chatMessages');
                 if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
                 
-                document.querySelectorAll('.external-chat-badge').forEach(b => b.classList.add('hidden'));
+                document.querySelectorAll('.external-chat-badges').forEach(b => b.classList.add('hidden'));
                 const homeBadge = document.getElementById('homeChatBadge');
                 if(homeBadge) homeBadge.classList.add('hidden');
                 const mobileBadge = document.getElementById('globalChatBadgeMobile');
@@ -4666,7 +4734,6 @@
                         currentUserData = docSnap.data();
                         groupReadTimestamps = currentUserData.readReceipts || {};
                         
-                        // تم إصلاح الخطأ هنا
                         if(!currentUserData.notificationPreferences) currentUserData.notificationPreferences = { email: true, push: true };
                         
                         if(currentUserData.lastSystemExport) {
@@ -4675,8 +4742,6 @@
                         }
                         
                         document.getElementById('setupProfileScreen').classList.add('hidden');
-                        
-                        // تم حذف الكود الذي يسبب الخلل من هنا 
                         
                         finishLoginSetup();
                     } else {
