@@ -4870,6 +4870,56 @@
                 lastActive: Date.now()
             }).catch(e => { console.error(e); });
         }
+
+        // --- الصق هذا الكود الجديد هنا ---
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var introPlayer;
+        window.onYouTubeIframeAPIReady = function() {
+            introPlayer = new YT.Player('youtubePlayer', {
+                height: '100%',
+                width: '100%',
+                videoId: 'ajOfVlSdzis',
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'rel': 0,
+                    'modestbranding': 1,
+                    'playsinline': 1,
+                    'mute': 1
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        };
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                skipIntro();
+            }
+        }
+
+        window.skipIntro = function() {
+            const introScreen = document.getElementById('introScreen');
+            if (introScreen) {
+                introScreen.style.opacity = '0';
+                setTimeout(() => {
+                    introScreen.classList.add('hidden');
+                    // إخفاء شاشة التحميل أيضاً إذا كانت لا تزال ظاهرة بعد التخطي
+                    const loadingScreen = document.getElementById('loadingScreen');
+                    if(loadingScreen && currentUserData) loadingScreen.classList.add('hidden');
+                }, 500);
+                if (introPlayer && typeof introPlayer.stopVideo === 'function') {
+                    introPlayer.stopVideo();
+                }
+            }
+        };
+        // --- نهاية الكود الجديد ---
+
     </script>
 </body>
 </html>
