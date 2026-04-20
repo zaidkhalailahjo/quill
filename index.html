@@ -1026,12 +1026,11 @@
         </div>
     </div>
 
-    <!-- نافذة تقرير المهمة (تم إزالة الإكس والإلغاء وإضافة زر التراجع) -->
+    <!-- نافذة تقرير المهمة -->
     <div id="taskReportModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
             <div class="bg-green-600 text-white p-4 flex justify-between items-center">
                 <h3 class="font-bold text-base md:text-lg">تأكيد إنجاز المهمة والتقرير</h3>
-                <!-- تمت إزالة زر الإغلاق لضمان إجبار الموظف على إتمام التقرير -->
             </div>
             <form id="taskReportForm" class="p-4 md:p-6 space-y-4">
                 <input type="hidden" id="reportTaskId">
@@ -1115,7 +1114,6 @@
         </div>
     </div>
 
-    <!-- نافذة إضافة عميل CRM مع تعديلات الصلاحية -->
     <div id="clientModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-lime-600 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1293,7 +1291,7 @@
         </div>
     </div>
 
-    <!-- نافذة تعديل بيانات وصلاحيات الموظف + تعديل لنقل المدير -->
+    <!-- نافذة تعديل بيانات وصلاحيات الموظف -->
     <div id="editEmployeeModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col">
             <div class="bg-blue-600 text-white p-4 flex justify-between items-center flex-shrink-0">
@@ -1313,7 +1311,6 @@
                             <option value="technical team supervisor">Technical Team Supervisor</option>
                             <option value="Technical Engineer">Technical Engineer</option>
                             <option value="accountant">Accountant</option>
-                            <!-- خيار CEO سيتم إضافته ديناميكياً عبر الجافاسكربت في حال كان المستخدم هو المدير -->
                         </select>
                     </div>
                     
@@ -1397,6 +1394,18 @@
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
+        // دالة الحماية القصوى لتنظيف المدخلات (مكافحة XSS)
+        window.escapeHTML = function(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, match => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            })[match]);
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyCfoP0rgX8WZthQVP_AeZcxDHHCllgu3TM",
             authDomain: "quill-world.firebaseapp.com",
@@ -1530,7 +1539,6 @@
             window.updateFavicon();
         });
 
-        // --- PWA Custom Install Logic ---
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -1668,7 +1676,7 @@
             const input = document.getElementById('newChecklistItemInput');
             const val = input.value.trim();
             if(val !== '') {
-                creationChecklists.push({ text: val, isCompleted: false });
+                creationChecklists.push({ text: window.escapeHTML(val), isCompleted: false });
                 input.value = '';
                 renderCreationChecklists();
             }
@@ -1711,7 +1719,7 @@
                         pendingTaskAttachmentType = file.type;
                         pendingTaskAttachmentName = file.name;
                         const display = document.getElementById('attachmentNameDisplay');
-                        display.innerHTML = `<i class="fa-solid fa-file-circle-check"></i> تم إرفاق: ${file.name} <button type="button" onclick="window.clearTaskAttachment()" class="text-red-500 float-left text-xs bg-white rounded-full p-1"><i class="fa-solid fa-xmark"></i></button>`;
+                        display.innerHTML = `<i class="fa-solid fa-file-circle-check"></i> تم إرفاق: ${window.escapeHTML(file.name)} <button type="button" onclick="window.clearTaskAttachment()" class="text-red-500 float-left text-xs bg-white rounded-full p-1"><i class="fa-solid fa-xmark"></i></button>`;
                         display.classList.remove('hidden');
                     };
                     reader.readAsDataURL(file);
@@ -1740,8 +1748,8 @@
             if(!currentUserData) return;
             const newNotif = {
                 id: Date.now().toString(),
-                title: title,
-                body: body,
+                title: window.escapeHTML(title),
+                body: window.escapeHTML(body),
                 link: link || 'home-grid',
                 timestamp: Date.now()
             };
@@ -2079,7 +2087,7 @@
                     if(r.punchInLoc.type === 'auto') {
                         pIn += ` <a href="https://maps.google.com/?q=${r.punchInLoc.lat},${r.punchInLoc.lng}" target="_blank" class="text-blue-500 hover:text-blue-700" title="الموقع التلقائي">📍</a>`;
                     } else {
-                        pIn += ` <span class="text-[10px] text-gray-500 block">${r.punchInLoc.text}</span>`;
+                        pIn += ` <span class="text-[10px] text-gray-500 block">${window.escapeHTML(r.punchInLoc.text)}</span>`;
                     }
                 }
 
@@ -2088,7 +2096,7 @@
                     if(r.punchOutLoc.type === 'auto') {
                         pOut += ` <a href="https://maps.google.com/?q=${r.punchOutLoc.lat},${r.punchOutLoc.lng}" target="_blank" class="text-red-500 hover:text-red-700" title="الموقع التلقائي">📍</a>`;
                     } else {
-                        pOut += ` <span class="text-[10px] text-gray-500 block">${r.punchOutLoc.text}</span>`;
+                        pOut += ` <span class="text-[10px] text-gray-500 block">${window.escapeHTML(r.punchOutLoc.text)}</span>`;
                     }
                 }
                 
@@ -2103,7 +2111,7 @@
 
                 list.innerHTML += `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-800 border-b dark:border-gray-700">
-                        <td class="p-3 text-sm font-bold text-primary dark:text-secondary">${r.name || 'غير محدد'}</td>
+                        <td class="p-3 text-sm font-bold text-primary dark:text-secondary">${window.escapeHTML(r.name || 'غير محدد')}</td>
                         <td class="p-3 text-sm font-bold text-gray-600 dark:text-gray-300">${r.date}</td>
                         <td class="p-3 text-sm text-green-600 dark:text-green-400 font-bold leading-tight">${pIn}</td>
                         <td class="p-3">${breaksHtml}</td>
@@ -2379,7 +2387,7 @@
                 const u = globalUsers.find(user => user.uid === uid);
                 if(u && u.readReceipts && u.readReceipts[groupId] >= msg.timestamp) {
                     readCount++;
-                    html += `<li class="flex items-center gap-3 text-sm text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-gray-700 p-2 rounded-lg border border-green-100 dark:border-green-900"><img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover"> ${u.name} <i class="fa-solid fa-check-double text-sm mr-auto"></i></li>`;
+                    html += `<li class="flex items-center gap-3 text-sm text-green-600 dark:text-green-400 font-bold bg-green-50 dark:bg-gray-700 p-2 rounded-lg border border-green-100 dark:border-green-900"><img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover"> ${window.escapeHTML(u.name)} <i class="fa-solid fa-check-double text-sm mr-auto"></i></li>`;
                 }
             });
             
@@ -2426,7 +2434,7 @@
             reader.onload = (ev) => {
                 pendingChatFileData = ev.target.result;
                 pendingChatFileType = file.type || 'unknown';
-                document.getElementById('attachmentFileName').innerText = file.name;
+                document.getElementById('attachmentFileName').innerText = window.escapeHTML(file.name);
                 document.getElementById('chatAttachmentPreview').classList.remove('hidden');
                 document.getElementById('chatInput').focus();
             };
@@ -2488,14 +2496,14 @@
                 if(isPoll) {
                     const inputs = document.querySelectorAll('.poll-option-input');
                     inputs.forEach(inp => {
-                        if(inp.value.trim() !== '') options.push(inp.value.trim());
+                        if(inp.value.trim() !== '') options.push(window.escapeHTML(inp.value.trim()));
                     });
                     if(options.length < 2) { showToast('يجب إضافة خيارين على الأقل للتصويت', 'warning'); return; }
                 }
 
                 try {
                     await addDoc(getColRef('notices'), {
-                        title: title,
+                        title: title, // سيتم عمل escape عند العرض
                         body: body,
                         type: finalType,
                         isPoll: isPoll,
@@ -2577,8 +2585,8 @@
                         
                         pollHtml += `
                             <div class="mb-2 relative">
-                                <button onclick="window.submitVote('${n.id}', '${opt}')" class="w-full text-right rtl:text-right ltr:text-left px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-colors font-bold text-sm z-10 relative ${btnClass}">
-                                    ${opt} ${myVote === opt ? '<i class="fa-solid fa-circle-check mx-2"></i>' : ''}
+                                <button onclick="window.submitVote('${n.id}', '${window.escapeHTML(opt)}')" class="w-full text-right rtl:text-right ltr:text-left px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg transition-colors font-bold text-sm z-10 relative ${btnClass}">
+                                    ${window.escapeHTML(opt)} ${myVote === opt ? '<i class="fa-solid fa-circle-check mx-2"></i>' : ''}
                                 </button>
                                 ${(isCEO || myVote) ? `<div class="absolute top-0 bottom-0 right-0 bg-yellow-400/20 dark:bg-yellow-500/20 rounded-lg pointer-events-none" style="width: ${percent}%"></div>` : ''}
                             </div>
@@ -2594,22 +2602,22 @@
                     pollHtml += `</div>`;
                 }
 
-                const badgeType = n.isPoll || n.type === 'poll' ? 'تصويت' : (n.type || 'تعميم إداري');
+                const badgeType = n.isPoll || n.type === 'poll' ? 'تصويت' : window.escapeHTML(n.type || 'تعميم إداري');
                 const badgeClass = n.isPoll || n.type === 'poll' ? 'bg-secondary' : 'bg-primary';
 
                 list.innerHTML += `
                     <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 ${n.isPoll || n.type==='poll'? 'border-secondary' : 'border-yellow-500'} dark:border-gray-700 relative">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-3">
-                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${n.title}</h3>
+                                <h3 class="font-bold text-lg text-gray-800 dark:text-gray-100">${window.escapeHTML(n.title)}</h3>
                                 <span class="${badgeClass} text-white px-2 py-0.5 rounded text-[10px] font-bold shadow-sm">${badgeType}</span>
                             </div>
                             ${delBtn}
                         </div>
-                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4 whitespace-pre-line leading-relaxed">${n.body}</p>
+                        <p class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4 whitespace-pre-line leading-relaxed">${window.escapeHTML(n.body)}</p>
                         ${pollHtml}
                         <div class="text-[10px] text-gray-400 flex items-center gap-4 mt-3">
-                            <span><i class="fa-solid fa-user-pen"></i> بواسطة: ${n.author}</span>
+                            <span><i class="fa-solid fa-user-pen"></i> بواسطة: ${window.escapeHTML(n.author)}</span>
                             <span><i class="fa-solid fa-calendar"></i> ${dateStr}</span>
                         </div>
                     </div>
@@ -2638,19 +2646,17 @@
             `;
 
             globalUsers.forEach(u => {
-                // إخفاء المدير والمستخدم الحالي لأنهما يريان العميل تلقائياً
                 if (u.role !== 'CEO' && u.uid !== currentUserData.uid) {
                     container.innerHTML += `
                         <label class="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer transition">
                             <input type="checkbox" value="${u.uid}" class="client-visibility-checkbox w-4 h-4 text-lime-600 rounded">
                             <img src="${u.photoURL}" class="w-5 h-5 rounded-full">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${u.name} <span class="text-[10px] text-gray-500">(${u.role})</span></span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${window.escapeHTML(u.name)} <span class="text-[10px] text-gray-500">(${window.escapeHTML(u.role)})</span></span>
                         </label>
                     `;
                 }
             });
 
-            // تفريغ الفورم في حال وجود داتا قديمة
             document.getElementById('clientForm')?.reset();
 
             setTimeout(() => {
@@ -2836,11 +2842,11 @@
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             
             const visibleClients = globalCRM.filter(c => {
-                if (isCEO) return true; // المدير يرى الجميع دائماً
-                if (c.addedById === currentUserData.uid) return true; // الموظف يرى من أضافه دائماً
-                if (c.visibleTo && c.visibleTo.includes('all')) return true; // الجميع
-                if (c.visibleTo && c.visibleTo.includes(currentUserData.uid)) return true; // مخصص للموظف
-                if (!c.visibleTo || c.visibleTo.length === 0) return true; // دعم النسخ السابقة إن لم يكن هناك مصفوفة
+                if (isCEO) return true; 
+                if (c.addedById === currentUserData.uid) return true; 
+                if (c.visibleTo && c.visibleTo.includes('all')) return true; 
+                if (c.visibleTo && c.visibleTo.includes(currentUserData.uid)) return true; 
+                if (!c.visibleTo || c.visibleTo.length === 0) return true; 
                 return false;
             });
 
@@ -2868,8 +2874,8 @@
                             notesHtml += `
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600 flex justify-between items-start">
                                     <div class="flex-1">
-                                        <p class="font-bold text-gray-700 dark:text-gray-300">${note.authorName}: ${note.editedAt ? '<span class="text-[9px] text-gray-400 font-normal">(معدلة)</span>' : ''}</p>
-                                        <p class="text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap leading-relaxed">${note.text}</p>
+                                        <p class="font-bold text-gray-700 dark:text-gray-300">${window.escapeHTML(note.authorName)}: ${note.editedAt ? '<span class="text-[9px] text-gray-400 font-normal">(معدلة)</span>' : ''}</p>
+                                        <p class="text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap leading-relaxed">${window.escapeHTML(note.text)}</p>
                                     </div>
                                     ${noteActionsHtml}
                                 </div>
@@ -2887,20 +2893,20 @@
                     contactIconsHtml = getContactIcon(c.contactMethod); 
                 }
 
-                const avatar = c.logoUrl ? `<img src="${c.logoUrl}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=00839b&color=fff'" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">${c.name.charAt(0)}</div>`;
+                const avatar = c.logoUrl ? `<img src="${window.escapeHTML(c.logoUrl)}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=00839b&color=fff'" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">${window.escapeHTML(c.name.charAt(0))}</div>`;
                 const followUpHtml = c.nextFollowUp ? `<p class="text-xs font-bold text-orange-500 mt-2"><i class="fa-regular fa-calendar-check"></i> المتابعة القادمة: ${new Date(c.nextFollowUp).toLocaleDateString('ar-EG')}</p>` : '';
 
                 const deleteClientBtn = (currentUserData.role === 'CEO' || currentUserData.permissions?.canCRM || c.addedById === currentUserData.uid) ?
                     `<button onclick="window.deleteClient('${c.id}')" class="text-red-400 hover:text-red-600 mr-2 p-1" title="حذف العميل"><i class="fa-solid fa-trash"></i></button>` : '';
 
                 list.innerHTML += `
-                    <div class="client-card-item bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full transition-shadow hover:shadow-md" data-name="${c.name}" data-phone="${c.phone || ''}">
+                    <div class="client-card-item bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col h-full transition-shadow hover:shadow-md" data-name="${window.escapeHTML(c.name)}" data-phone="${window.escapeHTML(c.phone || '')}">
                         <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 ${avatar}
                                 <div class="truncate">
-                                    <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${c.name}">${c.name} ${deleteClientBtn}</h3>
-                                    <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded font-bold">${c.category || 'عام'}</span>
+                                    <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${window.escapeHTML(c.name)}">${window.escapeHTML(c.name)} ${deleteClientBtn}</h3>
+                                    <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded font-bold">${window.escapeHTML(c.category || 'عام')}</span>
                                 </div>
                             </div>
                             <div class="flex flex-col items-end gap-2 flex-shrink-0 ml-2 flex-row md:flex-col lg:flex-row">
@@ -2918,13 +2924,13 @@
                         </select>
 
                         <div class="text-sm text-gray-600 dark:text-gray-300 space-y-2 flex-1 font-medium">
-                            <p><i class="fa-solid fa-phone text-gray-400 mx-1 w-4"></i> <span dir="ltr">${c.phone || 'غير مسجل'}</span></p>
-                            <p class="truncate" title="${c.email || ''}"><i class="fa-solid fa-envelope text-gray-400 mx-1 w-4"></i> ${c.email || 'غير مسجل'}</p>
+                            <p><i class="fa-solid fa-phone text-gray-400 mx-1 w-4"></i> <span dir="ltr">${window.escapeHTML(c.phone || 'غير مسجل')}</span></p>
+                            <p class="truncate" title="${window.escapeHTML(c.email || '')}"><i class="fa-solid fa-envelope text-gray-400 mx-1 w-4"></i> ${window.escapeHTML(c.email || 'غير مسجل')}</p>
                             ${followUpHtml}
                         </div>
 
                         <div class="mt-4 border-t dark:border-gray-700 pt-3">
-                            <h4 class="text-xs font-bold text-gray-500 mb-2 flex justify-between">الملاحظات: <span class="text-[9px] font-normal">بواسطة: ${c.addedBy}</span></h4>
+                            <h4 class="text-xs font-bold text-gray-500 mb-2 flex justify-between">الملاحظات: <span class="text-[9px] font-normal">بواسطة: ${window.escapeHTML(c.addedBy)}</span></h4>
                             <div class="max-h-32 overflow-y-auto mb-2 pr-1 custom-scrollbar">${notesHtml}</div>
                             <button onclick="window.openNoteModal('${c.id}')" class="w-full text-xs bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 text-gray-600 dark:text-gray-300 py-2 rounded-lg transition font-bold"><i class="fa-solid fa-plus mx-1"></i> إضافة ملاحظة / تذكير</button>
                         </div>
@@ -3187,8 +3193,8 @@
             document.getElementById(`msg-menu-${id}`).classList.add('hidden');
             
             const previewBar = document.getElementById('chatReplyPreview');
-            document.getElementById('replyTargetName').innerText = senderName;
-            document.getElementById('replyTargetText').innerText = text || 'مرفق';
+            document.getElementById('replyTargetName').innerText = window.escapeHTML(senderName);
+            document.getElementById('replyTargetText').innerText = window.escapeHTML(text || 'مرفق');
             previewBar.classList.remove('hidden');
             previewBar.classList.add('flex');
             
@@ -3206,7 +3212,7 @@
             const activeGroup = globalGroups.find(g => g.id === currentGroupId);
             if(!activeGroup) return;
 
-            document.getElementById('infoModalTitle').innerText = `${t('معلومات المجموعة')}: ${activeGroup.name}`;
+            document.getElementById('infoModalTitle').innerText = `${t('معلومات المجموعة')}: ${window.escapeHTML(activeGroup.name)}`;
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             
             const addMemberSection = document.getElementById('addMemberSection');
@@ -3216,7 +3222,7 @@
                 select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
                 globalUsers.forEach(u => {
                     if (!activeGroup.members.includes(u.id)) {
-                        select.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+                        select.innerHTML += `<option value="${u.id}">${window.escapeHTML(u.name)} (${window.escapeHTML(u.role)})</option>`;
                     }
                 });
             } else {
@@ -3235,165 +3241,162 @@
             membersToShow.forEach(u => {
                 let removeBtn = '';
                 if (isCEO && activeGroup.id !== 'global' && u.id !== currentUserData.uid && !u.isViewer) {
-                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-gray-700 p-1.5 rounded transition text-xs font-bold" title="${t('حذف من المجموعة')}"><i class="fa-solid fa-user-minus"></i> ${t('حذف')}</button>`;
+                    removeBtn = `<button onclick="window.removeGroupMember('${u.id}', '${window.escapeHTML(u.name.replace(/'/g, "\\'"))}')" class="text-red-400 hover:text-red-600 bg-red-50 dark:bg-gray-700 p-1.5 rounded transition text-xs font-bold" title="${t('حذف من المجموعة')}"><i class="fa-solid fa-user-minus"></i> ${t('حذف')}</button>`;
                 }
                 let badge = u.role === 'CEO' ? `<span class="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مدير')}</span>` : '';
                 if(u.isViewer) badge = `<span class="bg-gray-200 text-gray-600 text-[10px] px-1.5 py-0.5 rounded mx-2">${t('مراقب')}</span>`;
 
                 list.innerHTML += `
                     <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700 border border-transparent hover:border-gray-100 dark:hover:border-gray-600 rounded-lg transition">
-                    <div class="flex items-center gap-2">
-                                <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover">
-                                <div>
-                                    <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${u.name} ${badge}</p>
-                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">${u.role}</p>
-                                </div>
+                        <div class="flex items-center gap-2">
+                            <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 dark:text-gray-200">${window.escapeHTML(u.name)} ${badge}</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">${window.escapeHTML(u.role)}</p>
                             </div>
-                            ${removeBtn}
                         </div>
-                    `;
-                });
-                window.openModal('groupInfoModal');
-            };
+                        ${removeBtn}
+                    </div>
+                `;
+            });
+            window.openModal('groupInfoModal');
+        };
 
-            window.removeGroupMember = async (userId, userName) => {
-                if (currentUserData.role !== 'CEO') return;
-                if(confirm(`هل تريد بالتأكيد إزالة ${userName} من المجموعة؟`)) {
-                    const activeGroup = globalGroups.find(g => g.id === currentGroupId);
-                    if(!activeGroup || activeGroup.id === 'global') return;
-                    try {
-                        const newMembers = activeGroup.members.filter(id => id !== userId);
-                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
-                        showToast(`تمت إزالة ${userName} بنجاح`, 'success');
-                        window.openGroupInfoModal(); 
-                    } catch(e) { console.error(e); }
-                }
-            };
-
-            window.addGroupMember = async () => {
-                if (currentUserData.role !== 'CEO') return;
-                const select = document.getElementById('newMemberSelect');
-                const userId = select.value;
-                const userName = select.options[select.selectedIndex]?.text.split(' (')[0];
-                if(!userId) { showToast('يرجى اختيار موظف أولاً', 'warning'); return; }
+        window.removeGroupMember = async (userId, userName) => {
+            if (currentUserData.role !== 'CEO') return;
+            if(confirm(`هل تريد بالتأكيد إزالة ${userName} من المجموعة؟`)) {
                 const activeGroup = globalGroups.find(g => g.id === currentGroupId);
                 if(!activeGroup || activeGroup.id === 'global') return;
                 try {
-                    const newMembers = [...activeGroup.members, userId];
+                    const newMembers = activeGroup.members.filter(id => id !== userId);
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
-                    showToast(`تم إضافة ${userName} بنجاح`, 'success');
+                    showToast(`تمت إزالة ${userName} بنجاح`, 'success');
                     window.openGroupInfoModal(); 
                 } catch(e) { console.error(e); }
-            };
+            }
+        };
 
-            window.openCreateGroupModal = () => {
-                const container = document.getElementById('groupMembersSelection');
-                container.innerHTML = '';
-                globalUsers.forEach(emp => {
-                    if(emp.id !== currentUserData.uid) {
-                        container.innerHTML += `
-                            <label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-500 transition">
-                                <input type="checkbox" value="${emp.id}" class="group-member-checkbox w-4 h-4 text-secondary rounded border-gray-300 focus:ring-secondary">
-                                <img src="${emp.photoURL}" class="w-6 h-6 rounded-full object-cover">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${emp.name} <span class="text-xs text-gray-400">(${emp.role})</span></span>
-                            </label>
-                        `;
-                    }
-                });
-                window.openModal('createGroupModal');
-            };
+        window.addGroupMember = async () => {
+            if (currentUserData.role !== 'CEO') return;
+            const select = document.getElementById('newMemberSelect');
+            const userId = select.value;
+            const userName = select.options[select.selectedIndex]?.text.split(' (')[0];
+            if(!userId) { showToast('يرجى اختيار موظف أولاً', 'warning'); return; }
+            const activeGroup = globalGroups.find(g => g.id === currentGroupId);
+            if(!activeGroup || activeGroup.id === 'global') return;
+            try {
+                const newMembers = [...activeGroup.members, userId];
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'groups', activeGroup.id), { members: newMembers });
+                showToast(`تم إضافة ${userName} بنجاح`, 'success');
+                window.openGroupInfoModal(); 
+            } catch(e) { console.error(e); }
+        };
 
-            window.updateDashboardStats = () => {
-                const statEmp = document.getElementById('stat-employees');
-                if(statEmp) statEmp.innerText = globalUsers.length;
-                
-                const statTasks = document.getElementById('stat-tasks');
-                if(statTasks) statTasks.innerText = globalTasks.length;
-                
-                const statComp = document.getElementById('stat-completed');
-                if(statComp) statComp.innerText = globalTasks.filter(t => t.status === 'completed').length;
-            };
-
-            window.openEditEmployeeModal = (id, name, role) => {
-                document.getElementById('editEmpId').value = id;
-                document.getElementById('editEmpName').value = name;
-                const selectRole = document.getElementById('editEmpRole');
-                if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
-                    selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
-                } else if (currentUserData.role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
-                    selectRole.innerHTML += `<option value="CEO">CEO (المدير التنفيذي)</option>`;
+        window.openCreateGroupModal = () => {
+            const container = document.getElementById('groupMembersSelection');
+            container.innerHTML = '';
+            globalUsers.forEach(emp => {
+                if(emp.id !== currentUserData.uid) {
+                    container.innerHTML += `
+                        <label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer border border-transparent hover:border-gray-200 dark:hover:border-gray-500 transition">
+                            <input type="checkbox" value="${emp.id}" class="group-member-checkbox w-4 h-4 text-secondary rounded border-gray-300 focus:ring-secondary">
+                            <img src="${emp.photoURL}" class="w-6 h-6 rounded-full object-cover">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-200">${window.escapeHTML(emp.name)} <span class="text-xs text-gray-400">(${window.escapeHTML(emp.role)})</span></span>
+                        </label>
+                    `;
                 }
-                selectRole.value = role;
+            });
+            window.openModal('createGroupModal');
+        };
 
-                const targetUser = globalUsers.find(u => u.id === id);
-                const perms = targetUser?.permissions || {};
-                
-                document.getElementById('permAssignTasks').checked = !!perms.canAssignTasks;
-                document.getElementById('permExpenses').checked = !!perms.canExpenses;
-                document.getElementById('permCRM').checked = !!perms.canCRM;
-                document.getElementById('permNotices').checked = !!perms.canNotices;
-                document.getElementById('editEmpAssets').value = targetUser?.assets || '';
+        window.updateDashboardStats = () => {
+            const statEmp = document.getElementById('stat-employees');
+            if(statEmp) statEmp.innerText = globalUsers.length;
+            
+            const statTasks = document.getElementById('stat-tasks');
+            if(statTasks) statTasks.innerText = globalTasks.length;
+            
+            const statComp = document.getElementById('stat-completed');
+            if(statComp) statComp.innerText = globalTasks.filter(t => t.status === 'completed').length;
+        };
 
-                window.openModal('editEmployeeModal');
-            };
+        window.openEditEmployeeModal = (id, name, role) => {
+            document.getElementById('editEmpId').value = id;
+            document.getElementById('editEmpName').value = name;
+            const selectRole = document.getElementById('editEmpRole');
+            if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
+                selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
+            } else if (currentUserData.role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
+                selectRole.innerHTML += `<option value="CEO">CEO (المدير التنفيذي)</option>`;
+            }
+            selectRole.value = role;
 
-            const editEmployeeForm = document.getElementById('editEmployeeForm');
-            if (editEmployeeForm) {
-                editEmployeeForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if(currentUserData.role !== 'CEO') return;
+            const targetUser = globalUsers.find(u => u.id === id);
+            const perms = targetUser?.permissions || {};
+            
+            document.getElementById('permAssignTasks').checked = !!perms.canAssignTasks;
+            document.getElementById('permExpenses').checked = !!perms.canExpenses;
+            document.getElementById('permCRM').checked = !!perms.canCRM;
+            document.getElementById('permNotices').checked = !!perms.canNotices;
+            document.getElementById('editEmpAssets').value = targetUser?.assets || '';
 
-                    const id = document.getElementById('editEmpId').value;
-                    const newName = document.getElementById('editEmpName').value;
-                    const newRole = document.getElementById('editEmpRole').value;
-                    const newAssets = document.getElementById('editEmpAssets').value;
+            window.openModal('editEmployeeModal');
+        };
 
-                    // منطق نقل المدير التنفيذي
-                    if (newRole === 'CEO' && id !== currentUserData.uid) {
-                        const confirmMsg = "تحذير نهائي:\nأنت على وشك التنازل عن منصب (CEO - المدير التنفيذي) ونقل كافة الصلاحيات الإدارية المطلقة لهذا الموظف، ولن تتمكن من استرجاعها.\n\nهل أنت متأكد بنسبة 100% ؟";
-                        if (!confirm(confirmMsg)) return;
+        const editEmployeeForm = document.getElementById('editEmployeeForm');
+        if (editEmployeeForm) {
+            editEmployeeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentUserData.role !== 'CEO') return;
 
-                        try {
-                            // جعل الموظف المختار CEO بكامل الصلاحيات
-                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
-                                role: 'CEO',
-                                name: newName,
-                                assets: newAssets,
-                                permissions: { canAssignTasks: true, canExpenses: true, canCRM: true, canNotices: true }
-                            });
-                            
-                            // تغيير منصبي وسحب الصلاحيات
-                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { 
-                                role: 'Technical Engineer', // افتراضي ويمكنه تعديله لاحقا
-                                permissions: { canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false }
-                            });
-                            
-                            window.closeModal('editEmployeeModal');
-                            showToast('تم نقل الإدارة بنجاح! سيتم إعادة تحميل النظام...', 'success');
-                            logAction('نقل الإدارة', `تم التنازل عن منصب المدير ونقله إلى ${newName}`);
-                            
-                            setTimeout(() => { window.location.reload(); }, 2000);
-                            return;
-                        } catch(e) { console.error(e); showToast('حدث خطأ', 'error'); return; }
-                    }
+                const id = document.getElementById('editEmpId').value;
+                const newName = document.getElementById('editEmpName').value;
+                const newRole = document.getElementById('editEmpRole').value;
+                const newAssets = document.getElementById('editEmpAssets').value;
 
-                    const permissions = {
-                        canAssignTasks: document.getElementById('permAssignTasks').checked,
-                        canExpenses: document.getElementById('permExpenses').checked,
-                        canCRM: document.getElementById('permCRM').checked,
-                        canNotices: document.getElementById('permNotices').checked
-                    };
+                if (newRole === 'CEO' && id !== currentUserData.uid) {
+                    const confirmMsg = "تحذير نهائي:\nأنت على وشك التنازل عن منصب (CEO - المدير التنفيذي) ونقل كافة الصلاحيات الإدارية المطلقة لهذا الموظف، ولن تتمكن من استرجاعها.\n\nهل أنت متأكد بنسبة 100% ؟";
+                    if (!confirm(confirmMsg)) return;
 
                     try {
                         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
-                            name: newName, 
-                            role: newRole,
+                            role: 'CEO',
+                            name: newName,
                             assets: newAssets,
-                            permissions: permissions
+                            permissions: { canAssignTasks: true, canExpenses: true, canCRM: true, canNotices: true }
                         });
+                        
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { 
+                            role: 'Technical Engineer', 
+                            permissions: { canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false }
+                        });
+                        
                         window.closeModal('editEmployeeModal');
-                        showToast('تم تحديث بيانات وصلاحيات الموظف بنجاح', 'success');
-                        logAction('تعديل موظف', `تم تعديل بيانات وصلاحيات الموظف: ${newName}`);
+                        showToast('تم نقل الإدارة بنجاح! سيتم إعادة تحميل النظام...', 'success');
+                        logAction('نقل الإدارة', `تم التنازل عن منصب المدير ونقله إلى ${newName}`);
+                        
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                        return;
+                    } catch(e) { console.error(e); showToast('حدث خطأ', 'error'); return; }
+                }
+
+                const permissions = {
+                    canAssignTasks: document.getElementById('permAssignTasks').checked,
+                    canExpenses: document.getElementById('permExpenses').checked,
+                    canCRM: document.getElementById('permCRM').checked,
+                    canNotices: document.getElementById('permNotices').checked
+                };
+
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
+                        name: newName, 
+                        role: newRole,
+                        assets: newAssets,
+                        permissions: permissions
+                    });
+                    window.closeModal('editEmployeeModal');
+                    showToast('تم تحديث بيانات وصلاحيات الموظف بنجاح', 'success');
+                    logAction('تعديل موظف', `تم تعديل بيانات وصلاحيات الموظف: ${newName}`);
                     } catch(error) { console.error(error); }
                 });
             }
@@ -3409,8 +3412,8 @@
                     if(isCEO && emp.id !== currentUserData.uid) { 
                         actionsHtml = `
                             <td class="p-3 md:p-4 whitespace-nowrap rtl:text-left ltr:text-right">
-                                <button onclick="window.openEditEmployeeModal('${emp.id}', '${emp.name}', '${emp.role}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-gray-700 p-2 rounded mx-1 transition" title="تعديل الصلاحيات والممتلكات"><i class="fa-solid fa-user-shield"></i></button>
-                                <button onclick="window.deleteEmployee('${emp.id}', '${emp.name}')" class="text-red-500 hover:text-red-700 bg-red-50 dark:bg-gray-700 p-2 rounded transition" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="window.openEditEmployeeModal('${emp.id}', '${window.escapeHTML(emp.name)}', '${window.escapeHTML(emp.role)}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 dark:bg-gray-700 p-2 rounded mx-1 transition" title="تعديل الصلاحيات والممتلكات"><i class="fa-solid fa-user-shield"></i></button>
+                                <button onclick="window.deleteEmployee('${emp.id}', '${window.escapeHTML(emp.name)}')" class="text-red-500 hover:text-red-700 bg-red-50 dark:bg-gray-700 p-2 rounded transition" title="حذف"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         `;
                     } else if(isCEO) {
@@ -3420,10 +3423,10 @@
                     list.innerHTML += `
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             <td class="p-3 md:p-4 flex items-center">
-                                <img src="${emp.photoURL}" class="w-8 h-8 rounded-full mx-3 object-cover">
-                                <span class="font-medium text-gray-800 dark:text-gray-200 text-sm">${emp.name}</span>
+                                <img src="${window.escapeHTML(emp.photoURL)}" class="w-8 h-8 rounded-full mx-3 object-cover">
+                                <span class="font-medium text-gray-800 dark:text-gray-200 text-sm">${window.escapeHTML(emp.name)}</span>
                             </td>
-                            <td class="p-3 md:p-4 text-gray-600 dark:text-gray-300 font-bold text-xs md:text-sm">${emp.role}</td>
+                            <td class="p-3 md:p-4 text-gray-600 dark:text-gray-300 font-bold text-xs md:text-sm">${window.escapeHTML(emp.role)}</td>
                             ${actionsHtml}
                         </tr>
                     `;
@@ -3440,11 +3443,11 @@
                 globalUsers.forEach(u => {
                     if(u.role !== 'CEO') {
                         list.innerHTML += `
-                            <div id="ceo-emp-item-${u.id}" onclick="window.renderCeoEmployeeTasks('${u.id}', '${u.name.replace(/'/g, "\\'")}')" class="ceo-emp-item p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 transition">
-                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                            <div id="ceo-emp-item-${u.id}" onclick="window.renderCeoEmployeeTasks('${u.id}', '${window.escapeHTML(u.name.replace(/'/g, "\\'"))}')" class="ceo-emp-item p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 transition">
+                                <img src="${window.escapeHTML(u.photoURL)}" class="w-10 h-10 rounded-full object-cover">
                                 <div>
-                                    <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200">${u.name}</h4>
-                                    <p class="text-xs text-gray-500">${u.role}</p>
+                                    <h4 class="font-bold text-sm text-gray-800 dark:text-gray-200">${window.escapeHTML(u.name)}</h4>
+                                    <p class="text-xs text-gray-500">${window.escapeHTML(u.role)}</p>
                                 </div>
                             </div>
                         `;
@@ -3465,7 +3468,7 @@
                     return;
                 }
 
-                let html = `<h4 class="font-bold text-primary dark:text-secondary mb-4 border-b dark:border-gray-700 pb-2">المهام المنجزة لـ: ${empName}</h4><div class="space-y-4">`;
+                let html = `<h4 class="font-bold text-primary dark:text-secondary mb-4 border-b dark:border-gray-700 pb-2">المهام المنجزة لـ: ${window.escapeHTML(empName)}</h4><div class="space-y-4">`;
                 empTasks.forEach(t => {
                     const dateStr = t.completedAt ? new Date(t.completedAt).toLocaleString('ar-EG') : 'غير محدد';
                     const startStr = t.startedAt ? new Date(t.startedAt).toLocaleString('ar-EG') : 'لم يتم تسجيل وقت البدء';
@@ -3473,15 +3476,15 @@
                     let fileHtml = '';
                     if(t.reportFileData) {
                         if(t.reportFileType && t.reportFileType.startsWith('image/')) {
-                            fileHtml = `<img src="${t.reportFileData}" class="mt-3 rounded-lg max-w-[200px] cursor-pointer border dark:border-gray-600 shadow-sm" onclick="window.openMedia('${t.reportFileData}', '${t.reportFileType}')">`;
+                            fileHtml = `<img src="${window.escapeHTML(t.reportFileData)}" class="mt-3 rounded-lg max-w-[200px] cursor-pointer border dark:border-gray-600 shadow-sm" onclick="window.openMedia('${window.escapeHTML(t.reportFileData)}', '${window.escapeHTML(t.reportFileType)}')">`;
                         } else {
-                            fileHtml = `<a href="${t.reportFileData}" download="مرفق_مهمة" class="inline-block mt-3 bg-secondary text-white text-xs px-3 py-1.5 rounded transition hover:bg-primary"><i class="fa-solid fa-download mx-1"></i> تحميل المرفق</a>`;
+                            fileHtml = `<a href="${window.escapeHTML(t.reportFileData)}" download="مرفق_مهمة" class="inline-block mt-3 bg-secondary text-white text-xs px-3 py-1.5 rounded transition hover:bg-primary"><i class="fa-solid fa-download mx-1"></i> تحميل المرفق</a>`;
                         }
                     }
                     html += `
                         <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm">
                             <div class="flex justify-between items-start mb-2">
-                                <h5 class="font-bold text-gray-800 dark:text-gray-100">${t.title}</h5>
+                                <h5 class="font-bold text-gray-800 dark:text-gray-100">${window.escapeHTML(t.title)}</h5>
                                 <span class="text-[10px] text-gray-500 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">${dateStr}</span>
                             </div>
                             
@@ -3490,10 +3493,10 @@
                                 <span class="text-green-600 dark:text-green-400 font-bold"><i class="fa-solid fa-stop mx-1"></i> وقت الانتهاء: ${dateStr}</span>
                             </div>
 
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-3 bg-white dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-600 whitespace-pre-wrap">وصف المهمة: ${t.desc}</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mb-3 bg-white dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-600 whitespace-pre-wrap">وصف المهمة: ${window.escapeHTML(t.desc)}</p>
                             <div class="border-t border-gray-200 dark:border-gray-600 pt-3">
                                 <h6 class="text-xs font-bold text-green-600 dark:text-green-400 mb-1"><i class="fa-solid fa-comment-dots mx-1"></i> تقرير الموظف:</h6>
-                                <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">${t.reportText || 'لا يوجد نص تقرير'}</p>
+                                <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">${window.escapeHTML(t.reportText || 'لا يوجد نص تقرير')}</p>
                                 ${fileHtml}
                             </div>
                         </div>
@@ -3513,17 +3516,16 @@
                 if (isCEO || canAssign) {
                     select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
                     globalUsers.forEach(emp => {
-                        select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.role})</option>`;
+                        select.innerHTML += `<option value="${emp.id}">${window.escapeHTML(emp.name)} (${window.escapeHTML(emp.role)})</option>`;
                     });
                     select.disabled = false;
                 } else {
-                    select.innerHTML = `<option value="${currentUserData.uid}" selected>${currentUserData.name} (${t('أنت')})</option>`;
+                    select.innerHTML = `<option value="${currentUserData.uid}" selected>${window.escapeHTML(currentUserData.name)} (${t('أنت')})</option>`;
                     select.disabled = false;
                 }
                 window.openModal('taskModal');
             };
 
-            // زر التراجع عن إنجاز المهمة وإغلاق نافذة التقرير
             window.undoTaskCompletion = async () => {
                 const id = document.getElementById('reportTaskId').value;
                 try {
@@ -3533,7 +3535,7 @@
                     });
                     showToast('تم التراجع عن إنجاز المهمة', 'info');
                     window.closeModal('taskReportModal');
-                    renderTasks(); // تحديث العرض لإزالة الصح
+                    renderTasks(); 
                 } catch(e) { console.error(e); }
             };
 
@@ -3702,7 +3704,7 @@
                         let clItemsHtml = task.checklists.map((cl, idx) => `
                             <div class="flex items-center gap-2 p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
                                 <input type="checkbox" class="custom-checkbox w-4 h-4 rounded-sm" ${cl.isCompleted ? 'checked' : ''} ${!canCheck ? 'disabled' : ''} onchange="window.toggleTaskChecklistItem('${task.id}', ${idx}, this.checked)">
-                                <span class="text-sm ${cl.isCompleted ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}">${cl.text}</span>
+                                <span class="text-sm ${cl.isCompleted ? 'line-through text-gray-400' : 'text-gray-700 dark:text-gray-200'}">${window.escapeHTML(cl.text)}</span>
                             </div>
                         `).join('');
                         
@@ -3715,29 +3717,34 @@
                     }
 
                     const fireIcon = task.isHighPriority ? '<i class="fa-solid fa-fire text-orange-500 mr-2" title="أولوية قصوى"></i>' : '';
+                    
+                    let assigneeLabel = window.escapeHTML(task.assigneeName);
+                    if(task.assigneeId === currentUserData.uid) assigneeLabel += ' <span class="text-[9px] bg-secondary text-white px-1 py-0.5 rounded mr-1">أنت</span>';
+                    
                     const assigneeAvatar = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(task.assigneeName)}&background=random&color=fff" class="w-6 h-6 rounded-full inline-block ml-2">`;
                     
                     const creatorUser = globalUsers.find(u => u.uid === task.createdBy);
-                    const creatorName = creatorUser ? creatorUser.name : 'مجهول';
+                    let creatorName = creatorUser ? window.escapeHTML(creatorUser.name) : 'مجهول';
+                    if (task.createdBy === currentUserData.uid) creatorName += ' <span class="text-[9px] bg-primary text-white px-1 py-0.5 rounded mx-1">أنشأتها أنت</span>';
                     const creatorAvatar = `<div class="flex items-center"><i class="fa-solid fa-user-pen text-gray-400 mx-2"></i> <span>${creatorName}</span></div>`; 
                     
                     let attHtml = '';
                     if(task.attachmentData) {
                         attHtml = `
                             <div class="mt-3">
-                                <a href="${task.attachmentData}" download="${task.attachmentName || 'مرفق'}" class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs px-3 py-1.5 rounded hover:bg-blue-100 transition"><i class="fa-solid fa-paperclip"></i> ${task.attachmentName || 'تحميل المرفق'}</a>
+                                <a href="${window.escapeHTML(task.attachmentData)}" download="${window.escapeHTML(task.attachmentName || 'مرفق')}" class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs px-3 py-1.5 rounded hover:bg-blue-100 transition"><i class="fa-solid fa-paperclip"></i> ${window.escapeHTML(task.attachmentName || 'تحميل المرفق')}</a>
                             </div>
                         `;
                     }
 
                     listBody.innerHTML += `
-                        <tr class="task-row-item hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 ${isCompleted ? 'opacity-60' : ''}" data-id="${task.id}" data-title="${task.title}" data-assignee="${task.assigneeName}" data-project="${task.project || ''}">
+                        <tr class="task-row-item hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 ${isCompleted ? 'opacity-60' : ''}" data-id="${task.id}" data-title="${window.escapeHTML(task.title)}" data-assignee="${window.escapeHTML(task.assigneeName)}" data-project="${window.escapeHTML(task.project || '')}">
                             <td class="p-3 text-center">
-                                <input type="checkbox" class="custom-checkbox" ${isCompleted ? 'checked' : ''} ${!canCheck ? 'disabled' : ''} onchange="window.updateTaskStatusFromCheckbox('${task.id}', '${task.title.replace(/'/g, "\\'")}', this.checked)">
+                                <input type="checkbox" class="custom-checkbox" ${isCompleted ? 'checked' : ''} ${!canCheck ? 'disabled' : ''} onchange="window.updateTaskStatusFromCheckbox('${task.id}', '${window.escapeHTML(task.title.replace(/'/g, "\\'"))}', this.checked)">
                             </td>
                             <td class="p-3">
                                 <div class="flex items-center cursor-pointer" onclick="window.toggleTaskDetailsList('${task.id}')">
-                                    <span class="font-bold text-gray-800 dark:text-gray-100 ${isCompleted ? 'line-through' : ''}">${task.title}</span>
+                                    <span class="font-bold text-gray-800 dark:text-gray-100 ${isCompleted ? 'line-through' : ''}">${window.escapeHTML(task.title)}</span>
                                     ${fireIcon}
                                     ${progressBadge}
                                 </div>
@@ -3755,20 +3762,20 @@
                                 ${creatorAvatar}
                             </td>
                             <td class="p-3 whitespace-nowrap font-medium text-gray-700 dark:text-gray-300">
-                                ${assigneeAvatar} ${task.assigneeName}
+                                ${assigneeAvatar} ${assigneeLabel}
                             </td>
                             <td class="p-3 whitespace-nowrap">
-                                <span class="text-primary dark:text-secondary bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-folder ml-1"></i> ${task.project || 'عام'}</span>
+                                <span class="text-primary dark:text-secondary bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded text-xs font-bold"><i class="fa-solid fa-folder ml-1"></i> ${window.escapeHTML(task.project || 'عام')}</span>
                             </td>
                             <td class="p-3 text-center">
-                                ${isCEO ? `<button onclick="window.deleteTask('${task.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : ''}
+                                ${isCEO || task.createdBy === currentUserData.uid ? `<button onclick="window.deleteTask('${task.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : ''}
                             </td>
                         </tr>
                         <tr id="task-details-tr-${task.id}" class="bg-gray-50/50 dark:bg-gray-800/50">
                             <td colspan="8" class="p-0 border-0">
                                 <div id="task-details-${task.id}" class="slide-down">
                                     <div class="p-4 mr-10">
-                                        <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">${task.desc || 'لا توجد تفاصيل إضافية'}</p>
+                                        <p class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">${window.escapeHTML(task.desc || 'لا توجد تفاصيل إضافية')}</p>
                                         ${attHtml}
                                         ${checklistHtml}
                                     </div>
@@ -3798,14 +3805,14 @@
                     const submitTask = async (fileData, fileType, fileName) => {
                         try {
                             const newTaskObj = {
-                                title: title,
-                                desc: desc,
+                                title: window.escapeHTML(title),
+                                desc: window.escapeHTML(desc),
                                 assigneeId: assigneeId,
-                                assigneeName: assigneeName,
+                                assigneeName: window.escapeHTML(assigneeName),
                                 createdBy: currentUserData.uid,
                                 deadline: deadlineTime,
                                 status: 'pending',
-                                project: projectTag,
+                                project: window.escapeHTML(projectTag),
                                 isHighPriority: isHighPriority,
                                 checklists: creationChecklists, 
                                 timestamp: Date.now()
@@ -3814,7 +3821,7 @@
                             if(fileData) {
                                 newTaskObj.attachmentData = fileData;
                                 newTaskObj.attachmentType = fileType;
-                                newTaskObj.attachmentName = fileName;
+                                newTaskObj.attachmentName = window.escapeHTML(fileName);
                             }
 
                             await addDoc(getColRef('tasks'), newTaskObj);
@@ -3860,8 +3867,8 @@
                     </div>`;
 
                     html += availableUsers.map(u => 
-                        `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-semibold text-primary dark:text-gray-200" onclick="window.selectMention('${u.name}')">
-                            <i class="fa-solid fa-user-circle mx-1 text-gray-400"></i> ${u.name}
+                        `<div class="p-3 hover:bg-gray-50 dark:hover:bg-gray-600 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 font-semibold text-primary dark:text-gray-200" onclick="window.selectMention('${window.escapeHTML(u.name)}')">
+                            <i class="fa-solid fa-user-circle mx-1 text-gray-400"></i> ${window.escapeHTML(u.name)}
                         </div>`
                     ).join('');
                     
@@ -3885,7 +3892,7 @@
             };
 
             window.deleteTask = async (id) => {
-                if(currentUserData.role !== 'CEO') return;
+                if(currentUserData.role !== 'CEO' && !globalTasks.find(t => t.id === id && t.createdBy === currentUserData.uid)) return;
                 if(confirm('حذف هذه المهمة نهائياً؟')) {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)).catch(e => console.error(e));
                     showToast('تم الحذف بنجاح', 'success');
@@ -4042,8 +4049,8 @@
                     list.innerHTML += `
                         <tr class="hover:bg-gray-50 dark:bg-gray-800 transition">
                             <td class="p-3 md:p-4 text-[10px] md:text-xs text-gray-500 dark:text-gray-400" dir="ltr">${date}</td>
-                            <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary dark:text-secondary">${userNameText}</td>
-                            <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600 dark:text-gray-300"><i class="fa-solid ${icon} mx-2"></i>${detailsText}</td>
+                            <td class="p-3 md:p-4 text-xs md:text-sm font-bold text-primary dark:text-secondary">${window.escapeHTML(userNameText)}</td>
+                            <td class="p-3 md:p-4 text-xs md:text-sm text-gray-600 dark:text-gray-300"><i class="fa-solid ${icon} mx-2"></i>${window.escapeHTML(detailsText)}</td>
                         </tr>
                     `;
                 });
@@ -4066,8 +4073,8 @@
                     pinnedDropdown.innerHTML = pinnedMsgs.map(m => `
                         <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700/50 p-2 rounded border-l-4 border-yellow-400 text-xs shadow-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition" onclick="window.scrollToMsg('${m.id}')">
                             <div class="flex flex-col gap-1 truncate w-full">
-                                <span class="font-bold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-thumbtack text-yellow-500 mx-1"></i> ${m.senderName}</span>
-                                <span class="text-gray-600 dark:text-gray-400 truncate w-full pl-2">${m.text || 'مرفق'}</span>
+                                <span class="font-bold text-gray-800 dark:text-gray-200"><i class="fa-solid fa-thumbtack text-yellow-500 mx-1"></i> ${window.escapeHTML(m.senderName)}</span>
+                                <span class="text-gray-600 dark:text-gray-400 truncate w-full pl-2">${window.escapeHTML(m.text || 'مرفق')}</span>
                             </div>
                         </div>
                     `).join('');
@@ -4113,7 +4120,7 @@
                         }
                     }
 
-                    let formattedText = msg.text || '';
+                    let formattedText = window.escapeHTML(msg.text || '');
                     const rawTextForCopy = msg.text ? msg.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n") : '';
 
                     if (formattedText) {
@@ -4126,10 +4133,10 @@
                         
                         let counter = 0;
                         sortedNames.forEach((name) => {
-                            const safeName = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            const safeName = window.escapeHTML(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                             const regex = new RegExp(`@${safeName}`, 'g');
                             if (regex.test(formattedText)) {
-                                mentionedNames.push({key: `__MENTION_${counter}__`, name: name});
+                                mentionedNames.push({key: `__MENTION_${counter}__`, name: window.escapeHTML(name)});
                                 formattedText = formattedText.replace(regex, `__MENTION_${counter}__`);
                                 counter++;
                             }
@@ -4155,11 +4162,11 @@
                     if(msg.fileData) {
                         const fileTypeSafe = msg.fileType || '';
                         if(fileTypeSafe.startsWith('image/')) {
-                            attachmentHtml = `<img src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10 shadow-sm" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')">`;
+                            attachmentHtml = `<img src="${window.escapeHTML(msg.fileData)}" class="rounded-lg max-w-full h-auto max-h-48 cursor-pointer object-contain bg-black/5 border border-black/10 shadow-sm" onclick="window.openMedia('${window.escapeHTML(msg.fileData)}', '${fileTypeSafe}')">`;
                         } else if(fileTypeSafe.startsWith('video/')) {
-                            attachmentHtml = `<div class="relative cursor-pointer" onclick="window.openMedia('${msg.fileData}', '${fileTypeSafe}')"><video src="${msg.fileData}" class="rounded-lg max-w-full h-auto max-h-48 bg-black shadow-sm"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
+                            attachmentHtml = `<div class="relative cursor-pointer" onclick="window.openMedia('${window.escapeHTML(msg.fileData)}', '${fileTypeSafe}')"><video src="${window.escapeHTML(msg.fileData)}" class="rounded-lg max-w-full h-auto max-h-48 bg-black shadow-sm"></video><i class="fa-solid fa-circle-play text-white/80 text-4xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 drop-shadow-md"></i></div>`;
                         } else {
-                            attachmentHtml = `<a href="${msg.fileData}" download="مرفق" class="inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit shadow-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                            attachmentHtml = `<a href="${window.escapeHTML(msg.fileData)}" download="مرفق" class="inline-flex items-center gap-2 bg-black/10 hover:bg-black/20 px-3 py-2 rounded transition text-sm text-inherit shadow-sm"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
                         }
                     }
 
@@ -4167,8 +4174,8 @@
                     if(msg.replyTo) {
                         replyHtml = `
                             <div class="mb-2 p-2 bg-black/10 dark:bg-black/20 rounded border-r-2 border-primary dark:border-secondary cursor-pointer hover:bg-black/20 transition text-xs flex flex-col gap-0.5" onclick="window.scrollToMsg('${msg.replyTo.id}')">
-                                <span class="font-bold text-primary dark:text-secondary opacity-80">${msg.replyTo.senderName}</span>
-                                <span class="truncate opacity-80 whitespace-pre-wrap">${msg.replyTo.text}</span>
+                                <span class="font-bold text-primary dark:text-secondary opacity-80">${window.escapeHTML(msg.replyTo.senderName)}</span>
+                                <span class="truncate opacity-80 whitespace-pre-wrap">${window.escapeHTML(msg.replyTo.text)}</span>
                             </div>
                         `;
                     }
@@ -4195,7 +4202,7 @@
                             </button>
                             
                             <div id="msg-menu-${msg.id}" class="msg-dropdown-menu hidden absolute ${isMe ? 'right-full mr-1' : 'left-full ml-1'} bottom-0 mb-8 bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 rounded-lg w-44 z-30 text-sm overflow-hidden flex flex-col text-right font-bold">
-                                <button onclick="window.replyToMsg('${msg.id}', decodeURIComponent('${encodeURIComponent(msg.text || '')}'), '${msg.senderName}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
+                                <button onclick="window.replyToMsg('${msg.id}', decodeURIComponent('${encodeURIComponent(msg.text || '')}'), '${window.escapeHTML(msg.senderName)}')" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
                                     <span>الرد</span> <i class="fa-solid fa-reply text-gray-400"></i>
                                 </button>
                                 <button onclick="window.togglePinMsg('${msg.id}', ${msg.isPinned || false})" class="w-full text-right px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center justify-between transition-colors border-b border-gray-100 dark:border-gray-700">
@@ -4221,13 +4228,13 @@
 
                     htmlBuffer += `
                         <div id="msg-${msg.id}" class="chat-msg-item flex ${alignClass} mb-4 items-end gap-2 group w-full relative transition-all duration-500 rounded-lg p-1" data-text="${encodeURIComponent(msg.text || '')}" data-sender="${encodeURIComponent(msg.senderName || '')}">
-                            ${!isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
+                            ${!isMe ? `<img src="${window.escapeHTML(avatarUrl)}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
                             
                             ${isMe ? msgActionsHtml : ''}
 
                             <div class="max-w-[85%] md:max-w-[70%] min-w-[150px] relative">
                                 <div class="flex items-center gap-2 mb-1 px-1 ${isMe ? 'flex-row-reverse' : ''}">
-                                    <span class="text-[10px] ${textClass}">${msg.senderName || 'مجهول'}</span>
+                                    <span class="text-[10px] ${textClass}">${window.escapeHTML(msg.senderName || 'مجهول')}</span>
                                     ${msg.isPinned ? '<i class="fa-solid fa-thumbtack text-[10px] text-yellow-500"></i>' : ''}
                                 </div>
                                 <div class="p-3 shadow-sm ${msgBgClass} ${radiusClass}">
@@ -4240,7 +4247,7 @@
 
                             ${!isMe ? msgActionsHtml : ''}
                             
-                            ${isMe ? `<img src="${avatarUrl}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
+                            ${isMe ? `<img src="${window.escapeHTML(avatarUrl)}" class="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-gray-700 flex-shrink-0" alt="Avatar">` : ''}
                         </div>
                     `;
                 });
@@ -4292,7 +4299,7 @@
                     let creatorHtml = '';
                     if (isCEO && g.id !== 'global') {
                         const creatorUser = globalUsers.find(u => u.uid === g.createdBy);
-                        const creatorName = creatorUser ? creatorUser.name : t('مجهول');
+                        const creatorName = creatorUser ? window.escapeHTML(creatorUser.name) : t('مجهول');
                         creatorHtml = `<span class="block text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">${t('بواسطة:')} ${creatorName}</span>`;
                     }
 
@@ -4301,7 +4308,7 @@
                             <button onclick="window.selectGroup('${g.id}')" class="w-full text-right rtl:text-right ltr:text-left py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white dark:bg-gray-700 shadow-sm text-primary dark:text-white font-bold border border-gray-100 dark:border-gray-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}">
                                 <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-hashtag'} w-5 text-center mx-2 text-gray-400 ${isActive ? 'text-primary dark:text-secondary' : ''}"></i> 
                                 <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-                                    <span class="truncate">${g.name}</span>
+                                    <span class="truncate">${window.escapeHTML(g.name)}</span>
                                     ${creatorHtml}
                                 </div>
                                 ${badgeHtml}
@@ -4314,7 +4321,7 @@
                             <button onclick="window.selectGroup('${g.id}')" class="text-right rtl:text-right ltr:text-left w-full py-2 px-3 rounded-lg text-sm transition-colors flex items-center ${isActive ? 'bg-white/20 text-white font-bold' : 'text-gray-300 hover:bg-white/10 hover:text-white'}">
                                 <i class="fa-solid ${g.id === 'global' ? 'fa-globe' : 'fa-users'} w-5 text-center mx-2"></i> 
                                 <div class="flex flex-col flex-1 overflow-hidden min-w-0">
-                                    <span>${g.name}</span>
+                                    <span>${window.escapeHTML(g.name)}</span>
                                     ${creatorHtml.replace('text-gray-400', 'text-gray-400/70')}
                                 </div>
                                 ${badgeHtml}
@@ -4453,16 +4460,16 @@
 
             function updateUIWithUserData() {
                 if(!currentUserData) return;
-                document.getElementById('userName').innerText = currentUserData.name;
-                document.getElementById('userRole').innerText = currentUserData.role;
-                document.getElementById('userAvatar').src = currentUserData.photoURL;
+                document.getElementById('userName').innerText = window.escapeHTML(currentUserData.name);
+                document.getElementById('userRole').innerText = window.escapeHTML(currentUserData.role);
+                document.getElementById('userAvatar').src = window.escapeHTML(currentUserData.photoURL);
 
                 const myProfileName = document.getElementById('myProfileName');
-                if(myProfileName) myProfileName.innerText = currentUserData.name;
+                if(myProfileName) myProfileName.innerText = window.escapeHTML(currentUserData.name);
                 const myProfileRole = document.getElementById('myProfileRole');
-                if(myProfileRole) myProfileRole.innerText = currentUserData.role;
+                if(myProfileRole) myProfileRole.innerText = window.escapeHTML(currentUserData.role);
                 const myProfileAvatar = document.getElementById('myProfileAvatar');
-                if(myProfileAvatar) myProfileAvatar.src = currentUserData.photoURL;
+                if(myProfileAvatar) myProfileAvatar.src = window.escapeHTML(currentUserData.photoURL);
                 
                 const myProfileAssets = document.getElementById('myProfileAssets');
                 if(myProfileAssets) {
@@ -4478,7 +4485,7 @@
                                 <div class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-2 rounded-full">
                                     <i class="fa-solid fa-check text-sm"></i>
                                 </div>
-                                <span class="font-bold text-gray-700 dark:text-gray-200 text-sm flex-1 leading-snug">${item}</span>
+                                <span class="font-bold text-gray-700 dark:text-gray-200 text-sm flex-1 leading-snug">${window.escapeHTML(item)}</span>
                             </div>`;
                         });
                         html += '</div>';
@@ -4487,11 +4494,11 @@
                 }
 
                 const settingsAvatarPreview = document.getElementById('settingsAvatarPreview');
-                if(settingsAvatarPreview) settingsAvatarPreview.src = currentUserData.photoURL;
+                if(settingsAvatarPreview) settingsAvatarPreview.src = window.escapeHTML(currentUserData.photoURL);
                 const settingsName = document.getElementById('settingsName');
-                if(settingsName) settingsName.value = currentUserData.name;
+                if(settingsName) settingsName.value = window.escapeHTML(currentUserData.name);
                 const settingsRole = document.getElementById('settingsRole');
-                if(settingsRole) settingsRole.value = currentUserData.role;
+                if(settingsRole) settingsRole.value = window.escapeHTML(currentUserData.role);
                 
                 const layoutSelect = document.getElementById('settingsChatLayout');
                 if (layoutSelect) layoutSelect.value = currentUserData.chatLayout || 'media-top';
@@ -4529,7 +4536,7 @@
                         newCeoSelect.innerHTML = '<option value="">-- اختر موظف ليصبح مديراً --</option>';
                         globalUsers.forEach(u => {
                             if(u.id !== currentUserData.uid && u.role !== 'CEO') {
-                                newCeoSelect.innerHTML += `<option value="${u.id}">${u.name} (${u.role})</option>`;
+                                newCeoSelect.innerHTML += `<option value="${u.id}">${window.escapeHTML(u.name)} (${window.escapeHTML(u.role)})</option>`;
                             }
                         });
                     }
@@ -4823,8 +4830,8 @@
                 const role = document.getElementById('setupRole').value;
                 try {
                     const newUserData = {
-                        name: name, role: role, uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
-                        photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${name}&background=00839b&color=fff`,
+                        name: window.escapeHTML(name), role: window.escapeHTML(role), uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
+                        photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00839b&color=fff`,
                         readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now(),
                         permissions: {
                             canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false
