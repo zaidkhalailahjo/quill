@@ -618,7 +618,7 @@
             <section id="notices" class="section-content hidden animate-fade-in p-4 md:p-0">
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300 font-bold" data-i18n="التعميمات">لوحة الإعلانات والتعميمات الرسمية</p>
-                    <button id="addNoticeBtn" onclick="window.openModal('noticeModal')" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
+                    <button id="addNoticeBtn" onclick="window.openNoticeModal()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm font-bold shadow-sm">
                         <i class="fa-solid fa-bullhorn mx-2"></i> إضافة إعلان جديد
                     </button>
                 </div>
@@ -1168,6 +1168,12 @@
                         <button type="button" onclick="window.addPollOption()" class="mt-2 text-xs bg-yellow-100 text-yellow-700 px-3 py-2 rounded hover:bg-yellow-200 font-bold w-full md:w-auto"><i class="fa-solid fa-plus mx-1"></i> خيار إضافي</button>
                     </div>
 
+                    <div class="border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">من يمكنه رؤية هذا التعميم؟</label>
+                        <div id="noticeVisibilitySelection" class="border border-gray-200 dark:border-gray-600 rounded-lg p-2 max-h-32 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-700">
+                        </div>
+                    </div>
+
                     <div class="pt-4 flex justify-end space-x-2 space-x-reverse">
                         <button type="button" onclick="window.closeModal('noticeModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm md:text-base">إلغاء</button>
                         <button type="submit" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm md:text-base font-bold">نشر</button>
@@ -1486,7 +1492,7 @@
 
         const EMAILJS_SERVICE_ID_1 = 'service_ibewued'; 
         const EMAILJS_TEMPLATE_NEW_TASK = 'template_iro6gon'; 
-        const EMAILJS_TEMPLATE_REMINDER = 'template_6pbna5z'; 
+        const EMAILJS_TEMPLATE_REMINDER = 'template_iz6sznz'; 
         const EMAILJS_PUBLIC_KEY_1 = '1jeick6OIh3v4znyt';
 
         const EMAILJS_SERVICE_ID_2 = 'service_cf5myn4'; 
@@ -1808,6 +1814,25 @@
                 document.getElementById('notificationsBadge').innerText = '0';
             }
         };
+
+        function sendNotificationToUser(targetUid, title, body, link) {
+            getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', targetUid)).then(snap => {
+                if(snap.exists()) {
+                    const data = snap.data();
+                    const newNotif = {
+                        id: Date.now().toString(),
+                        title: window.escapeHTML(title),
+                        body: window.escapeHTML(body),
+                        link: link || 'home-grid',
+                        timestamp: Date.now()
+                    };
+                    let notifs = data.notifications || [];
+                    notifs.unshift(newNotif);
+                    if(notifs.length > 50) notifs = notifs.slice(0, 50);
+                    updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', targetUid), { notifications: notifs }).catch(e => console.error(e));
+                }
+            });
+        }
 
         function addNotificationToDB(title, body, link) {
             if(!currentUserData) return;
@@ -2322,11 +2347,11 @@
 
                     if(now - lastTimeChecked >= ONE_DAY) {
                         
+                        task.lastReminder = now; // تحديث محلي فوري لمنع التكرار
                         updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', task.id), {
-                            lastReminder: Date.now()
+                            lastReminder: now
                         }).catch(e => console.error(e));
 
-                        // 1. Always send to the assignee
                         const assignedUser = globalUsers.find(u => u.id === task.assigneeId);
                         if(assignedUser && assignedUser.email && assignedUser.email !== 'no-email@company.com') {
                             const taskLink = window.location.origin + window.location.pathname + '#tasks';
@@ -2340,7 +2365,6 @@
                             }, EMAILJS_PUBLIC_KEY_1).catch(e => console.error(e));
                         }
 
-                        // 2. Only send to CEO if the task was created by the CEO (or someone else) - not self-assigned
                         if (ceoUser && ceoUser.email && task.createdBy !== task.assigneeId) {
                             const taskLink = window.location.origin + window.location.pathname + '#tasks';
                             const deadlineStr = task.deadline ? new Date(task.deadline).toLocaleString('ar-EG') : 'غير محدد';
@@ -2539,6 +2563,49 @@
             input.placeholder = 'أدخل خياراً جديداً';
             list.appendChild(input);
         };
+        
+        window.openNoticeModal = () => {
+            const container = document.getElementById('noticeVisibilitySelection');
+            container.innerHTML = `
+                <label class="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer transition">
+                    <input type="checkbox" value="all" class="notice-visibility-checkbox w-4 h-4 text-yellow-500 rounded" checked>
+                    <span class="text-sm font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-users text-yellow-500 mx-1"></i> الجميع</span>
+                </label>
+                <hr class="my-1 border-gray-200 dark:border-gray-600">
+            `;
+
+            globalUsers.forEach(u => {
+                if (u.role !== 'CEO' && u.uid !== currentUserData.uid) {
+                    container.innerHTML += `
+                        <label class="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer transition">
+                            <input type="checkbox" value="${u.uid}" class="notice-visibility-checkbox w-4 h-4 text-yellow-500 rounded" disabled>
+                            <img src="${window.escapeHTML(u.photoURL)}" class="w-5 h-5 rounded-full">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">${window.escapeHTML(u.name)} <span class="text-[10px] text-gray-500">(${window.escapeHTML(u.role)})</span></span>
+                        </label>
+                    `;
+                }
+            });
+
+            document.getElementById('noticeForm')?.reset();
+            document.getElementById('pollOptionsContainer').classList.add('hidden');
+            document.getElementById('customNoticeType').classList.add('hidden');
+            
+            setTimeout(() => {
+                const allCb = container.querySelector('input[value="all"]');
+                const otherCbs = container.querySelectorAll('input[value]:not([value="all"])');
+                if(allCb) {
+                    allCb.addEventListener('change', (e) => {
+                        if(e.target.checked) {
+                            otherCbs.forEach(cb => { cb.checked = false; cb.disabled = true; });
+                        } else {
+                            otherCbs.forEach(cb => { cb.disabled = false; });
+                        }
+                    });
+                }
+            }, 100);
+
+            window.openModal('noticeModal');
+        };
 
         const noticeForm = document.getElementById('noticeForm');
         if(noticeForm) {
@@ -2569,6 +2636,8 @@
                     });
                     if(options.length < 2) { showToast('يجب إضافة خيارين على الأقل للتصويت', 'warning'); return; }
                 }
+                
+                const visibleTo = Array.from(document.querySelectorAll('.notice-visibility-checkbox:checked')).map(cb => cb.value);
 
                 try {
                     await addDoc(getColRef('notices'), {
@@ -2580,6 +2649,8 @@
                         votes: {},
                         author: currentUserData.name,
                         expiryDate: expiryTime,
+                        visibleTo: visibleTo.length > 0 ? visibleTo : ['all'],
+                        viewedBy: [],
                         timestamp: Date.now()
                     });
                     window.closeModal('noticeModal');
@@ -2629,7 +2700,10 @@
             }
 
             const now = Date.now();
-            const validNotices = globalNotices.filter(n => !n.expiryDate || n.expiryDate >= now);
+            const validNotices = globalNotices.filter(n => 
+                (!n.expiryDate || n.expiryDate >= now) && 
+                (n.author === currentUserData.name || isCEO || !n.visibleTo || n.visibleTo.includes('all') || n.visibleTo.includes(currentUserData.uid))
+            );
 
             if(validNotices.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد إعلانات أو تعميمات حالياً.</p>';
@@ -2637,6 +2711,12 @@
             }
 
             validNotices.forEach(n => {
+                if(!n.viewedBy) n.viewedBy = [];
+                if(!n.viewedBy.includes(currentUserData.uid)) {
+                    n.viewedBy.push(currentUserData.uid);
+                    updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'notices', n.id), { viewedBy: n.viewedBy }).catch(e=>console.log(e));
+                }
+
                 const dateStr = new Date(n.timestamp).toLocaleDateString('ar-EG');
                 const delBtn = (isCEO || canPost) ? `<button onclick="window.deleteNotice('${n.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '';
                 
@@ -2678,6 +2758,20 @@
                 const badgeType = n.isPoll || n.type === 'poll' ? 'تصويت' : window.escapeHTML(n.type || 'تعميم إداري');
                 const badgeClass = n.isPoll || n.type === 'poll' ? 'bg-secondary' : 'bg-primary';
 
+                let viewersHtml = `<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-600 flex flex-wrap gap-1 items-center">
+                    <span class="text-[10px] text-gray-500 font-bold ml-2"><i class="fa-solid fa-eye"></i> شوهد من قبل:</span>`;
+                if(n.viewedBy.length === 0) {
+                    viewersHtml += `<span class="text-[10px] text-gray-400">لا أحد بعد</span>`;
+                } else {
+                    n.viewedBy.forEach(uid => {
+                        const u = globalUsers.find(user => user.uid === uid);
+                        if(u) {
+                            viewersHtml += `<img src="${window.escapeHTML(u.photoURL)}" class="w-5 h-5 rounded-full object-cover border border-gray-200 dark:border-gray-600" title="${window.escapeHTML(u.name)}">`;
+                        }
+                    });
+                }
+                viewersHtml += `</div>`;
+
                 list.innerHTML += `
                     <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 ${n.isPoll || n.type==='poll'? 'border-secondary' : 'border-yellow-500'} dark:border-gray-700 relative">
                         <div class="flex justify-between items-start mb-2">
@@ -2693,6 +2787,7 @@
                             <span><i class="fa-solid fa-user-pen"></i> بواسطة: ${window.escapeHTML(n.author)}</span>
                             <span><i class="fa-solid fa-calendar"></i> ${dateStr}</span>
                         </div>
+                        ${viewersHtml}
                     </div>
                 `;
             });
@@ -3080,7 +3175,7 @@
                         <div class="flex justify-between items-start mb-3 border-b dark:border-gray-700 pb-3">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 ${avatar}
-                                <div class="truncate">
+                                <div class"truncate">
                                     <h3 class="font-bold text-lg text-primary dark:text-secondary truncate" title="${window.escapeHTML(c.name)}">${window.escapeHTML(c.name)} <span class="inline-flex">${editClientBtn}${deleteClientBtn}</span></h3>
                                     <span class="text-[10px] bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-0.5 rounded font-bold">${window.escapeHTML(c.category || 'عام')}</span>
                                 </div>
@@ -3851,7 +3946,11 @@
                                     company_name: 'نظام شركة Quill'
                                 }, EMAILJS_PUBLIC_KEY_3).catch(e => console.error(e));
                             }
-                            addNotificationToDB('مهمة بانتظار الموافقة', `أنهى ${currentUserData.name} المهمة: ${title} بانتظار الاعتماد`, 'tasks');
+                            
+                            // Send local push notification to CEO
+                            if(ceoUser) {
+                                sendNotificationToUser(ceoUser.uid, 'مهمة بانتظار الموافقة', `أنهى ${currentUserData.name} المهمة: ${title} بانتظار الاعتماد`, 'tasks');
+                            }
                         }
                     } catch(e) { console.error(e); }
                 };
@@ -3869,6 +3968,18 @@
 
         window.updateTaskStatusFromCheckbox = async (id, title, isCompleted) => {
             if(isCompleted) {
+                const task = globalTasks.find(t => t.id === id);
+                if(task && task.checklists && task.checklists.length > 0) {
+                    const uncompletedItems = task.checklists.filter(c => !c.isCompleted).length;
+                    if(uncompletedItems > 0) {
+                        showToast(`يجب وضع علامة "صح" على جميع عناصر قائمة التحقق أولاً (متبقي ${uncompletedItems} عناصر)`, 'warning');
+                        
+                        const cb = document.querySelector(`.task-row-item[data-id="${id}"] .custom-checkbox`);
+                        if(cb) cb.checked = false;
+                        return;
+                    }
+                }
+
                 document.getElementById('reportTaskId').value = id;
                 document.getElementById('reportTaskTitle').value = title;
                 document.getElementById('reportText').value = '';
@@ -5088,6 +5199,11 @@
                         }
                         
                         document.getElementById('setupProfileScreen').classList.add('hidden');
+                        
+                        // Request notification permission if needed
+                        if ("Notification" in window && Notification.permission === "default") {
+                            Notification.requestPermission();
+                        }
                         
                         finishLoginSetup();
                     } else {
