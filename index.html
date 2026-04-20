@@ -1052,6 +1052,27 @@
         </div>
     </div>
 
+    <!-- نافذة رفض المهمة (للمدير) -->
+    <div id="rejectTaskModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[70] p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md overflow-hidden">
+            <div class="bg-red-600 text-white p-4 flex justify-between items-center">
+                <h3 class="font-bold text-base md:text-lg">سبب رفض المهمة</h3>
+                <button onclick="window.closeModal('rejectTaskModal')" class="hover:text-red-200 p-2"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form id="rejectTaskForm" class="p-4 md:p-6 space-y-4">
+                <input type="hidden" id="rejectModalTaskId">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">اكتب ملاحظتك للموظف للتعديل:</label>
+                    <textarea id="rejectReasonInput" rows="3" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-red-500 focus:outline-none whitespace-pre-wrap"></textarea>
+                </div>
+                <div class="pt-4 flex justify-end gap-2 space-x-reverse">
+                    <button type="button" onclick="window.closeModal('rejectTaskModal')" class="px-4 py-2 border dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition shadow-sm">تأكيد الرفض</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- نافذة تقارير المدير -->
     <div id="ceoReportsModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[60] p-4">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden">
@@ -1096,6 +1117,11 @@
                     <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">عنوان الإعلان</label><input type="text" id="noticeTitle" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none"></div>
                     <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">التفاصيل الكاملة</label><textarea id="noticeBody" rows="4" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none whitespace-pre-wrap font-semibold"></textarea></div>
                     
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تاريخ انتهاء الإعلان (اختياري - يُحذف تلقائياً)</label>
+                        <input type="date" id="noticeExpiryDate" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-yellow-500 focus:outline-none text-sm" style="color-scheme: light dark;">
+                    </div>
+
                     <div id="pollOptionsContainer" class="hidden border border-gray-200 dark:border-gray-700 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
                         <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">خيارات التصويت</label>
                         <div id="pollInputsList" class="space-y-2">
@@ -1394,7 +1420,6 @@
         import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc, getDoc, setDoc, query, orderBy, limit, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // دالة الحماية القصوى لتنظيف المدخلات (مكافحة XSS)
         window.escapeHTML = function(str) {
             if (!str) return '';
             return String(str).replace(/[&<>'"]/g, match => ({
@@ -2486,6 +2511,9 @@
                 const body = document.getElementById('noticeBody').value;
                 const rawType = document.getElementById('noticeType').value;
                 
+                const expiryVal = document.getElementById('noticeExpiryDate').value;
+                const expiryTime = expiryVal ? new Date(expiryVal).getTime() + (24*60*60*1000 - 1) : null;
+                
                 let finalType = rawType;
                 if(rawType === 'custom') {
                     finalType = document.getElementById('customNoticeType').value.trim() || 'تعميم عادي';
@@ -2503,13 +2531,14 @@
 
                 try {
                     await addDoc(getColRef('notices'), {
-                        title: title, // سيتم عمل escape عند العرض
+                        title: title, 
                         body: body,
                         type: finalType,
                         isPoll: isPoll,
                         options: options,
                         votes: {},
                         author: currentUserData.name,
+                        expiryDate: expiryTime,
                         timestamp: Date.now()
                     });
                     window.closeModal('noticeModal');
@@ -2558,12 +2587,15 @@
                 else addNoticeBtn.classList.add('hidden');
             }
 
-            if(globalNotices.length === 0) {
+            const now = Date.now();
+            const validNotices = globalNotices.filter(n => !n.expiryDate || n.expiryDate >= now);
+
+            if(validNotices.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-500 py-8">لا توجد إعلانات أو تعميمات حالياً.</p>';
                 return;
             }
 
-            globalNotices.forEach(n => {
+            validNotices.forEach(n => {
                 const dateStr = new Date(n.timestamp).toLocaleDateString('ar-EG');
                 const delBtn = (isCEO || canPost) ? `<button onclick="window.deleteNotice('${n.id}')" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>` : '';
                 
@@ -3421,7 +3453,7 @@
                 }
 
                 list.innerHTML += `
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <tr class="hover:bg-gray-50 dark:bg-gray-700 transition-colors">
                         <td class="p-3 md:p-4 flex items-center">
                             <img src="${window.escapeHTML(emp.photoURL)}" class="w-8 h-8 rounded-full mx-3 object-cover">
                             <span class="font-medium text-gray-800 dark:text-gray-200 text-sm">${window.escapeHTML(emp.name)}</span>
@@ -3738,7 +3770,7 @@
                 }
 
                 listBody.innerHTML += `
-                    <tr class="task-row-item hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 ${isCompleted ? 'opacity-60' : ''}" data-id="${task.id}" data-title="${window.escapeHTML(task.title)}" data-assignee="${window.escapeHTML(task.assigneeName)}" data-project="${window.escapeHTML(task.project || '')}">
+                    <tr class="task-row-item hover:bg-gray-50 dark:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 ${isCompleted ? 'opacity-60' : ''}" data-id="${task.id}" data-title="${window.escapeHTML(task.title)}" data-assignee="${window.escapeHTML(task.assigneeName)}" data-project="${window.escapeHTML(task.project || '')}">
                         <td class="p-3 text-center">
                             <input type="checkbox" class="custom-checkbox" ${isCompleted ? 'checked' : ''} ${!canCheck ? 'disabled' : ''} onchange="window.updateTaskStatusFromCheckbox('${task.id}', '${window.escapeHTML(task.title.replace(/'/g, "\\'"))}', this.checked)">
                         </td>
