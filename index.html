@@ -164,7 +164,7 @@
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-4">رمز الدخول للنظام</h2>
             <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm">يرجى إدخال رمز المرور الخاص بالشركة للمتابعة</p>
             <input type="password" id="sysPasswordInput" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-3 focus:outline-none focus:border-secondary mb-4 text-center" placeholder="اكتب كلمة السر">
-            <button onclick="window.checkSystemPassword()" class="w-full bg-secondary hover:bg-primary text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-sm">متابعة</button>
+            <button onclick="window.checkSystemPassword()" id="sysPasswordBtn" class="w-full bg-secondary hover:bg-primary text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-sm disabled:opacity-50">متابعة</button>
             <p id="sysPassError" class="text-red-500 text-sm mt-3 hidden font-bold">رمز الدخول غير صحيح!</p>
         </div>
     </div>
@@ -224,7 +224,7 @@
 
     <div id="toastContainer" class="fixed bottom-6 left-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- نافذة عارض الوسائط (الجديدة لحل المشكلة) -->
+    <!-- نافذة عارض الوسائط -->
     <div id="mediaViewerModal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
         <button onclick="window.closeMediaModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 p-2 z-[101]">
             <i class="fa-solid fa-xmark text-3xl"></i>
@@ -957,25 +957,20 @@
                         </div>
                     </div>
 
-                    <div id="transferCEOSection" class="hidden mt-8 pt-6 border-t border-red-200 dark:border-red-900/30">
-                        <h3 class="font-bold text-red-600 mb-4"><i class="fa-solid fa-triangle-exclamation mx-2"></i>نقل الإدارة (التنازل عن منصب المدير)</h3>
-                        <div class="bg-red-50 dark:bg-red-900/10 p-4 rounded-lg border border-red-100 dark:border-red-900/30">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 mb-4 font-semibold leading-relaxed">تحذير: هذا الإجراء سينقل جميع صلاحيات المدير التنفيذي لشخص آخر من اختيارك ولن تتمكن من استرجاعها. يجب عليك اختيار وظيفتك الجديدة في الشركة.</p>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">المدير الجديد:</label>
-                                    <select id="newCeoSelect" class="w-full border rounded-lg p-2.5 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 outline-none focus:border-red-400"></select>
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">وظيفتك الجديدة بعد النقل:</label>
-                                    <select id="exCeoNewRole" class="w-full border rounded-lg p-2.5 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600 outline-none focus:border-red-400">
-                                        <option value="technical team supervisor">Technical Team Supervisor</option>
-                                        <option value="Technical Engineer">Technical Engineer</option>
-                                        <option value="accountant">Accountant</option>
-                                    </select>
-                                </div>
+                    <!-- Auto Delete Logs Settings (Admin Only) -->
+                    <div id="logSettingsSection" class="hidden mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                        <h3 class="font-bold text-primary dark:text-secondary mb-4"><i class="fa-solid fa-clock-rotate-left mx-2"></i>إعدادات الحذف التلقائي لسجل النظام</h3>
+                        <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">حذف السجلات الأقدم من:</label>
+                            <div class="flex gap-2">
+                                <select id="logRetentionSelect" class="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-secondary">
+                                    <option value="0">عدم الحذف التلقائي (الاحتفاظ دائماً)</option>
+                                    <option value="1">1 يوم</option>
+                                    <option value="7">7 أيام</option>
+                                    <option value="30">30 يوم</option>
+                                </select>
+                                <button onclick="window.saveLogRetention()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm whitespace-nowrap">حفظ الإعدادات</button>
                             </div>
-                            <button onclick="window.transferCEO()" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition shadow">تأكيد ونقل الصلاحيات نهائياً</button>
                         </div>
                     </div>
                     
@@ -1013,7 +1008,7 @@
         </div>
     </div>
 
-    <!-- نافذة عرض إجراءات التعميم (من شاهد/من صوّت) -->
+    <!-- نافذة عرض إجراءات التعميم -->
     <div id="noticeActionModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[80] p-4 transition-opacity" onclick="if(event.target === this) window.closeModal('noticeActionModal')">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh] relative animate-fade-in text-right">
             <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
@@ -1772,10 +1767,12 @@
         
         let replyingToMsg = null;
         let creationChecklists = [];
-        let currentCrmTab = 'new'; // Tabs: 'new', 'current', 'signed'
-        window.currentTaskTab = 'active'; // Tabs: 'active', 'reports'
+        let currentCrmTab = 'new'; 
+        window.currentTaskTab = 'active'; 
         
-        let currentSystemPassword = '1112021'; // Default
+        let currentSystemPassword = '1112021'; 
+        let logRetentionDays = 0;
+        let isSystemConfigLoaded = false;
 
         const initSystem = async () => {
             try {
@@ -1786,12 +1783,24 @@
                 }
                 
                 onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), (docSnap) => {
+                    isSystemConfigLoaded = true;
                     if (docSnap.exists()) {
-                        currentSystemPassword = docSnap.data().password || '1112021';
+                        const data = docSnap.data();
+                        currentSystemPassword = data.password || '1112021';
                         const disp = document.getElementById('currentSysPassDisplay');
                         if(disp) disp.innerText = currentSystemPassword;
+                        
+                        logRetentionDays = data.logRetentionDays || 0;
+                        const sel = document.getElementById('logRetentionSelect');
+                        if(sel) sel.value = logRetentionDays;
                     } else {
-                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), { password: '1112021' }).catch(e=>{});
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), { password: '1112021', logRetentionDays: 0 }).catch(e=>{});
+                    }
+                    
+                    const sysBtn = document.getElementById('sysPasswordBtn');
+                    if(sysBtn) {
+                        sysBtn.disabled = false;
+                        sysBtn.innerText = 'متابعة';
                     }
                 });
             } catch(e) { console.error("Init Error", e); }
@@ -2012,6 +2021,10 @@
         }
 
         window.checkSystemPassword = () => {
+            if(!isSystemConfigLoaded) {
+                showToast('جاري الاتصال وتحديث البيانات، يرجى الانتظار...', 'warning');
+                return;
+            }
             const pass = document.getElementById('sysPasswordInput').value;
             if(pass === currentSystemPassword) {
                 document.getElementById('systemPasswordScreen').classList.add('hidden');
@@ -2029,8 +2042,17 @@
                 currentSystemPassword = newPass;
                 document.getElementById('currentSysPassDisplay').innerText = newPass;
                 document.getElementById('newSystemPassword').value = '';
-                showToast('تم تغيير كلمة المرور بنجاح', 'success');
-                logAction('تغيير كلمة المرور', `تم تغيير كلمة مرور النظام`);
+                showToast('تم تغيير كلمة المرور بنجاح. ستُطبق على الفور.', 'success');
+                logAction('تغيير كلمة المرور', `تم تغيير كلمة مرور الدخول للنظام`);
+            } catch(e) { console.error(e); }
+        };
+
+        window.saveLogRetention = async () => {
+            const days = parseInt(document.getElementById('logRetentionSelect').value);
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), { logRetentionDays: days }, { merge: true });
+                showToast('تم حفظ إعدادات الحذف التلقائي', 'success');
+                logAction('إعدادات النظام', `تم تغيير إعدادات حذف السجلات التلقائي إلى: ${days === 0 ? 'عدم الحذف' : days + ' أيام'}`);
             } catch(e) { console.error(e); }
         };
 
@@ -2601,7 +2623,6 @@
             document.getElementById(`msg-menu-${msgId}`).classList.add('hidden');
         };
 
-        // دالة فتح عارض الوسائط وإغلاقه
         window.openMedia = (src, type) => {
             const container = document.getElementById('mediaViewerContent');
             if(type.startsWith('image/')) {
@@ -2614,7 +2635,7 @@
 
         window.closeMediaModal = () => {
             const container = document.getElementById('mediaViewerContent');
-            container.innerHTML = ''; // لإيقاف الفيديو إن كان يعمل
+            container.innerHTML = ''; 
             window.closeModal('mediaViewerModal');
         };
 
@@ -3102,7 +3123,6 @@
                     if(allCb) {
                         allCb.addEventListener('change', (e) => {
                             if(e.target.checked) {
-                                // BUG 2 FIXED: Changed 'pos' to 'otherCbs'
                                 otherCbs.forEach(cb => { cb.checked = false; cb.disabled = true; });
                             } else {
                                 otherCbs.forEach(cb => { cb.disabled = false; });
@@ -3121,9 +3141,7 @@
                 e.preventDefault();
                 if(!currentUserData) return;
                 
-                const editId = document.getElementById('editClientId').value;
-                
-                try {
+                const editId = document.getElementById('editClientId').value;try {
                     const status = document.getElementById('clientStatus').value;
                     const cMethods = Array.from(document.querySelectorAll('input[name="contactMethod"]:checked')).map(cb => cb.value);
                     const visibleTo = Array.from(document.querySelectorAll('.client-visibility-checkbox:checked')).map(cb => cb.value);
@@ -3362,10 +3380,16 @@
                                 }
                             }
                             
+                            // إضافة وقت وتاريخ للملاحظة
+                            const noteTimeStr = note.timestamp ? new Date(note.timestamp).toLocaleString('ar-EG', {year: 'numeric', month: 'numeric', day: 'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+
                             notesHtml += `
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600 flex justify-between items-start">
                                     <div class="flex-1">
-                                        <p class="font-bold text-gray-700 dark:text-gray-300">${window.escapeHTML(note.authorName)}: ${note.editedAt ? '<span class="text-[9px] text-gray-400 font-normal">(معدلة)</span>' : ''}</p>
+                                        <div class="flex justify-between items-center mb-1">
+                                            <p class="font-bold text-gray-700 dark:text-gray-300">${window.escapeHTML(note.authorName)} ${note.editedAt ? '<span class="text-[9px] text-gray-400 font-normal">(معدلة)</span>' : ''}</p>
+                                            <span class="text-[9px] text-gray-400" dir="ltr">${noteTimeStr}</span>
+                                        </div>
                                         <p class="text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap leading-relaxed">${window.escapeHTML(note.text)}</p>
                                         ${attHtml}
                                     </div>
@@ -3612,7 +3636,6 @@
             
             if (currentUserData.role !== 'CEO') {
                 if (['dashboard', 'employees', 'logs'].includes(targetSection) && !currentUserData.permissions?.canAssignTasks && !currentUserData.permissions?.canExpenses && !currentUserData.permissions?.canCRM && !currentUserData.permissions?.canNotices) {
-                    // Check if employee has any permission that allows viewing the employees section
                     if (targetSection === 'employees' && (currentUserData.permissions?.canAssignTasks || currentUserData.permissions?.canExpenses || currentUserData.permissions?.canCRM || currentUserData.permissions?.canNotices)) {
                         // Allowed
                     } else {
@@ -4565,7 +4588,7 @@
                         
                         const actionText = (currentUserData.uid !== assigneeId) 
                             ? `تم إسناد مهمة "${title}" إلى ${assigneeName}` 
-                            : `قام الموظ ${currentUserData.name} بإنشاء مهمة ذاتية "${title}"`;
+                            : `قام الموظف ${currentUserData.name} بإنشاء مهمة ذاتية "${title}"`;
                             
                         logAction('إسناد مهمة', actionText);
                         showToast('تم إنشاء المهمة بنجاح', 'success');
@@ -5270,27 +5293,34 @@
             }
 
             if(currentUserData.role === 'CEO') {
-                const transferSection = document.getElementById('transferCEOSection');
-                if(transferSection) transferSection.classList.remove('hidden');
-                
-                const newCeoSelect = document.getElementById('newCeoSelect');
-                if(newCeoSelect) {
-                    newCeoSelect.innerHTML = '<option value="">-- اختر موظف ليصبح مديراً --</option>';
-                    globalUsers.forEach(u => {
-                        if(u.id !== currentUserData.uid && u.role !== 'CEO' && u.status !== 'pending' && u.status !== 'rejected') {
-                            newCeoSelect.innerHTML += `<option value="${u.id}">${window.escapeHTML(u.name)} (${window.escapeHTML(u.role)})</option>`;
-                        }
-                    });
-                }
-                
+                // Removed transferCEOSection logic completely as requested
                 const passwordSection = document.getElementById('systemPasswordSettings');
                 if(passwordSection) passwordSection.classList.remove('hidden');
+                
+                const logSettingsSection = document.getElementById('logSettingsSection');
+                if(logSettingsSection) logSettingsSection.classList.remove('hidden');
             } else {
-                const transferSection = document.getElementById('transferCEOSection');
-                if(transferSection) transferSection.classList.add('hidden');
                 const passwordSection = document.getElementById('systemPasswordSettings');
                 if(passwordSection) passwordSection.classList.add('hidden');
+                
+                const logSettingsSection = document.getElementById('logSettingsSection');
+                if(logSettingsSection) logSettingsSection.classList.add('hidden');
             }
+        }
+
+        function checkLogRetention() {
+            if (!currentUserData || currentUserData.role !== 'CEO' || logRetentionDays === 0) return;
+            
+            const now = Date.now();
+            const cutoffTime = now - (logRetentionDays * 24 * 60 * 60 * 1000);
+            
+            globalLogs.forEach(async (log) => {
+                if (log.timestamp < cutoffTime) {
+                    try {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'logs', log.id));
+                    } catch(e) { console.error('Error auto-deleting log:', e); }
+                }
+            });
         }
 
         function startDatabaseListeners() {
@@ -5323,6 +5353,11 @@
                         globalLogs.push({ id: doc.id, ...doc.data() });
                     });
                     renderLogs();
+                    
+                    // Check for auto-deletion logic based on retention settings
+                    if(currentUserData.role === 'CEO' && logRetentionDays > 0) {
+                        checkLogRetention();
+                    }
                 }, (error) => { console.error(error); });
             }
 
@@ -5558,7 +5593,6 @@
                         
                         document.getElementById('setupProfileScreen').classList.add('hidden');
                         
-                        // Request notification permission if needed
                         if ("Notification" in window && Notification.permission === "default") {
                             Notification.requestPermission();
                         }
@@ -5568,7 +5602,6 @@
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
                     }
                 } catch(e) { 
-                    // Silent catch to prevent disruptive alerts on load if network issues occur momentarily
                     console.error("Error fetching user data:", e); 
                 }
             } else {
@@ -5682,8 +5715,8 @@
             
             updateActivity();
             setInterval(updateActivity, 60000);
-            setInterval(checkAndSendReminders, 300000); // Check tasks every 5 mins
-            setInterval(checkAndSendCRMReminders, 600000); // Check CRM every 10 mins
+            setInterval(checkAndSendReminders, 300000); 
+            setInterval(checkAndSendCRMReminders, 600000); 
         }
         
         function updateActivity() {
