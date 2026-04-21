@@ -676,13 +676,10 @@
                 <div id="tasksMainView" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                     <div class="flex flex-col md:flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-primary rounded-t-lg text-white">
                         <div class="flex gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
-                            <button onclick="window.switchTaskTab('active')" id="tab-tasks-active" class="font-bold text-sm whitespace-nowrap px-3 py-1 rounded-full bg-white text-primary transition"><i class="fa-solid fa-list text-xs mx-1"></i> المهام الحالية</button>
-                            <button onclick="window.switchTaskTab('reports')" id="tab-tasks-reports" class="font-bold text-sm whitespace-nowrap bg-white/20 px-3 py-1 rounded-full text-white transition"><i class="fa-solid fa-folder text-xs mx-1"></i> تقاريري</button>
+                            <button onclick="window.switchTaskTab('active')" id="tab-tasks-active" class="font-bold text-sm whitespace-nowrap px-3 py-1 rounded-full bg-white text-primary transition shadow-sm"><i class="fa-solid fa-list text-xs mx-1"></i> المهام الحالية</button>
+                            <button onclick="window.switchTaskTab('reports')" id="tab-tasks-reports" class="font-bold text-sm whitespace-nowrap bg-white/20 px-3 py-1 rounded-full text-white hover:bg-white/30 transition"><i class="fa-solid fa-folder text-xs mx-1"></i> <span id="reportsTabTxt">تقاريري</span></button>
                         </div>
                         <div class="flex gap-2 mt-3 md:mt-0 w-full md:w-auto">
-                            <button id="viewReportsBtn" onclick="window.toggleCeoReportsInline()" class="hidden bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded text-sm font-bold transition flex items-center gap-1 shadow-sm whitespace-nowrap">
-                                <i class="fa-solid fa-folder-open"></i> تقارير الموظفين
-                            </button>
                             <div class="relative w-full md:w-48">
                                 <input type="text" id="taskSearchInput" onkeyup="window.filterTasksList()" placeholder="عامل التصفية والبحث" class="bg-white/10 border border-white/20 rounded text-white px-3 py-1.5 text-sm w-full focus:outline-none focus:bg-white/20 placeholder-white/60">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 text-xs"></i>
@@ -718,25 +715,6 @@
                     <div class="p-3 border-t border-gray-200 dark:border-gray-700 flex justify-end items-center text-xs text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
                         <div class="flex items-center gap-4">
                             <span>الإجمالي: <b id="totalTasksCountList">0</b></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Inline CEO Reports View -->
-                <div id="inlineCeoReports" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-sm h-[calc(100vh-140px)] flex flex-col overflow-hidden">
-                    <div class="bg-gray-700 text-white p-4 flex justify-between items-center flex-shrink-0 rounded-t-lg">
-                        <h3 class="font-bold text-base md:text-lg"><i class="fa-solid fa-folder-open mx-2"></i> تقارير المهام المنجزة للموظفين</h3>
-                        <button onclick="window.toggleCeoReportsInline()" class="bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded text-sm font-bold transition flex items-center gap-2">
-                            <i class="fa-solid fa-arrow-right"></i> العودة للمهام
-                        </button>
-                    </div>
-                    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
-                        <div class="w-full md:w-1/3 border-b md:border-b-0 md:rtl:border-l md:ltr:border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-2" id="ceoReportEmployeesList"></div>
-                        <div class="w-full md:w-2/3 p-4 overflow-y-auto bg-white dark:bg-gray-800 relative" id="ceoReportTasksDetails">
-                            <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                                <i class="fa-solid fa-clipboard-list text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
-                                <p>اختر موظفاً من القائمة لعرض تقاريره</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1406,15 +1384,19 @@
                         <div class="space-y-2 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="permAssignTasks" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إسناد المهام للآخرين</span>
+                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إسناد ومراجعة المهام</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="permExpenses" class="w-4 h-4 text-blue-600 rounded">
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إدارة المصاريف والنثريات</span>
+                                <input type="checkbox" id="permManageGroups" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إدارة مجموعات الدردشة</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="permCRM" class="w-4 h-4 text-blue-600 rounded">
                                 <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إدارة العملاء كاملة</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="permExpenses" class="w-4 h-4 text-blue-600 rounded">
+                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">إدارة المصاريف والنثريات</span>
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" id="permNotices" class="w-4 h-4 text-blue-600 rounded">
@@ -3644,14 +3626,87 @@
             };
 
             window.openEditEmployeeModal = (id, name, role) => {
-                document.getElementById('editEmpId').value = id;
-                document.getElementById('editEmpName').value = name;
-                const selectRole = document.getElementById('editEmpRole');
-                if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
-                    selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
-                } else if (currentUserData.role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
-                    selectRole.innerHTML += `<option value="CEO">CEO (المدير التنفيذي)</option>`;
+            document.getElementById('editEmpId').value = id;
+            document.getElementById('editEmpName').value = name;
+            const selectRole = document.getElementById('editEmpRole');
+            if(role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
+                selectRole.innerHTML = `<option value="CEO">CEO (المدير التنفيذي)</option>` + selectRole.innerHTML;
+            } else if (currentUserData.role === 'CEO' && !selectRole.querySelector('option[value="CEO"]')) {
+                selectRole.innerHTML += `<option value="CEO">CEO (المدير التنفيذي)</option>`;
+            }
+            selectRole.value = role;
+
+            const targetUser = globalUsers.find(u => u.id === id);
+            const perms = targetUser?.permissions || {};
+            
+            document.getElementById('permAssignTasks').checked = !!perms.canAssignTasks;
+            document.getElementById('permManageGroups').checked = !!perms.permManageGroups;
+            document.getElementById('permExpenses').checked = !!perms.canExpenses;
+            document.getElementById('permCRM').checked = !!perms.canCRM;
+            document.getElementById('permNotices').checked = !!perms.canNotices;
+            document.getElementById('editEmpAssets').value = targetUser?.assets || '';
+
+            window.openModal('editEmployeeModal');
+        };
+
+        const editEmployeeForm = document.getElementById('editEmployeeForm');
+        if (editEmployeeForm) {
+            editEmployeeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if(currentUserData.role !== 'CEO') return;
+
+                const id = document.getElementById('editEmpId').value;
+                const newName = document.getElementById('editEmpName').value;
+                const newRole = document.getElementById('editEmpRole').value;
+                const newAssets = document.getElementById('editEmpAssets').value;
+
+                if (newRole === 'CEO' && id !== currentUserData.uid) {
+                    const confirmMsg = "تحذير نهائي:\nأنت على وشك التنازل عن منصب (CEO - المدير التنفيذي) ونقل كافة الصلاحيات الإدارية المطلقة لهذا الموظف، ولن تتمكن من استرجاعها.\n\nهل أنت متأكد بنسبة 100% ؟";
+                    if (!confirm(confirmMsg)) return;
+
+                    try {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
+                            role: 'CEO',
+                            name: newName,
+                            assets: newAssets,
+                            permissions: { canAssignTasks: true, canExpenses: true, canCRM: true, canNotices: true, permManageGroups: true }
+                        });
+                        
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUserData.uid), { 
+                            role: 'Technical Engineer', 
+                            permissions: { canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false, permManageGroups: false }
+                        });
+                        
+                        window.closeModal('editEmployeeModal');
+                        showToast('تم نقل الإدارة بنجاح! سيتم إعادة تحميل النظام...', 'success');
+                        logAction('نقل الإدارة', `تم التنازل عن منصب المدير ونقله إلى ${newName}`);
+                        
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                        return;
+                    } catch(e) { console.error(e); showToast('حدث خطأ', 'error'); return; }
                 }
+
+                const permissions = {
+                    canAssignTasks: document.getElementById('permAssignTasks').checked,
+                    permManageGroups: document.getElementById('permManageGroups').checked,
+                    canExpenses: document.getElementById('permExpenses').checked,
+                    canCRM: document.getElementById('permCRM').checked,
+                    canNotices: document.getElementById('permNotices').checked
+                };
+
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id), { 
+                        name: newName, 
+                        role: newRole,
+                        assets: newAssets,
+                        permissions: permissions
+                    });
+                    window.closeModal('editEmployeeModal');
+                    showToast('تم تحديث بيانات وصلاحيات الموظف بنجاح', 'success');
+                    logAction('تعديل موظف', `تم تعديل بيانات وصلاحيات الموظف: ${newName}`);
+                } catch(error) { console.error(error); }
+            });
+        }
                 selectRole.value = role;
 
                 const targetUser = globalUsers.find(u => u.id === id);
@@ -4117,17 +4172,25 @@
                 if(!listBody) return;
                 listBody.innerHTML = '';
                 
-                const isCEO = currentUserData.role === 'CEO';
+                const isCEO = currentUserData.role === 'CEO' || currentUserData.permissions?.canAssignTasks;
                 let tasksToRender = globalTasks;
                 
                 if(!isCEO) {
                     tasksToRender = globalTasks.filter(t => t.assigneeId === currentUserData.uid || t.createdBy === currentUserData.uid);
                 }
 
-                if (window.currentTaskTab === 'reports' && !isCEO) {
-                    tasksToRender = tasksToRender.filter(t => (t.status === 'completed' || t.status === 'pending_approval') && t.assigneeId === currentUserData.uid);
+                if (window.currentTaskTab === 'reports') {
+                    if(isCEO) {
+                        tasksToRender = tasksToRender.filter(t => t.status === 'completed' || t.status === 'pending_approval');
+                    } else {
+                        tasksToRender = tasksToRender.filter(t => (t.status === 'completed' || t.status === 'pending_approval') && t.assigneeId === currentUserData.uid);
+                    }
                 } else if (window.currentTaskTab === 'active') {
-                    tasksToRender = tasksToRender.filter(t => t.status !== 'completed' && t.status !== 'pending_approval');
+                    if(isCEO) {
+                        tasksToRender = tasksToRender.filter(t => t.status !== 'completed' && t.status !== 'pending_approval');
+                    } else {
+                        tasksToRender = tasksToRender.filter(t => t.status !== 'completed' && t.status !== 'pending_approval');
+                    }
                 }
 
                 tasksToRender.sort((a,b) => b.timestamp - a.timestamp); 
@@ -4201,7 +4264,12 @@
 
                     let rejectAlertHtml = '';
                     if (task.rejectReason && task.status === 'in-progress') {
-                        rejectAlertHtml = `<div class="bg-red-100 text-red-700 p-2 rounded mb-3 text-xs font-bold border border-red-300"><i class="fa-solid fa-triangle-exclamation mx-1"></i> ملاحظة الإدارة (مرفوضة للتعديل): ${window.escapeHTML(task.rejectReason)}</div>`;
+                        rejectAlertHtml = `
+                            <div class="bg-red-50 text-red-700 p-4 rounded-lg mb-4 text-sm font-bold border-2 border-red-300 shadow-sm animate-pulse">
+                                <i class="fa-solid fa-triangle-exclamation text-xl mx-2 text-red-600"></i> 
+                                مهمة مرفوضة وبحاجة لتعديل. السبب: <span class="block mt-2 text-gray-800 bg-white p-2 rounded border border-red-200">${window.escapeHTML(task.rejectReason)}</span>
+                            </div>
+                        `;
                     }
 
                     // Report section if in "reports" tab
@@ -4215,11 +4283,23 @@
                                 repFileHtml = `<a href="${window.escapeHTML(task.reportFileData)}" download="مرفق_مهمة" class="inline-block mt-3 bg-secondary text-white text-xs px-3 py-1.5 rounded transition hover:bg-primary"><i class="fa-solid fa-download mx-1"></i> تحميل المرفق</a>`;
                             }
                         }
+                        
+                        let approvalHtml = '';
+                        if(task.status === 'pending_approval' && isCEO && task.createdBy !== task.assigneeId) {
+                            approvalHtml = `
+                                <div class="mt-4 flex gap-2 border-t border-gray-200 dark:border-gray-600 pt-3">
+                                    <button onclick="window.approveTask('${task.id}')" class="flex-1 bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition shadow-sm text-sm"><i class="fa-solid fa-check ml-1"></i> موافقة واعتماد</button>
+                                    <button onclick="window.openRejectTaskModal('${task.id}')" class="flex-1 bg-red-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-600 transition shadow-sm text-sm"><i class="fa-solid fa-xmark ml-1"></i> رفض وتعديل</button>
+                                </div>
+                            `;
+                        }
+
                         myReportHtml = `
                             <div class="mt-4 border-t border-gray-200 dark:border-gray-600 pt-3 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
-                                <h6 class="text-xs font-bold text-secondary dark:text-teal-400 mb-1"><i class="fa-solid fa-file-contract mx-1"></i> تقريري المرسل:</h6>
+                                <h6 class="text-xs font-bold text-secondary dark:text-teal-400 mb-1"><i class="fa-solid fa-file-contract mx-1"></i> تقرير إنجاز المهمة:</h6>
                                 <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">${window.escapeHTML(task.reportText || 'لم يتم كتابة نص')}</p>
                                 ${repFileHtml}
+                                ${approvalHtml}
                             </div>
                         `;
                     }
@@ -4273,6 +4353,49 @@
                             </td>
                         </tr>
                     `;
+                });
+            }
+
+            window.approveTask = async (taskId) => {
+                if(confirm('هل أنت متأكد من الموافقة على هذا التقرير واعتماده؟')) {
+                    try {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), { status: 'completed' });
+                        showToast('تم الموافقة على المهمة بنجاح', 'success');
+                        renderTasks();
+                    } catch(e) { console.error(e); }
+                }
+            };
+
+            window.openRejectTaskModal = (taskId) => {
+                document.getElementById('rejectModalTaskId').value = taskId;
+                window.openModal('rejectTaskModal');
+            };
+
+            const rejectForm = document.getElementById('rejectTaskForm');
+            if(rejectForm) {
+                rejectForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const taskId = document.getElementById('rejectModalTaskId').value;
+                    const reason = document.getElementById('rejectReasonInput').value;
+                    try {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', taskId), {
+                            status: 'in-progress',
+                            rejectReason: reason,
+                            completedAt: null
+                        });
+                        window.closeModal('rejectTaskModal');
+                        showToast('تم رفض المهمة وإعادتها للموظف', 'success');
+                        
+                        const task = globalTasks.find(t => t.id === taskId);
+                        if(task) {
+                            const assignedUser = globalUsers.find(u => u.id === task.assigneeId);
+                            if(assignedUser && assignedUser.email) {
+                                sendEmailNotification(assignedUser.email, assignedUser.name, `مرفوضة للتعديل: ${task.title}`, `لقد قام المدير برفض التقرير وطلب التعديل. السبب: ${reason}`);
+                                sendNotificationToUser(task.assigneeId, 'مهمة مرفوضة', `تم رفض تقرير المهمة: ${task.title}، يرجى التعديل`, 'tasks');
+                            }
+                        }
+                        renderTasks();
+                    } catch(e) { console.error(e); }
                 });
             }
 
@@ -4770,7 +4893,7 @@
                 
                 let totalUnreadCount = 0;
                 let totalMentions = false;
-                const isCEO = currentUserData && currentUserData.role === 'CEO';
+                const isCEO = currentUserData && (currentUserData.role === 'CEO' || currentUserData.permissions?.permManageGroups);
 
                 globalGroups.forEach(g => {
                     const isActive = currentGroupId === g.id && !document.getElementById('chat').classList.contains('hidden');
@@ -5165,24 +5288,24 @@
                 }, (error) => { console.error(error); });
 
                 onSnapshot(getColRef('groups'), (snapshot) => {
-                    globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
-                    let foundCurrentGroup = false;
-                    
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-                        if(currentUserData.role === 'CEO' || (data.members && data.members.includes(currentUserData.uid))) {
-                            globalGroups.push({ id: doc.id, ...data });
-                            if (doc.id === currentGroupId) foundCurrentGroup = true;
-                        }
-                    });
-                    
-                    if(!foundCurrentGroup && currentGroupId !== 'global') {
-                        currentGroupId = 'global';
+                globalGroups = [{ id: 'global', name: t('الدردشة العامة للشركة'), members: [], desc: t('يتواجد هنا جميع أعضاء مساحة العمل') }];
+                let foundCurrentGroup = false;
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(currentUserData.role === 'CEO' || currentUserData.permissions?.permManageGroups || (data.members && data.members.includes(currentUserData.uid))) {
+                        globalGroups.push({ id: doc.id, ...data });
+                        if (doc.id === currentGroupId) foundCurrentGroup = true;
                     }
-                    
-                    renderChatSidebarList();
-                    renderChat();
-                }, (error) => { console.error(error); });
+                });
+                
+                if(!foundCurrentGroup && currentGroupId !== 'global') {
+                    currentGroupId = 'global';
+                }
+                
+                renderChatSidebarList();
+                renderChat();
+            }, (error) => { console.error(error); });
 
                 const chatQuery = query(getColRef('chat'), orderBy('timestamp', 'desc'), limit(150));
                 onSnapshot(chatQuery, (snapshot) => {
@@ -5349,6 +5472,12 @@
                 const isCEO = currentUserData.role === 'CEO';
                 const p = currentUserData.permissions || {};
 
+                if(isCEO || p.canAssignTasks) {
+                    document.getElementById('reportsTabTxt').innerText = 'تقارير الموظفين';
+                } else {
+                    document.getElementById('reportsTabTxt').innerText = 'تقاريري';
+                }
+
                 if(isCEO) {
                     document.getElementById('grid-employees').classList.remove('hidden');
                     document.getElementById('grid-dashboard').classList.remove('hidden');
@@ -5360,8 +5489,6 @@
                     
                     document.getElementById('clearLogsBtn').classList.remove('hidden'); 
                     document.getElementById('clearLogsBtn').style.display = 'flex';
-                    document.getElementById('viewReportsBtn').classList.remove('hidden');
-                    document.getElementById('viewReportsBtn').style.display = 'flex';
                     document.getElementById('empActionHeader').classList.remove('hidden');
                     document.getElementById('ceoExportSection').classList.remove('hidden');
                 } else {
@@ -5380,7 +5507,6 @@
                     document.getElementById('nav-dashboard-btn').classList.add('hidden');
                     
                     document.getElementById('clearLogsBtn').classList.add('hidden');
-                    document.getElementById('viewReportsBtn').classList.add('hidden');
                     
                     document.getElementById('empActionHeader').classList.add('hidden');
                     document.getElementById('ceoExportSection').classList.add('hidden');
@@ -5395,7 +5521,11 @@
                     document.getElementById('grid-expenses-ext').classList.remove('hidden');
                 }
                 
-                document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+                if (isCEO || p.permManageGroups) {
+                    document.getElementById('innerCreateGroupBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('innerCreateGroupBtn').classList.add('hidden');
+                }
                 
                 if(currentUserData.lastSystemExport) {
                     const txt = document.getElementById('lastSystemExportTxt');
