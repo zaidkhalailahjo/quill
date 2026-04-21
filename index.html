@@ -155,6 +155,7 @@
         <p class="text-primary dark:text-secondary font-bold text-lg" data-i18n="جاري التحميل...">جاري تحميل النظام...</p>
     </div>
 
+    <!-- شاشة إدخال رمز النظام -->
     <div id="systemPasswordScreen" class="fixed inset-0 bg-primary z-[45] hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-gray-800 p-6 md:p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
             <img src="https://quill.world/wp-content/uploads/2022/01/New-Project-9-1-1.png" alt="Logo" class="h-12 md:h-16 mx-auto mb-6 object-contain block dark:hidden">
@@ -165,6 +166,16 @@
             <input type="password" id="sysPasswordInput" class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-4 py-3 focus:outline-none focus:border-secondary mb-4 text-center" placeholder="اكتب كلمة السر">
             <button onclick="window.checkSystemPassword()" class="w-full bg-secondary hover:bg-primary text-white font-bold py-3 px-4 rounded-lg transition-colors shadow-sm">متابعة</button>
             <p id="sysPassError" class="text-red-500 text-sm mt-3 hidden font-bold">رمز الدخول غير صحيح!</p>
+        </div>
+    </div>
+
+    <!-- شاشة بانتظار موافقة الإدارة -->
+    <div id="pendingApprovalScreen" class="fixed inset-0 bg-primary z-[42] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <i class="fa-solid fa-user-clock text-6xl text-orange-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">طلبك قيد المراجعة</h2>
+            <p class="text-gray-500 dark:text-gray-400 mb-6 text-sm leading-relaxed">تم إرسال بياناتك بنجاح. يرجى الانتظار حتى يقوم المدير بالموافقة على طلب انضمامك للنظام.</p>
+            <button onclick="window.location.reload()" class="w-full bg-secondary hover:bg-primary text-white font-bold py-3 px-4 rounded-lg transition-colors">تحديث الصفحة</button>
         </div>
     </div>
 
@@ -205,7 +216,7 @@
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-secondary text-white font-bold py-3 px-4 rounded-lg hover:bg-primary transition-colors mt-4" data-i18n="الدخول للنظام">
-                    الدخول للنظام
+                    إرسال طلب الانضمام
                 </button>
             </form>
         </div>
@@ -334,7 +345,7 @@
                             <i class="fa-solid fa-comments w-6 text-center ml-3"></i><span class="font-semibold text-sm" data-i18n="المناقشة">المناقشة</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span id="globalChatBadgeMobile" class="hidden bg-blue-500 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
+                            <span id="globalChatBadgeMobile" class="hidden bg-blue-50 text-white text-[10px] font-bold px-1.5 rounded-full"></span>
                             <i id="chatMenuIconMobile" class="fa-solid fa-chevron-down text-xs transition-transform duration-300"></i>
                         </div>
                     </button>
@@ -601,6 +612,24 @@
                 <div class="flex justify-between items-center mb-4 md:mb-6">
                     <p class="text-sm md:text-base text-gray-600 dark:text-gray-300" data-i18n="فريق العمل المسجل">فريق العمل المسجل في النظام</p>
                 </div>
+                
+                <!-- Pending Approvals Section (CEO only) -->
+                <div id="pendingEmployeesContainer" class="mb-8 hidden">
+                    <h3 class="font-bold text-orange-500 mb-3 flex items-center gap-2"><i class="fa-solid fa-user-clock"></i> طلبات الانضمام المعلقة</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-orange-200 dark:border-orange-900 overflow-hidden overflow-x-auto">
+                        <table class="w-full text-right min-w-[500px]">
+                            <thead class="bg-orange-50/50 dark:bg-orange-900/10 border-b border-orange-100 dark:border-orange-900/50">
+                                <tr>
+                                    <th class="p-3 md:p-4 text-xs md:text-sm font-bold text-orange-800 dark:text-orange-200">الاسم / البريد</th>
+                                    <th class="p-3 md:p-4 text-xs md:text-sm font-bold text-orange-800 dark:text-orange-200">الوظيفة المطلوبة</th>
+                                    <th class="p-3 md:p-4 text-xs md:text-sm font-bold text-orange-800 dark:text-orange-200 text-left">قرار الإدارة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pendingEmployeesList" class="divide-y divide-orange-100 dark:divide-orange-900/50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden overflow-x-auto">
                     <table class="w-full text-right min-w-[500px]">
                         <thead class="bg-gray-50 dark:bg-gray-700 border-b dark:border-gray-600">
@@ -881,6 +910,18 @@
                         </div>
                     </div>
 
+                    <!-- System Password Management (Admin Only) -->
+                    <div id="systemPasswordSettings" class="hidden mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+                        <h3 class="font-bold text-primary dark:text-secondary mb-4"><i class="fa-solid fa-lock mx-2"></i>إدارة كلمة مرور النظام</h3>
+                        <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">كلمة المرور الحالية: <span id="currentSysPassDisplay" class="font-bold text-gray-800 dark:text-white tracking-widest px-2 py-1 bg-gray-200 dark:bg-gray-600 rounded">جاري التحميل...</span></p>
+                            <div class="flex gap-2">
+                                <input type="text" id="newSystemPassword" placeholder="كلمة المرور الجديدة..." class="flex-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-secondary">
+                                <button onclick="window.changeSystemPassword()" class="bg-secondary hover:bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm whitespace-nowrap">تغيير</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="transferCEOSection" class="hidden mt-8 pt-6 border-t border-red-200 dark:border-red-900/30">
                         <h3 class="font-bold text-red-600 mb-4"><i class="fa-solid fa-triangle-exclamation mx-2"></i>نقل الإدارة (التنازل عن منصب المدير)</h3>
                         <div class="bg-red-50 dark:bg-red-900/10 p-4 rounded-lg border border-red-100 dark:border-red-900/30">
@@ -938,12 +979,13 @@
     </div>
 
     <!-- نافذة عرض إجراءات التعميم (من شاهد/من صوّت) -->
-    <div id="noticeActionModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[80] p-4 transition-opacity">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-xs overflow-hidden flex flex-col animate-fade-in text-center p-6">
-            <button onclick="window.closeModal('noticeActionModal')" class="absolute top-4 left-4 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark text-lg"></i></button>
-            <img id="noticeActionAvatar" src="" class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-primary mb-3">
-            <h3 id="noticeActionName" class="font-bold text-lg text-gray-800 dark:text-white mb-2"></h3>
-            <div id="noticeActionDetails" class="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600"></div>
+    <div id="noticeActionModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-[80] p-4 transition-opacity" onclick="if(event.target === this) window.closeModal('noticeActionModal')">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col max-h-[80vh] relative animate-fade-in text-right">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900">
+                <h3 class="font-bold text-gray-800 dark:text-white">التفاعلات والمشاهدات</h3>
+                <button type="button" onclick="window.closeModal('noticeActionModal')" class="text-gray-400 hover:text-red-500 bg-gray-200 dark:bg-gray-700 w-8 h-8 rounded-full flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="noticeActionList" class="overflow-y-auto p-2 flex-1"></div>
         </div>
     </div>
 
@@ -1270,6 +1312,11 @@
                 <input type="hidden" id="noteClientId">
                 <div><label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تفاصيل الملاحظة (سيراها من لديه صلاحية فقط)</label><textarea id="noteText" rows="3" required class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-gray-500 focus:outline-none whitespace-pre-wrap"></textarea></div>
                 
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">إرفاق ملف إثبات (صورة / PDF) - اختياري</label>
+                    <input type="file" id="noteAttachmentInput" accept="image/*,application/pdf" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg px-3 py-2 focus:outline-none text-sm">
+                </div>
+
                 <div>
                     <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">تحديث تاريخ المتابعة؟ (اختياري)</label>
                     <input type="date" id="noteFollowUpUpdate" class="w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-3 py-2 focus:border-gray-500 focus:outline-none text-sm" style="color-scheme: light dark;">
@@ -1693,6 +1740,29 @@
         let currentCrmTab = 'new'; // Tabs: 'new', 'current', 'signed'
         window.currentTaskTab = 'active'; // Tabs: 'active', 'reports'
         
+        let currentSystemPassword = '1112021'; // Default
+
+        const initSystem = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentSystemPassword = docSnap.data().password || '1112021';
+                        const disp = document.getElementById('currentSysPassDisplay');
+                        if(disp) disp.innerText = currentSystemPassword;
+                    } else {
+                        setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), { password: '1112021' }).catch(e=>{});
+                    }
+                });
+            } catch(e) { console.error("Init Error", e); }
+        };
+        initSystem();
+
         function requestLocation() {
             return new Promise((resolve) => {
                 if ("geolocation" in navigator) {
@@ -1908,12 +1978,25 @@
 
         window.checkSystemPassword = () => {
             const pass = document.getElementById('sysPasswordInput').value;
-            if(pass === '1112021') {
+            if(pass === currentSystemPassword) {
                 document.getElementById('systemPasswordScreen').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
             } else {
                 document.getElementById('sysPassError').classList.remove('hidden');
             }
+        };
+        
+        window.changeSystemPassword = async () => {
+            const newPass = document.getElementById('newSystemPassword').value.trim();
+            if(!newPass) return;
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'system'), { password: newPass }, { merge: true });
+                currentSystemPassword = newPass;
+                document.getElementById('currentSysPassDisplay').innerText = newPass;
+                document.getElementById('newSystemPassword').value = '';
+                showToast('تم تغيير كلمة المرور بنجاح', 'success');
+                logAction('تغيير كلمة المرور', `تم تغيير كلمة مرور النظام`);
+            } catch(e) { console.error(e); }
         };
 
         function showToast(message, type = 'info') {
@@ -2558,21 +2641,43 @@
             list.appendChild(input);
         };
 
-        window.showNoticeAction = (uid, noticeId) => {
+        window.showNoticeActions = (noticeId) => {
             const notice = globalNotices.find(n => n.id === noticeId);
-            const user = globalUsers.find(u => u.uid === uid);
-            if(!notice || !user) return;
+            if(!notice) return;
             
-            let actionText = 'شاهد التعميم <i class="fa-solid fa-eye text-blue-500 mx-1"></i>';
-            if (notice.isPoll || notice.type === 'poll') {
-                if (notice.votes && notice.votes[uid]) {
-                    actionText = `صوّت لـ: <span class="font-bold text-secondary px-2 py-1 bg-blue-50 dark:bg-gray-600 rounded">${window.escapeHTML(notice.votes[uid])}</span>`;
-                }
+            const listContainer = document.getElementById('noticeActionList');
+            listContainer.innerHTML = '';
+            
+            const interactedUsers = new Set([...(notice.viewedBy || [])]);
+            if (notice.votes) {
+                Object.keys(notice.votes).forEach(uid => interactedUsers.add(uid));
             }
             
-            document.getElementById('noticeActionAvatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}`;
-            document.getElementById('noticeActionName').innerText = user.name;
-            document.getElementById('noticeActionDetails').innerHTML = actionText;
+            if(interactedUsers.size === 0) {
+                listContainer.innerHTML = '<p class="text-center text-gray-500 p-4 text-sm">لا يوجد تفاعلات بعد.</p>';
+            } else {
+                let html = '<ul class="divide-y divide-gray-100 dark:divide-gray-700">';
+                interactedUsers.forEach(uid => {
+                    const u = globalUsers.find(user => user.uid === uid);
+                    if(u) {
+                        let actionText = '<span class="text-xs text-gray-500"><i class="fa-solid fa-eye text-blue-400"></i> شاهد الإعلان</span>';
+                        if ((notice.isPoll || notice.type === 'poll') && notice.votes && notice.votes[uid]) {
+                            actionText = `<span class="text-xs font-bold text-secondary bg-blue-50 dark:bg-gray-700 px-2 py-1 rounded">صوّت لـ: ${window.escapeHTML(notice.votes[uid])}</span>`;
+                        }
+                        html += `
+                            <li class="p-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <img src="${window.escapeHTML(u.photoURL)}" class="w-10 h-10 rounded-full object-cover">
+                                <div class="flex-1">
+                                    <p class="font-bold text-sm text-gray-800 dark:text-gray-200">${window.escapeHTML(u.name)}</p>
+                                    <div class="mt-1">${actionText}</div>
+                                </div>
+                            </li>
+                        `;
+                    }
+                });
+                html += '</ul>';
+                listContainer.innerHTML = html;
+            }
             window.openModal('noticeActionModal');
         };
         
@@ -2771,7 +2876,6 @@
                 if(n.viewedBy.length === 0) {
                     viewersHtml += `<span class="text-[10px] text-gray-400">لا أحد بعد</span>`;
                 } else {
-                    // Collect unique users from viewers AND voters to display their avatars
                     const interactedUsers = new Set([...n.viewedBy]);
                     if (n.votes) {
                         Object.keys(n.votes).forEach(uid => interactedUsers.add(uid));
@@ -2780,7 +2884,7 @@
                     interactedUsers.forEach(uid => {
                         const u = globalUsers.find(user => user.uid === uid);
                         if(u) {
-                            viewersHtml += `<button type="button" onclick="window.showNoticeAction('${uid}', '${n.id}')" class="focus:outline-none hover:scale-110 transition-transform"><img src="${window.escapeHTML(u.photoURL)}" class="w-6 h-6 rounded-full object-cover border border-gray-200 dark:border-gray-600 shadow-sm" title="${window.escapeHTML(u.name)}"></button>`;
+                            viewersHtml += `<button type="button" onclick="window.showNoticeActions('${n.id}')" class="focus:outline-none hover:scale-110 transition-transform"><img src="${window.escapeHTML(u.photoURL)}" class="w-6 h-6 rounded-full object-cover border border-gray-200 dark:border-gray-600 shadow-sm" title="${window.escapeHTML(u.name)}"></button>`;
                         }
                     });
                 }
@@ -2851,13 +2955,12 @@
                 }
             });
             
-            // Only show search and add button on the 'new' tab
             const searchContainer = document.getElementById('crmSearchContainer');
             const addBtn = document.querySelector('button[onclick="window.openClientModal()"]');
             if (tabName === 'new') {
                 searchContainer.classList.remove('hidden');
                 addBtn.classList.remove('hidden');
-                renderCRM(); // Re-render to ensure filtering is correct
+                renderCRM(); 
             } else {
                 searchContainer.classList.add('hidden');
                 addBtn.classList.add('hidden');
@@ -2875,7 +2978,7 @@
             `;
 
             globalUsers.forEach(u => {
-                if (u.role !== 'CEO' && u.uid !== currentUserData.uid) {
+                if (u.role !== 'CEO' && u.uid !== currentUserData.uid && u.status !== 'pending' && u.status !== 'rejected') {
                     container.innerHTML += `
                         <label class="flex items-center gap-2 p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded cursor-pointer transition">
                             <input type="checkbox" value="${u.uid}" class="client-visibility-checkbox w-4 h-4 text-lime-600 rounded">
@@ -2889,7 +2992,6 @@
             document.getElementById('clientForm')?.reset();
             document.getElementById('editClientId').value = '';
 
-            // If editing an existing client
             if (clientId) {
                 const client = globalCRM.find(c => c.id === clientId);
                 if (client) {
@@ -2919,9 +3021,10 @@
                         const allCb = container.querySelector('input[value="all"]');
                         const otherCbs = container.querySelectorAll('input[value]:not([value="all"])');
                         if (client.visibleTo && client.visibleTo.includes('all')) {
-                            allCb.checked = true;
+                            if(allCb) allCb.checked = true;
                             otherCbs.forEach(cb => { cb.checked = false; cb.disabled = true; });
                         } else if (client.visibleTo) {
+                            if(allCb) allCb.checked = false;
                             client.visibleTo.forEach(v => {
                                 const cb = container.querySelector(`input[value="${v}"]`);
                                 if(cb) cb.checked = true;
@@ -2947,7 +3050,7 @@
                     if(allCb) {
                         allCb.addEventListener('change', (e) => {
                             if(e.target.checked) {
-                                otherCbs.forEach(cb => { cb.checked = false; cb.disabled = true; });
+                                pos.forEach(cb => { cb.checked = false; cb.disabled = true; });
                             } else {
                                 otherCbs.forEach(cb => { cb.disabled = false; });
                             }
@@ -2985,7 +3088,7 @@
                         status: status,
                         category: document.getElementById('clientCategory').value,
                         contactMethod: cMethods, 
-                        visibleTo: visibleTo.length > 0 ? visibleTo : null, 
+                        visibleTo: visibleTo.length > 0 ? visibleTo : ['all'], 
                         nextFollowUp: document.getElementById('clientNextFollowUp').value || null,
                     };
 
@@ -3013,6 +3116,9 @@
         window.openNoteModal = (clientId) => {
             const noteClientId = document.getElementById('noteClientId');
             if(noteClientId) noteClientId.value = clientId;
+            document.getElementById('noteAttachmentInput').value = '';
+            pendingNoteAttachment = null;
+            pendingNoteAttachmentType = null;
             window.openModal('noteModal');
         };
         
@@ -3061,6 +3167,23 @@
             });
         }
 
+        let pendingNoteAttachment = null;
+        let pendingNoteAttachmentType = null;
+        const noteAttachInput = document.getElementById('noteAttachmentInput');
+        if(noteAttachInput) {
+            noteAttachInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                if(file.size > 1024 * 1024) { showToast('الملف كبير جداً! الحد الأقصى 1MB', 'warning'); e.target.value = ''; return; }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    pendingNoteAttachment = ev.target.result;
+                    pendingNoteAttachmentType = file.type;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
         const noteForm = document.getElementById('noteForm');
         if(noteForm) {
             noteForm.addEventListener('submit', async (e) => {
@@ -3074,19 +3197,28 @@
                     const clientDoc = globalCRM.find(c => c.id === cId);
                     if(clientDoc) {
                         const updatedNotes = clientDoc.notes || [];
-                        updatedNotes.push({
+                        const newNote = {
                             authorId: currentUserData.uid,
                             authorName: currentUserData.name,
                             text: text,
                             timestamp: Date.now()
-                        });
+                        };
+                        
+                        if(pendingNoteAttachment) {
+                            newNote.attachmentData = pendingNoteAttachment;
+                            newNote.attachmentType = pendingNoteAttachmentType || 'unknown';
+                        }
+                        
+                        updatedNotes.push(newNote);
                         
                         const updates = { notes: updatedNotes };
                         if(newFollowUp) updates.nextFollowUp = newFollowUp;
 
                         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'clients', cId), updates);
                         window.closeModal('noteModal');
-                        showToast('تم إضافة الملاحظة', 'success');
+                        showToast('تم إضافة الملاحظة بنجاح', 'success');
+                        pendingNoteAttachment = null;
+                        pendingNoteAttachmentType = null;
                     }
                 } catch(e) { console.error(e); }
             });
@@ -3156,7 +3288,7 @@
                 let notesHtml = '';
                 if(c.notes && c.notes.length > 0) {
                     c.notes.forEach(note => {
-                        const canViewNotes = currentUserData.role === 'CEO' || currentUserData.permissions?.canCRM || note.authorId === currentUserData.uid;
+                        const canViewNotes = currentUserData.role === 'CEO' || currentUserData.permissions?.canCRM || note.authorId === currentUserData.uid || (c.visibleTo && c.visibleTo.includes(currentUserData.uid)) || (c.visibleTo && c.visibleTo.includes('all'));
                         if(canViewNotes) {
                             let noteActionsHtml = '';
                             if(currentUserData.role === 'CEO' || note.authorId === currentUserData.uid) {
@@ -3168,11 +3300,21 @@
                                 `;
                             }
                             
+                            let attHtml = '';
+                            if(note.attachmentData) {
+                                if(note.attachmentType && note.attachmentType.startsWith('image/')) {
+                                    attHtml = `<img src="${window.escapeHTML(note.attachmentData)}" class="mt-2 rounded-lg max-w-[150px] border dark:border-gray-600 cursor-pointer" onclick="window.openMedia('${window.escapeHTML(note.attachmentData)}', '${window.escapeHTML(note.attachmentType)}')">`;
+                                } else {
+                                    attHtml = `<a href="${window.escapeHTML(note.attachmentData)}" download="مرفق_ملاحظة" class="inline-block mt-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-[10px] px-2 py-1 rounded transition hover:bg-gray-300 dark:hover:bg-gray-500"><i class="fa-solid fa-download mx-1"></i> تحميل الملف</a>`;
+                                }
+                            }
+                            
                             notesHtml += `
                                 <div class="bg-gray-50 dark:bg-gray-700 p-2 rounded mb-2 text-xs border border-gray-100 dark:border-gray-600 flex justify-between items-start">
                                     <div class="flex-1">
                                         <p class="font-bold text-gray-700 dark:text-gray-300">${window.escapeHTML(note.authorName)}: ${note.editedAt ? '<span class="text-[9px] text-gray-400 font-normal">(معدلة)</span>' : ''}</p>
                                         <p class="text-gray-600 dark:text-gray-400 mt-1 whitespace-pre-wrap leading-relaxed">${window.escapeHTML(note.text)}</p>
+                                        ${attHtml}
                                     </div>
                                     ${noteActionsHtml}
                                 </div>
@@ -3192,7 +3334,7 @@
 
                 const avatar = c.logoUrl ? `<img src="${window.escapeHTML(c.logoUrl)}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=00839b&color=fff'" class="w-10 h-10 rounded-full object-cover border-2 border-gray-200">` : `<div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">${window.escapeHTML(c.name.charAt(0))}</div>`;
                 const followUpHtml = c.nextFollowUp ? `<p class="text-xs font-bold text-orange-500 mt-2"><i class="fa-regular fa-calendar-check"></i> المتابعة القادمة: ${new Date(c.nextFollowUp).toLocaleDateString('ar-EG')}</p>` : '';
-                const timestampHtml = `<p class="text-[10px] text-gray-400 mt-1">تاريخ الإضافة: ${new Date(c.timestamp).toLocaleDateString('ar-EG')}</p>`;
+                const timestampHtml = `<p class="text-[10px] text-gray-400 mt-1">تاريخ الإضافة: ${new Date(c.timestamp).toLocaleString('ar-EG')}</p>`;
 
                 const isCreatorOrAdmin = currentUserData.role === 'CEO' || currentUserData.permissions?.canCRM || c.addedById === currentUserData.uid || (c.visibleTo && c.visibleTo.includes(currentUserData.uid)) || (c.visibleTo && c.visibleTo.includes('all'));
 
@@ -3242,6 +3384,24 @@
                 `;
             });
         }
+
+        window.approveEmployee = async (uid) => {
+            if (currentUserData.role !== 'CEO') return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: 'active' });
+                showToast('تم قبول الموظف بنجاح', 'success');
+            } catch(e) { console.error(e); }
+        };
+
+        window.rejectEmployee = async (uid) => {
+            if (currentUserData.role !== 'CEO') return;
+            if(confirm('هل أنت متأكد من رفض طلب الانضمام هذا؟ سيتم حظر دخوله للنظام.')) {
+                try {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', uid), { status: 'rejected' });
+                    showToast('تم رفض الموظف', 'success');
+                } catch(e) { console.error(e); }
+            }
+        };
 
         window.openModal = (id) => {
             const el = document.getElementById(id);
@@ -3398,8 +3558,13 @@
             let targetSection = hash || 'home-grid';
             
             if (currentUserData.role !== 'CEO') {
-                if (['dashboard', 'employees', 'logs'].includes(targetSection)) {
-                    targetSection = 'home-grid';
+                if (['dashboard', 'employees', 'logs'].includes(targetSection) && !currentUserData.permissions?.canAssignTasks && !currentUserData.permissions?.canExpenses && !currentUserData.permissions?.canCRM && !currentUserData.permissions?.canNotices) {
+                    // Check if employee has any permission that allows viewing the employees section
+                    if (targetSection === 'employees' && (currentUserData.permissions?.canAssignTasks || currentUserData.permissions?.canExpenses || currentUserData.permissions?.canCRM || currentUserData.permissions?.canNotices)) {
+                        // Allowed
+                    } else {
+                        targetSection = 'home-grid';
+                    }
                 }
             }
 
@@ -3616,7 +3781,7 @@
 
         window.updateDashboardStats = () => {
             const statEmp = document.getElementById('stat-employees');
-            if(statEmp) statEmp.innerText = globalUsers.length;
+            if(statEmp) statEmp.innerText = globalUsers.filter(u => u.status !== 'pending' && u.status !== 'rejected').length;
             
             const statTasks = document.getElementById('stat-tasks');
             if(statTasks) statTasks.innerText = globalTasks.length;
@@ -3710,11 +3875,45 @@
 
         function renderEmployees() {
             const list = document.getElementById('employeesList');
+            const pendingList = document.getElementById('pendingEmployeesList');
+            const pendingContainer = document.getElementById('pendingEmployeesContainer');
+            
             if(!list) return;
             const isCEO = currentUserData && currentUserData.role === 'CEO';
             list.innerHTML = '';
             
-            globalUsers.forEach(emp => {
+            if (pendingList && pendingContainer) {
+                pendingList.innerHTML = '';
+                const pendingUsers = globalUsers.filter(u => u.status === 'pending');
+                
+                if (isCEO && pendingUsers.length > 0) {
+                    pendingContainer.classList.remove('hidden');
+                    pendingUsers.forEach(emp => {
+                        pendingList.innerHTML += `
+                            <tr class="hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">
+                                <td class="p-3 md:p-4 flex items-center gap-3">
+                                    <img src="${window.escapeHTML(emp.photoURL)}" class="w-8 h-8 rounded-full object-cover">
+                                    <div>
+                                        <p class="font-bold text-gray-800 dark:text-gray-200 text-sm">${window.escapeHTML(emp.name)}</p>
+                                        <p class="text-[10px] text-gray-500">${window.escapeHTML(emp.email)}</p>
+                                    </div>
+                                </td>
+                                <td class="p-3 md:p-4 text-orange-600 dark:text-orange-400 font-bold text-xs md:text-sm">${window.escapeHTML(emp.role)}</td>
+                                <td class="p-3 md:p-4 whitespace-nowrap text-left">
+                                    <button onclick="window.approveEmployee('${emp.id}')" class="bg-green-500 text-white px-3 py-1.5 rounded font-bold text-xs shadow-sm hover:bg-green-600 transition mx-1"><i class="fa-solid fa-check mx-1"></i> قبول</button>
+                                    <button onclick="window.rejectEmployee('${emp.id}')" class="bg-red-500 text-white px-3 py-1.5 rounded font-bold text-xs shadow-sm hover:bg-red-600 transition"><i class="fa-solid fa-xmark mx-1"></i> رفض</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                } else if (pendingContainer) {
+                    pendingContainer.classList.add('hidden');
+                }
+            }
+            
+            const activeUsers = globalUsers.filter(u => u.status !== 'pending' && u.status !== 'rejected');
+
+            activeUsers.forEach(emp => {
                 let actionsHtml = '';
                 if(isCEO && emp.id !== currentUserData.uid) { 
                     actionsHtml = `
@@ -3752,7 +3951,7 @@
                 list.innerHTML = '';
                 
                 globalUsers.forEach(u => {
-                    if(u.role !== 'CEO') {
+                    if(u.role !== 'CEO' && u.status !== 'pending' && u.status !== 'rejected') {
                         list.innerHTML += `
                             <div id="ceo-emp-item-${u.id}" onclick="window.renderCeoEmployeeTasks('${u.id}', '${window.escapeHTML(u.name.replace(/'/g, "\\'"))}')" class="ceo-emp-item p-3 hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 transition">
                                 <img src="${window.escapeHTML(u.photoURL)}" class="w-10 h-10 rounded-full object-cover">
@@ -3906,7 +4105,9 @@
             if (isCEO || canAssign) {
                 select.innerHTML = '<option value="">-- ' + t('اختر موظف') + ' --</option>';
                 globalUsers.forEach(emp => {
-                    select.innerHTML += `<option value="${emp.id}">${window.escapeHTML(emp.name)} (${window.escapeHTML(emp.role)})</option>`;
+                    if (emp.status !== 'pending' && emp.status !== 'rejected') {
+                        select.innerHTML += `<option value="${emp.id}">${window.escapeHTML(emp.name)} (${window.escapeHTML(emp.role)})</option>`;
+                    }
                 });
                 select.disabled = false;
             } else {
@@ -5023,14 +5224,19 @@
                 if(newCeoSelect) {
                     newCeoSelect.innerHTML = '<option value="">-- اختر موظف ليصبح مديراً --</option>';
                     globalUsers.forEach(u => {
-                        if(u.id !== currentUserData.uid && u.role !== 'CEO') {
+                        if(u.id !== currentUserData.uid && u.role !== 'CEO' && u.status !== 'pending' && u.status !== 'rejected') {
                             newCeoSelect.innerHTML += `<option value="${u.id}">${window.escapeHTML(u.name)} (${window.escapeHTML(u.role)})</option>`;
                         }
                     });
                 }
+                
+                const passwordSection = document.getElementById('systemPasswordSettings');
+                if(passwordSection) passwordSection.classList.remove('hidden');
             } else {
                 const transferSection = document.getElementById('transferCEOSection');
                 if(transferSection) transferSection.classList.add('hidden');
+                const passwordSection = document.getElementById('systemPasswordSettings');
+                if(passwordSection) passwordSection.classList.add('hidden');
             }
         }
 
@@ -5279,6 +5485,17 @@
                         currentUserData = docSnap.data();
                         groupReadTimestamps = currentUserData.readReceipts || {};
                         
+                        if(currentUserData.status === 'pending') {
+                            document.getElementById('pendingApprovalScreen').classList.remove('hidden');
+                            return;
+                        }
+                        
+                        if(currentUserData.status === 'rejected') {
+                            showToast('تم رفض طلب انضمامك للنظام. يرجى مراجعة الإدارة.', 'error');
+                            setTimeout(() => { window.location.reload(); }, 3000);
+                            return;
+                        }
+                        
                         if(!currentUserData.notificationPreferences) currentUserData.notificationPreferences = { email: true, push: true };
                         
                         if(currentUserData.lastSystemExport) {
@@ -5298,8 +5515,8 @@
                         document.getElementById('setupProfileScreen').classList.remove('hidden');
                     }
                 } catch(e) { 
+                    // Silent catch to prevent disruptive alerts on load if network issues occur momentarily
                     console.error("Error fetching user data:", e); 
-                    showToast('حدث خطأ في قراءة بياناتك، يرجى تحديث الصفحة', 'error');
                 }
             } else {
                 localStorage.removeItem('quill_user_cache_main');
@@ -5317,9 +5534,13 @@
             const role = document.getElementById('setupRole').value;
             try {
                 const newUserData = {
-                    name: window.escapeHTML(name), role: window.escapeHTML(role), uid: currentUserAuth.uid, email: currentUserAuth.email || 'no-email@company.com', 
+                    name: window.escapeHTML(name), 
+                    role: window.escapeHTML(role), 
+                    uid: currentUserAuth.uid, 
+                    email: currentUserAuth.email || 'no-email@company.com', 
                     photoURL: currentUserAuth.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00839b&color=fff`,
                     readReceipts: {}, chatLayout: 'media-top', chatColor: 'bg-[#00839b]', lastActive: Date.now(), timestamp: Date.now(),
+                    status: 'pending', // Requires admin approval
                     permissions: {
                         canAssignTasks: false, canExpenses: false, canCRM: false, canNotices: false, canGroups: false
                     }
@@ -5329,7 +5550,7 @@
                 groupReadTimestamps = {};
                 
                 document.getElementById('setupProfileScreen').classList.add('hidden');
-                finishLoginSetup();
+                document.getElementById('pendingApprovalScreen').classList.remove('hidden');
             } catch(e) { console.error(e); }
         });
 
