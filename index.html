@@ -216,19 +216,13 @@ body.light-theme #loginView {
 }
 
 /* Preview Area */
-.preview-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
 .preview-area {
-    width: 216px;
-    height: 384px;
+    width: 100%;
+    aspect-ratio: 16/9;
     background-color: #000;
     position: relative;
     overflow: hidden;
     margin-bottom: 15px;
-    margin-top: 15px;
 }
 .media-box {
     position: absolute;
@@ -283,38 +277,27 @@ body.light-theme #loginView {
 .duration-value { color: white; font-weight: bold; }
 input[type=range] { width: 100%; accent-color: #00A878; }
 
-/* Media List (Horizontal Strip) */
-.media-list-wrapper {
-    width: 100%; overflow-x: auto; padding: 10px 0;
-}
+/* Media List */
 .media-list {
-    display: flex; flex-direction: row; gap: 8px; padding: 0 20px; width: max-content;
+    flex: 1; overflow-y: auto; padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px;
 }
 .media-item {
-    position: relative; width: 72px; height: 82px;
-    background-color: transparent; border-radius: 10px; border: 1px solid var(--border-color);
-    cursor: pointer; padding: 2px;
+    display: flex; align-items: center; gap: 12px; padding: 10px;
+    background-color: #111A22; border-radius: 12px; border: 1px solid #1F2A35; cursor: pointer;
 }
-.media-item.active { border-color: #00A878; background-color: rgba(0, 168, 120, 0.2); }
+.media-item.active { border-color: #00A878; background-color: rgba(0, 168, 120, 0.1); }
 .media-thumb {
-    width: 100%; height: 100%; border-radius: 8px; background-color: #000;
+    width: 60px; height: 60px; border-radius: 8px; background-color: #000;
     display: flex; align-items: center; justify-content: center; overflow: hidden; color: #8899A6;
 }
 .media-thumb img, .media-thumb video { width: 100%; height: 100%; object-fit: cover; }
-
-.media-dur-overlay {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 16px; background: rgba(0,0,0,0.7);
-    color: white; font-size: 10px; display: flex; align-items: center; justify-content: center;
-    border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;
-}
-.media-actions { position: absolute; top: -5px; right: -5px; }
+.media-info { flex: 1; }
+.media-name { font-size: 14px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;}
+.media-type { font-size: 12px; color: #8899A6; }
 .media-actions button {
-    background: rgba(180, 40, 40, 0.9); border: none; color: white;
-    width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; font-size: 14px; padding: 0;
+    background: none; border: none; color: white; padding: 8px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
 }
-.media-info { display: none; }
 .delete-btn { color: #E74C3C !important; }
 
 /* Modal & Loader */
@@ -475,22 +458,24 @@ input[type=range] { width: 100%; accent-color: #00A878; }
             <div class="menu-item" id="menuDeviceNameBtn">تغيير اسم الجهاز</div>
             <div class="menu-item" id="menuLogoutBtn" style="color: #ff4d4d;">تسجيل خروج</div>
         </div>
+            <div class="menu-item" id="menuThemeBtn">🌗 تغيير المظهر</div>
+            <div class="menu-item" id="menuDeviceNameBtn">📱 تعيين اسم المرسل</div>
+            <div class="menu-item" id="menuLogoutBtn" style="color: #ff4d4d;">🚪 تسجيل خروج</div>
+        </div>
 
         <!-- منطقة المعاينة وتعديل الأبعاد -->
-        <div class="preview-container">
-            <div class="preview-area" id="previewArea">
-                <div id="mediaBox" class="media-box" style="display: none;">
-                    <img id="imagePreview" style="display: none;" draggable="false" />
-                    <video id="videoPreview" loop muted style="display: none;"></video>
-                    <div id="urlPreview" style="display: none;" class="url-placeholder">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                        رابط ويب
-                    </div>
-                    <div class="resize-handle" id="resizeHandle"></div>
+        <div class="preview-area" id="previewArea">
+            <div id="mediaBox" class="media-box" style="display: none;">
+                <img id="imagePreview" style="display: none;" draggable="false" />
+                <video id="videoPreview" loop muted style="display: none;"></video>
+                <div id="urlPreview" style="display: none;" class="url-placeholder">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom:8px;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                    رابط ويب
                 </div>
-                <div id="emptyPreview" class="empty-preview">
-                    لا توجد وسائط محددة
-                </div>
+                <div class="resize-handle" id="resizeHandle"></div>
+            </div>
+            <div id="emptyPreview" class="empty-preview">
+                لا توجد وسائط محددة
             </div>
         </div>
 
@@ -510,17 +495,23 @@ input[type=range] { width: 100%; accent-color: #00A878; }
             </button>
             <input type="file" id="fileInput" accept="image/*,video/*" style="display: none;" multiple>
             
+            
+            
+            
+
             <button id="sendBtn" class="send-btn" style="flex: 1; min-width: 150px;">
                 إرسال للشاشة
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; vertical-align:middle;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
 
+        
+        
+        </div>
+
         <!-- قائمة الوسائط المحددة -->
-        <div class="media-list-wrapper">
-            <div class="media-list" id="mediaList">
-                <!-- سيتم إضافة العناصر هنا عبر الجافاسكريبت -->
-            </div>
+        <div class="media-list" id="mediaList">
+            <!-- سيتم إضافة العناصر هنا عبر الجافاسكريبت -->
         </div>
 
         <!-- طبقة التحميل -->
@@ -547,9 +538,9 @@ input[type=range] { width: 100%; accent-color: #00A878; }
         <div id="remoteModal" class="modal" style="display: none;">
             <div class="modal-content" style="max-width: 400px; width: 90%; text-align: center;">
                 <h3>التحكم في الشاشة (ريموت)</h3>
-                <div class="vol-control" style="display:flex; justify-content:center; gap:20px; margin: 20px 0;">
-                    <button class="dpad-btn" onclick="sendCommand('vol_down')" style="width:60px; height:50px;">🔉 -</button>
-                    <button class="dpad-btn" onclick="sendCommand('vol_up')" style="width:60px; height:50px;">🔊 +</button>
+                <div class="vol-control" style="margin: 20px 0;">
+                    <label>مستوى الصوت: <span id="volText">50%</span></label>
+                    <input type="range" id="volSlider" min="0" max="100" value="50" style="width:100%;">
                 </div>
                 <div class="dpad-grid" style="margin: 0 auto;">
                     <button class="dpad-btn" onclick="sendCommand('open_settings')">⚙️</button>
@@ -566,6 +557,8 @@ input[type=range] { width: 100%; accent-color: #00A878; }
                     <button id="closeRemoteBtn" class="btn-secondary" style="width: 100%;">إغلاق</button>
                 </div>
             </div>
+        </div>
+
         </div>
 
         <!-- نافذة تثبيت التطبيق -->
@@ -613,7 +606,6 @@ const secondaryAuth = secondaryApp.auth();
 let currentUserDoc = null;
 let screens = [];
 let selectedScreens = [];
-let screensModalMode = 'select';
 let selectedMedia = [];
 let selectedMediaIndex = -1;
 let deviceName = localStorage.getItem('deviceName') || "Web App";
@@ -702,19 +694,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('refreshScreensBtn').onclick = loadScreens;
+    
     document.getElementById('addMediaBtn').onclick = () => document.getElementById('fileInput').click();
     document.getElementById('fileInput').onchange = handleFileSelect;
     
-    document.getElementById('sendBtn').onclick = () => {
-        if (selectedMedia.length === 0) {
-            alert("الرجاء إضافة محتوى أولاً");
-            return;
-        }
-        screensModalMode = 'send';
-        document.getElementById('saveScreensBtn').innerText = "تأكيد الإرسال";
-        document.getElementById('screensModal').style.display = 'flex';
-        renderScreensList();
-    };
+    
+    
+    document.getElementById('sendBtn').onclick = sendToScreens;
     
     durationSlider.oninput = (e) => {
         durationLabel.innerText = e.target.value + 's';
@@ -731,13 +718,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const remoteModal = document.getElementById('remoteModal');
     
     document.getElementById('menuScreensBtn').onclick = () => {
-        screensModalMode = 'select';
-        document.getElementById('saveScreensBtn').innerText = "اختيار وعرض المحتوى";
         document.getElementById('sideMenu').classList.remove('open');
         screensModal.style.display = 'flex';
         renderScreensList();
     };
-
     document.getElementById('saveScreensBtn').onclick = () => {
         screensModal.style.display = 'none';
         // Extract selected
@@ -748,75 +732,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const sid = cb.getAttribute('data-id');
                 const sname = cb.getAttribute('data-name');
                 const slast = cb.getAttribute('data-last');
-                const sseen = cb.getAttribute('data-seen');
-                selectedScreens.push({ id: sid, name: sname, lastBatchId: slast, lastSeenAt: parseInt(sseen) });
+                selectedScreens.push({ id: sid, name: sname, lastBatchId: slast });
             }
         });
-        
-        if (screensModalMode === 'select') {
-            // Fetch last content if only 1 screen selected
-            if (selectedScreens.length === 1 && selectedScreens[0].lastBatchId) {
-                const screen = selectedScreens[0];
-                const overlay = document.getElementById('loadingOverlay');
-                document.getElementById('loadingText').innerText = 'جلب محتوى ' + screen.name + '...';
-                overlay.style.display = 'flex';
-                
-                db.collection("screen_content")
-                  .where("screenId", "==", screen.id)
-                  .where("batchId", "==", screen.lastBatchId)
-                  .get()
-                  .then(async snap => {
-                      if(!snap.empty) {
-                          selectedMedia = [];
-                          const docs = snap.docs.map(d => d.data());
-                          docs.sort((a, b) => (a.batchOrder || 0) - (b.batchOrder || 0));
-                          for (let d of docs) {
-                              const mt = d.mediaType;
-                              let url = "";
-                              if (mt === 'url') url = d.url;
-                              else if (d.storagePath) {
-                                  try { url = await storage.ref(d.storagePath).getDownloadURL(); } catch(e){}
-                              }
-                              selectedMedia.push({
-                                  file: null,
-                                  name: d.originalFileName || "ملف من الشاشة",
-                                  mimeType: mt === 'video' ? 'video/mp4' : (mt === 'url' ? 'url' : 'image/jpeg'),
-                                  mediaType: mt,
-                                  durationSeconds: d.durationSeconds || 15,
-                                  url: url,
-                                  existingStoragePath: d.storagePath,
-                                  layoutX: d.layoutX || 0, layoutY: d.layoutY || 0, layoutW: d.layoutW || 1, layoutH: d.layoutH || 1
-                              });
-                          }
-                          selectedMediaIndex = 0;
-                          refreshUI();
-                      }
-                      overlay.style.display = 'none';
-                  }).catch(e => {
-                      console.error(e);
-                      overlay.style.display = 'none';
-                  });
-            }
-        } else if (screensModalMode === 'send') {
-            if (selectedScreens.length === 0) {
-                alert("الرجاء اختيار شاشة واحدة على الأقل!");
-                return;
-            }
-            sendToScreens();
-        }
     };
-
+    
     document.getElementById('menuRemoteBtn').onclick = () => {
         document.getElementById('sideMenu').classList.remove('open');
-        if (selectedScreens.length === 0) {
-            alert("الرجاء اختيار شاشة أولاً من قائمة الروبوتات!");
-            return;
-        }
-        const now = Date.now();
-        const offline = selectedScreens.some(s => !s.lastSeenAt || (now - s.lastSeenAt > 3 * 60 * 1000));
-        if (offline) {
-            alert("تنبيه: الشاشة المحددة تبدو غير متصلة حالياً (Offline). قد لا تستجيب للتحكم المباشر!");
-        }
         remoteModal.style.display = 'flex';
     };
     document.getElementById('closeRemoteBtn').onclick = () => {
@@ -831,11 +753,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function applyTheme() {
     if (isDarkMode) document.body.classList.remove('light-theme');
     else document.body.classList.add('light-theme');
-}
-
-function updateThemeBtnText() {
-    const btn = document.getElementById('menuThemeBtn');
-    if(btn) btn.innerText = isDarkMode ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي";
 }
 
 // ================== نظام المصادقة والإدارة ==================
@@ -880,12 +797,16 @@ function setupAuthAndMenu() {
                 currentUserDoc = doc.data();
                 if (currentUserDoc.role === 'admin') {
                     document.getElementById('menuAdminBtn').style.display = 'block';
+                    
+                    
                 }
             } else {
                 // أول مستخدم يدخل سيكون الأدمن
                 currentUserDoc = { role: 'admin', email: user.email, screens: [] };
                 await db.collection('users').doc(user.uid).set(currentUserDoc);
                 document.getElementById('menuAdminBtn').style.display = 'block';
+                
+                
             }
             loadScreens();
         } else {
@@ -905,7 +826,11 @@ function setupAuthAndMenu() {
             sideMenu.classList.remove('open'); 
         }
     };
-    document.getElementById('menuThemeBtn').onclick = () => {
+    function updateThemeBtnText() {
+    const btn = document.getElementById('menuThemeBtn');
+    if(btn) btn.innerText = isDarkMode ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي";
+}
+document.getElementById('menuThemeBtn').onclick = () => {
         isDarkMode = !isDarkMode;
         localStorage.setItem('isDarkMode', isDarkMode);
         applyTheme(); updateThemeBtnText();
@@ -966,6 +891,10 @@ function setupAuthAndMenu() {
             msg.style.color = '#ff4d4d'; msg.innerText = "خطأ: " + e.message;
         }
     };
+    
+    // أزرار التجميد
+    
+    
 }
 
 async function loadAdminData() {
@@ -975,7 +904,7 @@ async function loadAdminData() {
     rList.innerHTML = '';
     sSnap.forEach(doc => {
         const name = doc.data().screenName || doc.id;
-        rList.innerHTML += '<label><input type="checkbox" class="admin-screen-cb" value="' + doc.id + '"> ' + name + '</label>';
+        rList.innerHTML += `<label><input type="checkbox" class="admin-screen-cb" value="${doc.id}"> ${name}</label>`;
     });
     
     const uList = document.getElementById('usersList');
@@ -985,10 +914,10 @@ async function loadAdminData() {
     uSnap.forEach(doc => {
         const d = doc.data();
         if(d.role === 'admin') return;
-        uList.innerHTML += '<div style="padding: 10px; border-bottom: 1px solid var(--border-color);">' +
-            '<strong>' + d.email + '</strong> <span style="color:var(--accent-color); font-size:12px;">(' + d.role + ')</span><br>' +
-            '<span style="font-size: 12px; color: var(--text-secondary);">شاشات: ' + (d.screens ? d.screens.join(', ') : 'لا يوجد') + '</span>' +
-        '</div>';
+        uList.innerHTML += `<div style="padding: 10px; border-bottom: 1px solid var(--border-color);">
+            <strong>${d.email}</strong> <span style="color:var(--accent-color); font-size:12px;">(${d.role})</span><br>
+            <span style="font-size: 12px; color: var(--text-secondary);">شاشات: ${d.screens ? d.screens.join(', ') : 'لا يوجد'}</span>
+        </div>`;
     });
 }
 
@@ -996,33 +925,28 @@ async function loadAdminData() {
 
 function loadScreens() {
     if(!currentUserDoc) return;
-    db.collection('screens').onSnapshot(snap => {
+    db.collection('screens').onSnapshot(async snap => {
         screens = [];
         for (let doc of snap.docs) {
             const sid = doc.id;
-            const data = doc.data();
-            const name = data.screenName || sid;
+            const name = doc.data().screenName || sid;
             if (currentUserDoc && currentUserDoc.role !== 'admin' && currentUserDoc.role !== 'user') {
                 if (!currentUserDoc.screens || !currentUserDoc.screens.includes(sid)) continue;
             }
             
-            let lastBatchId = data.lastBatchId || null;
-            let mt = data.lastMediaType || "";
-            let fname = data.lastFileName || "محتوى";
-            let sender = data.lastSenderName || "مجهول";
-            
-            let lastSeenAt = data.lastSeenAt ? data.lastSeenAt.toMillis() : 0;
-            let isOnline = (Date.now() - lastSeenAt) < 120000;
-            let statusDot = isOnline ? "🟢" : "🔴";
-            let icon = mt === "video" ? "🎬" : (mt === "image" ? "🖼️" : (mt === "url" ? "🌐" : "📄"));
-            
-            let lastContentText = "";
-            if (lastBatchId) {
-                lastContentText = statusDot + " " + icon + " " + fname + " - مِن: " + sender;
-            } else {
-                lastContentText = statusDot + " فارغ";
+            let lastBatchId = null;
+            let lastContentText = "فارغ";
+            const cSnap = await db.collection("screen_content").where("screenId", "==", sid).orderBy("createdAtDeviceTime", "desc").limit(1).get().catch(e => {
+                return db.collection("screen_content").where("screenId", "==", sid).limit(1).get();
+            });
+            if (!cSnap.empty) {
+                const cDoc = cSnap.docs[0].data();
+                lastBatchId = cDoc.batchId;
+                const mt = cDoc.mediaType;
+                const fname = cDoc.originalFileName || "غير معروف";
+                lastContentText = "يعرض الآن: " + (mt === "video" ? "🎬" : "🖼️") + " " + fname;
             }
-            screens.push({ id: sid, name: name, lastBatchId: lastBatchId, lastContentText: lastContentText, lastSeenAt: lastSeenAt });
+            screens.push({ id: sid, name: name, lastBatchId: lastBatchId, lastContentText: lastContentText });
         }
         
         // Ensure previously selected screens remain selected if they still exist
@@ -1051,13 +975,14 @@ function renderScreensList() {
         div.style.gap = '8px';
         
         div.innerHTML = 
-            '<div style="display: flex; align-items: center; justify-content: space-between;">' +
-                '<label style="cursor:pointer; display:flex; align-items:center; gap:10px; font-weight:bold; font-size:16px;">' +
-                    '<input type="checkbox" class="screen-checkbox" data-id="' + s.id + '" data-name="' + s.name + '" data-last="' + (s.lastBatchId || '') + '" data-seen="' + (s.lastSeenAt || 0) + '" ' + isChecked + ' style="width:20px; height:20px;">' +
-                    s.name +
-                '</label>' +
-            '</div>' +
-            '<div style="color: var(--accent-color); font-size: 14px; padding-right: 30px;">' + s.lastContentText + '</div>';
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="cursor:pointer; display:flex; align-items:center; gap:10px; font-weight:bold; font-size:16px;">
+                    <input type="checkbox" class="screen-checkbox" data-id="" data-name="" data-last=""  style="width:20px; height:20px;">
+                    
+                </label>
+            </div>
+            <div style="color: var(--accent-color); font-size: 14px; padding-right: 30px;"></div>
+        ;
         list.appendChild(div);
     });
 }
@@ -1081,6 +1006,26 @@ function handleFileSelect(e) {
     e.target.value = ''; // Reset
 }
 
+function handleAddUrl() {
+    let url = document.getElementById('urlInput').value.trim();
+    if(url) {
+        if(!url.startsWith('http')) url = 'https://' + url;
+        selectedMedia.push({
+            file: null,
+            name: "رابط ويب",
+            mimeType: "text/html",
+            mediaType: "url",
+            durationSeconds: 15,
+            url: url,
+            layoutX: 0.0, layoutY: 0.0, layoutW: 1.0, layoutH: 1.0
+        });
+        selectedMediaIndex = selectedMedia.length - 1;
+        document.getElementById('urlModal').style.display = 'none';
+        document.getElementById('urlInput').value = '';
+        refreshUI();
+    }
+}
+
 function refreshUI() {
     mediaList.innerHTML = '';
     selectedMedia.forEach((item, index) => {
@@ -1096,17 +1041,18 @@ function refreshUI() {
         if (item.mediaType === 'url') {
             thumb.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>';
         }
-        else if (item.mediaType === 'image') thumb.innerHTML = '<img src="' + item.url + '">';
-        else thumb.innerHTML = '<video src="' + item.url + '#t=1"></video>';
+        else if (item.mediaType === 'image') thumb.innerHTML = `<img src="${item.url}">`;
+        else thumb.innerHTML = `<video src="${item.url}#t=1"></video>`; // t=1 for thumb
         
-        const durOverlay = document.createElement('div');
-        durOverlay.className = 'media-dur-overlay';
-        durOverlay.innerText = item.durationSeconds + 's';
+        const info = document.createElement('div');
+        info.className = 'media-info';
+        info.innerHTML = `<div class="media-name">${item.name}</div><div class="media-type">${item.mediaType === 'url' ? 'رابط ويب' : (item.mediaType==='image'?'صورة':'فيديو')}</div>`;
         
         const actions = document.createElement('div');
         actions.className = 'media-actions';
         const delBtn = document.createElement('button');
-        delBtn.innerHTML = '×';
+        delBtn.className = 'delete-btn';
+        delBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
         delBtn.onclick = (e) => {
             e.stopPropagation();
             selectedMedia.splice(index, 1);
@@ -1116,7 +1062,7 @@ function refreshUI() {
         actions.appendChild(delBtn);
         
         div.appendChild(thumb);
-        div.appendChild(durOverlay);
+        div.appendChild(info);
         div.appendChild(actions);
         mediaList.appendChild(div);
     });
@@ -1277,7 +1223,8 @@ async function sendToScreens() {
         const firstBatch = selectedScreens[0].lastBatchId;
         const mismatch = selectedScreens.some(s => s.lastBatchId !== firstBatch);
         if (mismatch) {
-            const ok = confirm("الشاشات المحددة تعرض حالياً محتويات مختلفة عن بعضها.\nهل أنت متأكد أنك تريد إرسال هذا المحتوى واستبدال كل ما يعرضونه؟");
+            const ok = confirm("الشاشات المحددة تعرض حالياً محتويات مختلفة عن بعضها.
+هل أنت متأكد أنك تريد إرسال هذا المحتوى واستبدال كل ما يعرضونه؟");
             if (!ok) return;
         }
     }
@@ -1315,23 +1262,6 @@ async function sendToScreens() {
                         layoutX: item.layoutX, layoutY: item.layoutY,
                         layoutW: item.layoutW, layoutH: item.layoutH,
                         url: item.url
-                    });
-                } else if (item.existingStoragePath) {
-                    await db.collection("screen_content").doc(cid).set({
-                        screenId: s.id,
-                        storagePath: item.existingStoragePath,
-                        mediaType: item.mediaType,
-                        senderName: deviceName,
-                        status: "pending",
-                        originalFileName: item.name,
-                        durationSeconds: item.durationSeconds,
-                        batchId: batchId,
-                        batchOrder: i,
-                        batchTotal: batchTotal,
-                        replacePlaylist: true,
-                        createdAtDeviceTime: Date.now(),
-                        layoutX: item.layoutX, layoutY: item.layoutY,
-                        layoutW: item.layoutW, layoutH: item.layoutH
                     });
                 } else {
                     // Upload file
@@ -1390,7 +1320,16 @@ window.sendCommand = function(cmd) {
     });
 };
 
-// Volume controls are now buttons that send vol_up and vol_down commands
+document.addEventListener('DOMContentLoaded', () => {
+    const volSlider = document.getElementById('volSlider');
+    if (volSlider) {
+        volSlider.addEventListener('change', function(e) {
+            const val = e.target.value;
+            document.getElementById('volText').innerText = val + '%';
+            window.sendCommand('volume:' + (val / 100));
+        });
+    }
+});
 
 </script>
     <script>
